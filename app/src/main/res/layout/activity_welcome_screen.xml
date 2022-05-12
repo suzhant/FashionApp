@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".WelcomeScreen">
+
+    <ImageView
+        android:id="@+id/imgBoarding"
+        android:layout_width="wrap_content"
+        android:layout_height="500dp"
+        android:src="@drawable/successful_business_woman_final1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtBoarding"
+        android:layout_width="229dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/gilroy_bold"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:text="Choose What You Love"
+        android:textSize="36sp"
+        app:layout_constraintEnd_toEndOf="@+id/imgBoarding"
+        app:layout_constraintStart_toStartOf="@+id/imgBoarding"
+        app:layout_constraintTop_toBottomOf="@+id/imgBoarding" />
+
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="140dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="20dp"
+        android:fontFamily="@font/gilroy_medium"
+        android:text="Register"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textSize="18sp"
+        app:backgroundTint="@color/skyBlue"
+        app:layout_constraintBottom_toBottomOf="@+id/btnSingIn"
+        app:layout_constraintEnd_toStartOf="@+id/btnSingIn"
+        app:layout_constraintStart_toStartOf="@+id/txtBoarding"
+        app:layout_constraintTop_toTopOf="@+id/btnSingIn" />
+
+    <Button
+        android:id="@+id/btnSingIn"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="140dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="88dp"
+        android:fontFamily="@font/gilroy_medium"
+        android:text="Sign In"
+        android:textAllCaps="false"
+        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/txtBoarding"
+        app:layout_constraintStart_toEndOf="@+id/btnRegister"
+        app:layout_constraintTop_toBottomOf="@+id/txtBoarding"
+        app:strokeColor="@color/skyBlue" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
