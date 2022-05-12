@@ -1,50 +1,22 @@
 package com.sushant.fashionapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.telephony.PhoneNumberUtils;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
-import android.text.method.DateKeyListener;
-import android.text.method.DigitsKeyListener;
-import android.view.MenuItem;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
-import com.google.android.material.datepicker.CalendarConstraints;
-import com.google.android.material.datepicker.DateValidatorPointBackward;
-import com.google.android.material.datepicker.DateValidatorPointForward;
-import com.google.android.material.datepicker.MaterialCalendar;
-import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.Phonenumber;
 import com.sushant.fashionapp.databinding.ActivityRegisterBinding;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Month;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ActivityRegister extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
@@ -52,7 +24,6 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     String gender;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    boolean isDobValid=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +74,8 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         binding.btnCreateAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isFieldEmpty() | !isChecked() | !nameValidation() | !genderValidation() | !validateDOB() | !validatePhoneNumber()){
+                if (isFieldEmpty() |!validateRePass() |!validatePass() |!validateEmail() |!validatePhoneNumber()
+                        | !validateDOB() |!genderValidation() |!nameValidation()){
                     return;
                 }
 
@@ -111,27 +83,9 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
             }
         });
 
-        binding.edPhone.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        binding.cpp.registerCarrierNumberEditText(binding.edPhone);
 
-            }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                binding.ipPhoneNumber.setCounterEnabled(true);
-                if (charSequence.length()<10){
-                    binding.ipPhoneNumber.setCounterTextColor(ColorStateList.valueOf(getResources().getColor(R.color.red)));
-                }else {
-                    binding.ipPhoneNumber.setCounterTextColor(ColorStateList.valueOf(getResources().getColor(R.color.black)));
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
         binding.edDOB.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
@@ -152,19 +106,20 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String email=binding.edMail.getText().toString();
         String Password=binding.edPass.getText().toString();
         String Repass=binding.edRePass.getText().toString();
-        if (name.isEmpty() | Gender.isEmpty() | DOB.isEmpty() |PhoneNum.isEmpty()|email.isEmpty()|Password.isEmpty()|Repass.isEmpty()){
+        boolean check=binding.chkBox.isChecked();
+        if (!check | name.isEmpty() | Gender.isEmpty() | DOB.isEmpty() |PhoneNum.isEmpty()|email.isEmpty()|Password.isEmpty()|Repass.isEmpty()){
             binding.txtError.setVisibility(View.VISIBLE);
             binding.txtError.setText("Please fill all the fields");
             return true;
-        }else {
-            binding.txtError.setVisibility(View.GONE);
         }
+        binding.txtError.setVisibility(View.GONE);
         return false;
     }
 
     private boolean nameValidation(){
         String name=binding.edUserName.getText().toString();
         if (name.isEmpty()){
+            binding.ipUserName.requestFocus();
             binding.ipUserName.setErrorEnabled(true);
             binding.ipUserName.setError("Empty UserName!");
             return false;
@@ -174,23 +129,14 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         return true;
     }
 
-    private boolean isChecked(){
-        if (!binding.chkBox.isChecked()){
-            binding.txtError.setVisibility(View.VISIBLE);
-            binding.txtError.setText("Please check Terms and Services");
-            return false;
-        }
-        return binding.chkBox.isChecked();
-    }
-
     private boolean genderValidation(){
         String gender=binding.autoComplete.getText().toString();
         if (gender.isEmpty()){
+            binding.ipGender.requestFocus();
             binding.ipGender.setError("Empty Field!");
             return false;
-        }else {
-            binding.ipGender.setErrorEnabled(false);
         }
+        binding.ipGender.setErrorEnabled(false);
         return true;
     }
 
@@ -223,35 +169,70 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     private boolean validatePhoneNumber(){
         String phone=binding.edPhone.getText().toString();
         if (phone.isEmpty()){
+            binding.ipPhoneNumber.requestFocus();
             binding.ipPhoneNumber.setError("Empty Phone Number!");
             return false;
         }
-        if (phone.length()<10){
-            binding.ipPhoneNumber.setError("Length of the Phone Number Must be 10!");
-            return false;
-        }
 
-        if (!isNumberValid(phone)){
+        if (!binding.cpp.isValidFullNumber()){
+            binding.ipPhoneNumber.requestFocus();
             binding.ipPhoneNumber.setError("Invalid Phone Number!");
             return false;
         }
         binding.ipPhoneNumber.setErrorEnabled(false);
         return true;
     }
-
-    private boolean isNumberValid(String phone){
-        String countryCode="+977";
-        phone=countryCode+phone;
-        PhoneNumberUtil phoneNumberUtil=PhoneNumberUtil.getInstance();
-        try {
-            Phonenumber.PhoneNumber numberProto = phoneNumberUtil.parse(phone, "np");
-            return phoneNumberUtil.isValidNumber(numberProto);
-        } catch (NumberParseException e) {
-            System.err.println("NumberParseException was thrown: " + e.toString());
+    private boolean validateEmail(){
+        String email=binding.edMail.getText().toString();
+        if (email.isEmpty()){
+            binding.ipEmail.requestFocus();
+            binding.ipEmail.setError("Empty Email!");
+            return false;
         }
-        return false;
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            binding.ipEmail.requestFocus();
+            binding.ipEmail.setError("Invalid Email Address!");
+            return false;
+        }
+        binding.ipEmail.setErrorEnabled(false);
+        return true;
     }
 
+    private boolean validatePass(){
+        String pass=binding.edPass.getText().toString();
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=\\S+$).{8,20}$";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(pass);
+        if (pass.isEmpty()){
+            binding.ipPass.requestFocus();
+            binding.ipPass.setError("Empty Password!");
+            return false;
+        }
+        if (!m.matches()) {
+            binding.ipPass.requestFocus();
+            binding.ipPass.setError("Password should contain minimum 8 character,at least 1 letter and 1 number ");
+            return false;
+        }
+        binding.ipPass.setErrorEnabled(false);
+        return true;
+    }
+
+    private boolean validateRePass(){
+        String RePass=binding.edRePass.getText().toString();
+        String pass=binding.edPass.getText().toString();
+        if (RePass.isEmpty()){
+            binding.ipRePass.requestFocus();
+            binding.ipRePass.setError("Empty Field!");
+            return false;
+        }
+        if (!RePass.equals(pass)){
+            binding.ipRePass.requestFocus();
+            binding.ipRePass.setError("Password doesn't match!");
+            return false;
+        }
+        binding.ipRePass.setErrorEnabled(false);
+        return true;
+    }
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {

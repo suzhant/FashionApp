@@ -48,6 +48,6 @@ dependencies {
     //datepicker
     implementation 'com.wdullaer:materialdatetimepicker:4.2.3'
 
-    //phone number validation
-    implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.4.2'
+    //country code picker
+    implementation 'com.hbb20:ccp:2.6.0'
 }
