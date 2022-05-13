@@ -1,10 +1,10 @@
 package com.sushant.fashionapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.sushant.fashionapp.databinding.ActivityWelcomeScreenBinding;
 
@@ -17,7 +17,7 @@ public class WelcomeScreen extends AppCompatActivity {
         binding=ActivityWelcomeScreenBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        getSupportActionBar().hide();
+        //  getSupportActionBar().hide();
 
         binding.btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override

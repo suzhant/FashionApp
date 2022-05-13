@@ -1,14 +1,12 @@
 package com.sushant.fashionapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.sushant.fashionapp.databinding.ActivityOnBoardingBinding;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Objects;
+import com.sushant.fashionapp.databinding.ActivityOnBoardingBinding;
 
 public class OnBoarding extends AppCompatActivity {
 
@@ -19,7 +17,7 @@ public class OnBoarding extends AppCompatActivity {
         binding=ActivityOnBoardingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        // Objects.requireNonNull(getSupportActionBar()).hide();
         binding.fabNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

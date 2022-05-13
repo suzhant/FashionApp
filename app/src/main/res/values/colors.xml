@@ -11,6 +11,9 @@
     <color name="hintColor">#808080</color>
     <color name="boxColor">#C7CBFB</color>
     <color name="red">#B00020</color>
-    
-    <color name="mtrl_textinput_default_box_stroke_color" tools:overide="true">@color/boxColor</color>
+    <color name="tea_900">#004D40</color>
+    <color name="teal_100">#B2DFDB</color>
+
+    <color name="mtrl_textinput_default_box_stroke_color" tools:overide="true">@color/hintColor
+    </color>
 </resources>

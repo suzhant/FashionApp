@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ActivitySignIn">
+    tools:context=".ActivityForgotPass">
 
     <ImageView
         android:id="@+id/btnBack"
@@ -27,7 +27,7 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="111dp"
         android:fontFamily="@font/gilroy_bold"
-        android:text="Login"
+        android:text="Forgot Password"
         android:textSize="32sp"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,10 +39,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/open_sans"
-        android:text="Welcome back ! Please login to your account."
+        android:text="Enter your email to reset Password"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.252"
+        app:layout_constraintHorizontal_bias="0.166"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -78,31 +78,9 @@
                 android:textColor="@color/black" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ipPass"
-            style="@style/Widget.App.TextInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:hint="Password"
-            android:textColorHint="@color/hintColor"
-            app:boxStrokeColor="@color/skyBlue"
-            app:endIconMode="password_toggle"
-            app:hintTextColor="@color/black">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edPass"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:inputType="textPassword|textWebPassword"
-                android:textColor="@color/black" />
-        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnSingIn"
+            android:id="@+id/btnResetPass"
             android:layout_width="match_parent"
             android:layout_height="61dp"
             android:layout_gravity="center_horizontal"
@@ -110,56 +88,13 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:fontFamily="@font/open_sans"
-            android:text="Sign In"
             android:textStyle="bold"
+            android:text="Reset Password"
             android:textAllCaps="false"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:backgroundTint="@color/skyBlue"
             app:cornerRadius="8dp" />
-
-        <TextView
-            android:id="@+id/txtForgotPass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Forgot Password"
-            android:layout_marginTop="20dp"
-            android:textColor="@color/hintColor"
-            android:layout_gravity="center" />
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:orientation="horizontal"
-        android:gravity="center_horizontal"
-        android:padding="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/open_sans"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:text="Don't have an account?" />
-
-        <TextView
-            android:id="@+id/txtCreateAcc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/open_sans"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginStart="5dp"
-            android:textColor="@color/skyBlue"
-            android:text="Create one" />
-
-    </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

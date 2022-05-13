@@ -1,13 +1,11 @@
 package com.sushant.fashionapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import java.util.Objects;
+import androidx.appcompat.app.AppCompatActivity;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashScreen extends AppCompatActivity {
@@ -17,7 +15,7 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
 
-        Objects.requireNonNull(getSupportActionBar()).hide();
+        //  Objects.requireNonNull(getSupportActionBar()).hide();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

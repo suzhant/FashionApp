@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">FashionApp</string>
-    
+
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
