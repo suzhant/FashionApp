@@ -96,5 +96,14 @@
             android:textSize="16sp"
             app:backgroundTint="@color/skyBlue"
             app:cornerRadius="8dp" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/circularProgressIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="61dp"
+            android:layout_marginTop="40dp"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

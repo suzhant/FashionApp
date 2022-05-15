@@ -1,16 +1,22 @@
 package com.sushant.fashionapp;
 
-import android.app.ProgressDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -38,27 +44,35 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     String gender;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    ProgressDialog dialog;
+    Dialog dialog;
+    LottieAnimationView lottieAnimationView;
+    Button btnLogin;
+    ImageView imgClose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivityRegisterBinding.inflate(getLayoutInflater());
+        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // getSupportActionBar().hide();
-        auth=FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        dialog = new ProgressDialog(this);
+        dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.progress_dialog);
+        lottieAnimationView = dialog.findViewById(R.id.lottie_create);
+        btnLogin = dialog.findViewById(R.id.btnLogin);
+        imgClose = dialog.findViewById(R.id.imgClose);
 
         //setting gender adapter for dropdown menu
-        String[] genders= getResources().getStringArray(R.array.gender);
-        binding.autoComplete.setAdapter(new ArrayAdapter<String>(getApplicationContext(),R.layout.drop_down_items,genders));
+        String[] genders = getResources().getStringArray(R.array.gender);
+        binding.autoComplete.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, genders));
 
         binding.autoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                gender=binding.autoComplete.getText().toString();
+                gender = binding.autoComplete.getText().toString();
             }
         });
 
@@ -99,9 +113,8 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                     return;
                 }
 
-                dialog.setTitle("Registration");
-                dialog.setMessage("Creating Your Account");
-                dialog.show();
+                binding.btnCreateAcc.setVisibility(View.GONE);
+                binding.circularProgressIndicator.setVisibility(View.VISIBLE);
                 String name = binding.edUserName.getText().toString();
                 String DOB = binding.edDOB.getMasked();
                 String PhoneNum = binding.edPhone.getText().toString().trim();
@@ -111,15 +124,17 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                dialog.dismiss();
+                                // dialog.dismiss();
+                                binding.circularProgressIndicator.setVisibility(View.GONE);
+                                binding.btnCreateAcc.setVisibility(View.VISIBLE);
                                 if (task.isSuccessful()) {
+                                    showCreatingDialog();
                                     FirebaseUser users = auth.getCurrentUser();
                                     Users user = new Users(name, email, gender, DOB, PhoneNum);
                                     String id = task.getResult().getUser().getUid();
                                     user.setUserId(id);
                                     database.getReference().child("Users").child(id).setValue(user);
                                     resetAllFields();
-                                    Toast.makeText(ActivityRegister.this, "User created successfully", Toast.LENGTH_SHORT).show();
                                     assert users != null;
                                     users.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -159,6 +174,21 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                 if (b) {
                     binding.ipDOB.setErrorEnabled(false);
                 }
+            }
+        });
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ActivityRegister.this, ActivitySignIn.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+            }
+        });
+
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
             }
         });
 
@@ -345,5 +375,14 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     private boolean isOnline() {
         CheckConnection checkConnection = new CheckConnection();
         return !checkConnection.isConnected(getApplicationContext()) || checkConnection.isInternet();
+    }
+
+
+    private void showCreatingDialog() {
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.CENTER);
+
     }
 }

@@ -10,4 +10,9 @@
     <style name="prefix" parent="Base.TextAppearance.AppCompat.Body2">
         <item name="android:textSize">14sp</item>
     </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/bottom_up</item>
+        <item name="android:windowExitAnimation">@anim/bottom_down</item>
+    </style>
 </resources>
