@@ -1,16 +1,19 @@
 package com.sushant.fashionapp;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -48,6 +51,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     LottieAnimationView lottieAnimationView;
     Button btnLogin;
     ImageView imgClose;
+    TextView txtVerification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         lottieAnimationView = dialog.findViewById(R.id.lottie_create);
         btnLogin = dialog.findViewById(R.id.btnLogin);
         imgClose = dialog.findViewById(R.id.imgClose);
+        txtVerification = dialog.findViewById(R.id.txtVerification);
 
         //setting gender adapter for dropdown menu
         String[] genders = getResources().getStringArray(R.array.gender);
@@ -97,7 +102,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finishAfterTransition();
+                onBackPressed();
             }
         });
 
@@ -112,7 +117,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                         | !validateDOB() | !genderValidation() | !nameValidation()) {
                     return;
                 }
-
+                hideSoftKeyboard();
                 binding.btnCreateAcc.setVisibility(View.GONE);
                 binding.circularProgressIndicator.setVisibility(View.VISIBLE);
                 String name = binding.edUserName.getText().toString();
@@ -139,7 +144,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                     users.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
-                                            Toast.makeText(getApplicationContext(), "Verification link sent to " + users.getEmail(), Toast.LENGTH_SHORT).show();
+                                            // Toast.makeText(getApplicationContext(), "Verification link sent to " + users.getEmail(), Toast.LENGTH_SHORT).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
@@ -167,12 +172,13 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
             }
         });
 
-
         binding.edDOB.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean b) {
                 if (b) {
-                    binding.ipDOB.setErrorEnabled(false);
+                    binding.edDOB.setHint("dd/mm/yyyy");
+                } else {
+                    binding.edDOB.setHint("");
                 }
             }
         });
@@ -180,8 +186,12 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (auth.getCurrentUser() != null) {
+                    auth.signOut();
+                }
                 startActivity(new Intent(ActivityRegister.this, ActivitySignIn.class));
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
             }
         });
 
@@ -383,6 +393,31 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         dialog.show();
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.CENTER);
+        txtVerification.setText("Please verify your account at " + binding.edMail.getText());
+    }
 
+    public void hideSoftKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (auth.getCurrentUser() != null) {
+            auth.signOut();
+        }
+        finishAfterTransition();
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (auth.getCurrentUser() != null) {
+            auth.signOut();
+        }
+        super.onDestroy();
     }
 }

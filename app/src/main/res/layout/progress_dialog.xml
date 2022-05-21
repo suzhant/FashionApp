@@ -26,6 +26,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lottie_create" />
 
+    <TextView
+        android:id="@+id/txtVerification"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Please verify your account at sushantshrestha62@gmail.com"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/txtCreate"
+        app:layout_constraintTop_toBottomOf="@+id/txtCreate" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
         android:layout_width="140dp"
@@ -33,14 +44,14 @@
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:fontFamily="@font/open_sans"
-        android:textStyle="bold"
         android:text="Sign In"
         android:textAllCaps="false"
+        android:textStyle="bold"
         app:backgroundTint="@color/skyBlue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtCreate" />
+        app:layout_constraintTop_toBottomOf="@+id/txtVerification" />
 
     <ImageView
         android:id="@+id/imgClose"

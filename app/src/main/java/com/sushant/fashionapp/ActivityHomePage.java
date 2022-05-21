@@ -1,15 +1,22 @@
 package com.sushant.fashionapp;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
+import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
+import com.sushant.fashionapp.fragments.AccountFragment;
+import com.sushant.fashionapp.fragments.CartFragment;
+import com.sushant.fashionapp.fragments.HomeFragment;
+import com.sushant.fashionapp.fragments.WishListFragment;
+
 
 public class ActivityHomePage extends AppCompatActivity {
 
@@ -26,15 +33,56 @@ public class ActivityHomePage extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        binding.btnSignOut.setOnClickListener(new View.OnClickListener() {
+        replaceFragment(new HomeFragment());
+
+//        binding.bottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
+//            @Override
+//            public boolean onItemSelect(int i) {
+//
+//                switch (i){
+//                    case 0:
+//                        replaceFragment(new HomeFragment());
+//                        break;
+//                    case 1:
+//                        replaceFragment(new WishListFragment());
+//                        break;
+//                    case 2:
+//                        replaceFragment(new CartFragment());
+//                        break;
+//                    case 3:
+//                        replaceFragment(new AccountFragment());
+//                        break;
+//                }
+//                return false;
+//            }
+//        });
+
+        binding.bottomNavigation.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                auth.signOut();
-                Intent intentLogout = new Intent(getApplicationContext(), WelcomeScreen.class);
-                intentLogout.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intentLogout);
-                Toast.makeText(getApplicationContext(), "Logged Out", Toast.LENGTH_SHORT).show();
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.page_1:
+                        replaceFragment(new HomeFragment());
+                        break;
+                    case R.id.page_2:
+                        replaceFragment(new WishListFragment());
+                        break;
+                    case R.id.page_3:
+                        replaceFragment(new CartFragment());
+                        break;
+                    case R.id.page_4:
+                        replaceFragment(new AccountFragment());
+                        break;
+
+                }
+                return true;
             }
         });
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frmLayout, fragment);
+        transaction.commit();
     }
 }

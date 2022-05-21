@@ -8,4 +8,6 @@
     </string-array>
 
     <string name="Policy">I agree to the <font color="#09AEA3"><u> Terms and Conditions</u></font> and  <font color="#09AEA3"><u>Privacy Policy</u></font></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

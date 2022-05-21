@@ -1,0 +1,77 @@
+package com.sushant.fashionapp.Adapters;
+
+import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.sushant.fashionapp.ActivityProductDetails;
+import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.R;
+
+import java.util.ArrayList;
+
+public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> {
+
+    ArrayList<Product> products;
+    Context context;
+
+    public CardAdapters(ArrayList<Product> products, Context context) {
+        this.products = products;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_product_layout, parent, false);
+        return new viewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull viewHolder holder, int position) {
+        Product product = products.get(position);
+        Glide.with(context).load(product.getpPic()).placeholder(R.drawable.avatar).into(holder.productImg);
+        holder.productName.setText(product.getpName());
+        holder.productPrice.setText("Rs " + product.getpPrice());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ActivityProductDetails.class);
+                intent.putExtra("pPic", product.getpPic());
+                intent.putExtra("pName", product.getpName());
+                intent.putExtra("pPrice", product.getpPrice());
+                intent.putExtra("pId", product.getpId());
+                context.startActivity(intent);
+            }
+        });
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return products.size();
+    }
+
+    public static class viewHolder extends RecyclerView.ViewHolder {
+
+        private ShapeableImageView productImg;
+        private TextView productName;
+        private TextView productPrice;
+
+        public viewHolder(@NonNull View itemView) {
+            super(itemView);
+            productImg = itemView.findViewById(R.id.imgProductPic);
+            productName = itemView.findViewById(R.id.txtProductName);
+            productPrice = itemView.findViewById(R.id.txtProductPrice);
+        }
+    }
+}

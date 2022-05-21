@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,7 +65,6 @@ public class ActivityForgotPass extends AppCompatActivity {
                             binding.btnResetPass.setVisibility(View.VISIBLE);
                             Objects.requireNonNull(binding.edMail.getText()).clear();
                             showEmailDialog();
-                            Toast.makeText(getApplicationContext(), "Check your email", Toast.LENGTH_SHORT).show();
                         } else {
                             binding.circularProgressIndicator.setVisibility(View.GONE);
                             binding.btnResetPass.setVisibility(View.VISIBLE);
