@@ -1,6 +1,9 @@
 package com.sushant.fashionapp;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -8,9 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
 import com.sushant.fashionapp.fragments.AccountFragment;
 import com.sushant.fashionapp.fragments.CartFragment;
@@ -84,5 +89,44 @@ public class ActivityHomePage extends AppCompatActivity {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frmLayout, fragment);
         transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            logoutDialog();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void logoutDialog() {
+        if (CheckConnection.isOnline(ActivityHomePage.this)) {
+            new MaterialAlertDialogBuilder(this, R.style.RoundShapeTheme)
+                    .setMessage("Do you want to logout?")
+                    .setTitle("Logout")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            startActivity(new Intent(getApplicationContext(), ActivitySignIn.class));
+                            auth.signOut();
+                            finishAfterTransition();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).show();
+        } else {
+            CheckConnection.showCustomDialog(ActivityHomePage.this);
+        }
     }
 }

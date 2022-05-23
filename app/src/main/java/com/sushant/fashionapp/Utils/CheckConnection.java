@@ -2,8 +2,10 @@ package com.sushant.fashionapp.Utils;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.Settings;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.sushant.fashionapp.R;
@@ -11,6 +13,7 @@ import com.sushant.fashionapp.R;
 import java.io.IOException;
 
 public class CheckConnection {
+
     public boolean isConnected(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -37,23 +40,21 @@ public class CheckConnection {
     }
 
     public static void showCustomDialog(Context context) {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.RoundShapeTheme);
-        builder.setMessage("Please connect to the internet to proceed forward")
+        new MaterialAlertDialogBuilder(context, R.style.RoundShapeTheme)
+                .setMessage("Please connect to the internet to proceed forward")
                 .setTitle("No Connection")
-                .setCancelable(true)
+                .setCancelable(false)
                 .setIcon(R.drawable.ic_wifi_off_24)
                 .setPositiveButton("Connect", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        context.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                     }
                 }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                dialogInterface.dismiss();
             }
-        });
-
-        builder.show();
+        }).show();
     }
 }

@@ -16,6 +16,7 @@ import com.sushant.fashionapp.ActivityProductDetails;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> {
@@ -40,7 +41,7 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
         Product product = products.get(position);
         Glide.with(context).load(product.getpPic()).placeholder(R.drawable.avatar).into(holder.productImg);
         holder.productName.setText(product.getpName());
-        holder.productPrice.setText("Rs " + product.getpPrice());
+        holder.productPrice.setText(MessageFormat.format("Rs {0}", product.getpPrice()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

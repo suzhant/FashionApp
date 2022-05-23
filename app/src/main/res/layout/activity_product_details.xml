@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ActivityProductDetails">
@@ -62,17 +63,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="305dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/red_skirt"
-        android:background="@color/white"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
 
     <TextView
         android:id="@+id/textView7"
@@ -85,7 +75,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imgSlider" />
 
     <TextView
-        android:id="@+id/textView8"
+        android:id="@+id/txtPrdtName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -107,7 +97,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8" />
+        app:layout_constraintTop_toBottomOf="@+id/txtPrdtName" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chip_group"
@@ -119,6 +109,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView9"
         app:selectionRequired="true"
         android:padding="5dp"
+        app:checkedChip="@id/chipSml"
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
@@ -180,7 +171,7 @@
         app:layout_constraintTop_toBottomOf="@+id/chip_group" />
 
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/txtDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -195,33 +186,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
+
     <LinearLayout
+        android:id="@+id/cartLyt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="16dp"
         android:padding="10dp"
+        android:background="@drawable/cart_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginStart="32dp"
             android:layout_gravity="center"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Price"
+                android:text="Subtotal"
                 android:textColor="#9A9A9A"
                 android:fontFamily="@font/gilroy_medium"
                 android:textSize="20sp" />
 
             <TextView
+                android:id="@+id/txtPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -235,10 +229,9 @@
             android:layout_width="112dp"
             android:layout_height="61dp"
             android:text="Add to Cart"
+            android:layout_marginEnd="16dp"
             android:gravity="center"
             android:textAllCaps="false" />
 
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,7 +2,6 @@ package com.sushant.fashionapp;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -24,7 +23,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -109,8 +107,8 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         binding.btnCreateAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isOnline()) {
-                    showCustomDialog();
+                if (!CheckConnection.isOnline(ActivityRegister.this)) {
+                    CheckConnection.showCustomDialog(ActivityRegister.this);
                     return;
                 }
                 if (isFieldEmpty() | !validateRePass() | !validatePass() | !validateEmail() | !validatePhoneNumber()
@@ -260,14 +258,17 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     private boolean validateDOB(){
         String DOB=binding.edDOB.getMasked();
         if (DOB.isEmpty()){
+            binding.ipDOB.requestFocus();
             binding.ipDOB.setError("Empty field!");
             return false;
         }
         if (DOB.length()<10){
+            binding.ipDOB.requestFocus();
             binding.ipDOB.setError("Incorrect DOB");
             return false;
         }
         if (!validateDOBFormat()){
+            binding.ipDOB.requestFocus();
             binding.ipDOB.setError("Incorrect DOB");
             return false;
         }
@@ -359,32 +360,6 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         calendar.set(Calendar.YEAR, year);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
         binding.edDOB.setText(simpleDateFormat.format(calendar.getTime()));
-    }
-
-    private void showCustomDialog() {
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(ActivityRegister.this, R.style.RoundShapeTheme);
-        builder.setMessage("Please connect to the internet to proceed forward")
-                .setTitle("No Connection")
-                .setCancelable(true)
-                .setIcon(R.drawable.ic_wifi_off_24)
-                .setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                }).setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-
-        builder.show();
-    }
-
-    private boolean isOnline() {
-        CheckConnection checkConnection = new CheckConnection();
-        return !checkConnection.isConnected(getApplicationContext()) || checkConnection.isInternet();
     }
 
 
