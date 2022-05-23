@@ -57,6 +57,7 @@
     <style name="Widget.App.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.TextInputLayout</item>
         <item name="hintTextColor">?attr/colorOnSurface</item>
+        <item name="endIconTint">@color/black</item>
     </style>
 
     <style name="ThemeOverlay.App.TextInputLayout" parent="">

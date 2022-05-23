@@ -14,6 +14,7 @@
         <!-- Customize your theme here. -->
         <item name="android:textColor">@color/white</item>
         <item name="android:windowActivityTransitions">true</item>
+        <item name="chipStyle">@style/CustomChipStyle</item>
     </style>
 
     //Material dialog
@@ -51,6 +52,7 @@
     <style name="Widget.App.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.TextInputLayout</item>
         <item name="hintTextColor">?attr/colorOnSurface</item>
+        <item name="endIconTint">@color/white</item>
     </style>
 
     <style name="ThemeOverlay.App.TextInputLayout" parent="">
@@ -63,4 +65,15 @@
         <item name="editTextStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox
         </item>
     </style>
+
+    //custom chip style
+
+    <style name="CustomChipStyle" parent="Widget.MaterialComponents.Chip.Choice">
+        <item name="chipBackgroundColor">@color/chip_dark_bg</item>
+        <item name="android:textColor">@color/chip_dark_txt</item>
+        <item name="rippleColor">@color/black</item>
+        <item name="chipStrokeColor">@color/chip_dark_storke</item>
+    </style>
+
+
 </resources>

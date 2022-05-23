@@ -29,7 +29,6 @@
         android:fontFamily="@font/gilroy_bold"
         android:text="Forgot Password"
         android:textSize="32sp"
-        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -66,16 +65,14 @@
             android:hint="Email Address"
             android:textColorHint="@color/hintColor"
             app:boxStrokeColor="@color/skyBlue"
-            app:endIconMode="clear_text"
-            app:hintTextColor="@color/black">
+            app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edMail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:inputType="textEmailAddress|textWebEmailAddress"
-                android:textColor="@color/black" />
+                android:inputType="textEmailAddress|textWebEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
 
