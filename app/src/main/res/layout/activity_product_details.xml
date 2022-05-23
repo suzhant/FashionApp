@@ -59,6 +59,7 @@
         app:iss_corner_radius="6"
         app:iss_selected_dot="@drawable/selected_dots"
         app:iss_unselected_dot="@drawable/unselected_dots"
+        app:iss_placeholder="@raw/email_sent1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />

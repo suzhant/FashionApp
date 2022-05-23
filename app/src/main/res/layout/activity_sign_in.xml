@@ -119,6 +119,23 @@
             app:backgroundTint="@color/skyBlue"
             app:cornerRadius="8dp" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFingerprint"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tap to login with fingerprint"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_fingerprint_24"
+            app:iconGravity="textStart"
+            app:iconPadding="20dp"
+            android:padding="10dp"
+            app:strokeColor="@color/skyBlue"
+            app:strokeWidth="0.5dp"
+            android:textSize="12sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp" />
+
         <TextView
             android:id="@+id/txtForgotPass"
             android:layout_width="wrap_content"

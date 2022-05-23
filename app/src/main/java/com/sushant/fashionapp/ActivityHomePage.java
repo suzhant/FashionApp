@@ -3,7 +3,6 @@ package com.sushant.fashionapp;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -93,18 +92,9 @@ public class ActivityHomePage extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
+        logoutDialog();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            logoutDialog();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
 
     private void logoutDialog() {
         if (CheckConnection.isOnline(ActivityHomePage.this)) {
