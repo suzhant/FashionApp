@@ -27,7 +27,7 @@ public class AccountFragment extends Fragment {
 
         auth = FirebaseAuth.getInstance();
 
-        binding.btnSignOut.setOnClickListener(new View.OnClickListener() {
+        binding.cardLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (CheckConnection.isOnline(getContext())) {

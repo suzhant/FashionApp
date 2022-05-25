@@ -2,7 +2,7 @@ package com.sushant.fashionapp.Models;
 
 public class Product {
     private String pId, pName;
-    private int pPrice, pPic;
+    private int pPrice, pPic, love = 0;
 
     public Product() {
     }
@@ -45,5 +45,13 @@ public class Product {
 
     public void setpPic(int pPic) {
         this.pPic = pPic;
+    }
+
+    public int getLove() {
+        return love;
+    }
+
+    public void setLove(int love) {
+        this.love = love;
     }
 }

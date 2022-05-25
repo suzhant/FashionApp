@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +56,20 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
             }
         });
 
+        holder.imgLove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (product.getLove() == 0) {
+                    holder.imgLove.setImageResource(R.drawable.ic_favorite_24);
+                    product.setLove(1);
+                } else {
+                    holder.imgLove.setImageResource(R.drawable.ic_favorite_border_24);
+                    product.setLove(0);
+                }
+            }
+        });
+
+
     }
 
     @Override
@@ -64,15 +79,18 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
 
     public static class viewHolder extends RecyclerView.ViewHolder {
 
-        private ShapeableImageView productImg;
-        private TextView productName;
-        private TextView productPrice;
+        private final ShapeableImageView productImg;
+        private final TextView productName;
+        private final TextView productPrice;
+        private final ImageView imgLove;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             productImg = itemView.findViewById(R.id.imgProductPic);
             productName = itemView.findViewById(R.id.txtProductName);
             productPrice = itemView.findViewById(R.id.txtProductPrice);
+            imgLove = itemView.findViewById(R.id.imgLove);
         }
     }
+
 }

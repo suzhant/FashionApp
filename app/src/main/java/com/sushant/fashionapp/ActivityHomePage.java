@@ -19,7 +19,7 @@ import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
 import com.sushant.fashionapp.fragments.AccountFragment;
 import com.sushant.fashionapp.fragments.CartFragment;
 import com.sushant.fashionapp.fragments.HomeFragment;
-import com.sushant.fashionapp.fragments.WishListFragment;
+import com.sushant.fashionapp.fragments.MessageFragment;
 
 
 public class ActivityHomePage extends AppCompatActivity {
@@ -69,7 +69,7 @@ public class ActivityHomePage extends AppCompatActivity {
                         replaceFragment(new HomeFragment());
                         break;
                     case R.id.page_2:
-                        replaceFragment(new WishListFragment());
+                        replaceFragment(new MessageFragment());
                         break;
                     case R.id.page_3:
                         replaceFragment(new CartFragment());

@@ -38,15 +38,33 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp" />
 
-            <TextView
-                android:id="@+id/txtProductPrice"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Rs 900"
-                android:fontFamily="@font/open_sans"
-                android:textSize="14sp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtProductPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rs 900"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/open_sans"
+                    android:textSize="14sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp" />
+
+                <ImageView
+                    android:id="@+id/imgLove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_gravity="center"
+                    app:tint="@color/skyBlue"
+                    android:src="@drawable/ic_favorite_border_24" />
+            </LinearLayout>
+
+
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

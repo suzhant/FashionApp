@@ -1,6 +1,7 @@
 package com.sushant.fashionapp;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,6 +16,7 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     ActivityProductDetailsBinding binding;
     int price;
+    boolean isTextViewClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,5 +33,19 @@ public class ActivityProductDetails extends AppCompatActivity {
         list.add(new SlideModel(R.drawable.red_skirt, null));
         list.add(new SlideModel(R.drawable.red_dress2, null));
         binding.imgSlider.setImageList(list);
+
+
+        binding.txtDescription.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isTextViewClicked) {
+                    binding.txtDescription.setMaxLines(Integer.MAX_VALUE);
+                    isTextViewClicked = true;
+                } else {
+                    binding.txtDescription.setMaxLines(2);
+                    isTextViewClicked = false;
+                }
+            }
+        });
     }
 }
