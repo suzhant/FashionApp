@@ -55,10 +55,10 @@
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
-        android:overScrollMode="never"
-        android:fillViewport="true"
         android:layout_marginBottom="4dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,6 +67,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:orientation="vertical">
 
             <com.denzcoskun.imageslider.ImageSlider
@@ -78,22 +79,55 @@
                 app:iss_selected_dot="@drawable/selected_dots"
                 app:iss_unselected_dot="@drawable/unselected_dots" />
 
-            <TextView
-                android:id="@+id/txtPrdtName"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="24dp"
-                android:fontFamily="@font/gilroy_bold"
-                android:text="Red Skirt"
-                android:textSize="32sp" />
+                android:layout_marginEnd="32dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtPrdtName"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/gilroy_bold"
+                    android:gravity="center_vertical"
+                    android:text="Red Skirt"
+                    android:textSize="32sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bell_bg"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_clarity_store_line" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="2dp"
+                        android:text="View Store"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:fontFamily="@font/open_sans"
                 android:text="Select Size"
                 android:textSize="16sp"
@@ -102,18 +136,17 @@
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chip_group"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_marginStart="25dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="8dp"
-                android:padding="5dp"
                 app:checkedChip="@id/chipSml"
                 app:selectionRequired="true"
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipSml"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginEnd="10dp"
                     android:fontFamily="@font/gilroy_bold"
                     android:text="S"
@@ -124,8 +157,8 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipMed"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginEnd="10dp"
                     android:text="M"
                     android:textAlignment="center"
@@ -135,8 +168,8 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipLrg"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:layout_marginEnd="10dp"
                     android:text="L"
                     android:textAlignment="center"
@@ -146,8 +179,8 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipXl"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:text="XL"
                     android:textAlignment="center"
                     app:chipCornerRadius="4dp"
@@ -168,6 +201,7 @@
 
             <TextView
                 android:id="@+id/txtDescription"
+                style="@style/TextAppearance.AppCompat.Display1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
@@ -183,31 +217,31 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="About Shop"
-                android:layout_marginTop="24dp"
                 android:layout_marginStart="32dp"
+                android:layout_marginTop="24dp"
                 android:fontFamily="@font/open_sans"
+                android:text="About Shop"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:src="@drawable/avatar"
                     android:layout_marginStart="32dp"
-                    android:layout_marginTop="4dp" />
+                    android:src="@drawable/avatar" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:layout_gravity="center"
                     android:layout_marginStart="8dp"
-                    android:layout_gravity="center">
+                    android:orientation="vertical">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -215,27 +249,28 @@
                         android:orientation="horizontal">
 
                         <TextView
+                            android:id="@+id/txtStoreName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="French Store Collection"
-                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:maxWidth="150dp"
-                            android:ellipsize="end" />
+                            android:maxLines="1"
+                            android:text="French Store Collection" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
                             android:text="Follow"
-                            android:textColor="@color/skyBlue"
-                            android:layout_marginStart="6dp" />
+                            android:textColor="@color/skyBlue" />
                     </LinearLayout>
 
                     <TextView
+                        style="@style/TextAppearance.AppCompat.Small"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2.9k followers"
                         android:layout_marginTop="4dp"
-                        style="@style/TextAppearance.AppCompat.Small" />
+                        android:text="2.9k followers" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -256,8 +291,7 @@
             android:id="@+id/cartLyt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -286,6 +320,7 @@
             </LinearLayout>
 
             <Button
+                android:id="@+id/btnAddCart"
                 style="@style/Widget.AppCompat.Button"
                 android:layout_width="112dp"
                 android:layout_height="61dp"

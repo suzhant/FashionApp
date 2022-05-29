@@ -19,7 +19,6 @@
         </item>
         <item name="chipStyle">@style/CustomChipStyle</item>
 
-
     </style>
 
     //Material dialog
@@ -116,9 +115,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.FashionApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="Theme.FashionApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="TextAppearance" parent="">
+        <item name="android:textSize">24sp</item>
+        <item name="fontFamily">@font/gilroy_medium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
 
 </resources>

@@ -86,7 +86,12 @@ public class ActivityHomePage extends AppCompatActivity {
 
     private void replaceFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frmLayout, fragment);
+        transaction.replace(R.id.frmLayout, fragment).setCustomAnimations(
+                R.anim.push_left_in,  // enter
+                R.anim.fade_out,  // exit
+                R.anim.fade_in,   // popEnter
+                R.anim.push_left_out  // popExit
+        );
         transaction.commit();
     }
 

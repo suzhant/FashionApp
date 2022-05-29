@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.sushant.fashionapp"
-        minSdk 21
+        minSdk 23
         targetSdk 31
         versionCode 1
         versionName "1.0"
@@ -73,4 +73,7 @@ dependencies {
 
     //dexter
     implementation 'com.karumi:dexter:6.2.3'
-}
+
+
+    //tinycart
+    implementation 'com.github.hishd:TinyCart:1.0.1'}

@@ -35,6 +35,17 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <TextView
+                    android:id="@+id/txtUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="8dp"
+                    android:textSize="16sp"
+                    android:text="Welcome"
+                    app:layout_constraintStart_toEndOf="@+id/circleImageView"
+                    app:layout_constraintTop_toTopOf="@+id/circleImageView" />
+
                 <EditText
                     android:id="@+id/editText"
                     style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
@@ -84,6 +95,17 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_begin="40dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Categories"
+                    android:fontFamily="@font/gilroy_bold"
+                    android:textSize="20sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/editText" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -142,6 +164,22 @@
                     android:text="Kids"
                     android:textAlignment="center"
                     app:chipCornerRadius="4dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip5"
+                    android:layout_width="75dp"
+                    android:layout_height="match_parent"
+                    android:text="Toddler"
+                    android:textAlignment="center"
+                    app:chipCornerRadius="4dp" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip6"
+                    android:layout_width="75dp"
+                    android:layout_height="match_parent"
+                    android:text="Shirt"
+                    android:textAlignment="center"
+                    app:chipCornerRadius="4dp" />
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
 
@@ -155,11 +193,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:overScrollMode="never"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"

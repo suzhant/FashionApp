@@ -1,10 +1,22 @@
 package com.sushant.fashionapp.Models;
 
-public class Product {
-    private String pId, pName;
-    private int pPrice, pPic, love = 0;
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Product implements Serializable {
+    private String pId, pName, storeName;
+    private int pPrice, pPic, love = 0, stock;
 
     public Product() {
+    }
+
+    public Product(String pId, String pName, int pPic, int pPrice, String storeName, int stock) {
+        this.pId = pId;
+        this.pName = pName;
+        this.pPic = pPic;
+        this.pPrice = pPrice;
+        this.storeName = storeName;
+        this.stock = stock;
     }
 
     public Product(String pId, String pName, int pPic, int pPrice) {
@@ -53,5 +65,34 @@ public class Product {
 
     public void setLove(int love) {
         this.love = love;
+    }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return pPrice == product.pPrice && pPic == product.pPic && love == product.love && stock == product.stock && Objects.equals(pId, product.pId) && Objects.equals(pName, product.pName) && Objects.equals(storeName, product.storeName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pId, pName, storeName, pPrice, pPic, love, stock);
     }
 }

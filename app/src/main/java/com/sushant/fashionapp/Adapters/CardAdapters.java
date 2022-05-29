@@ -52,6 +52,8 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
                 intent.putExtra("pName", product.getpName());
                 intent.putExtra("pPrice", product.getpPrice());
                 intent.putExtra("pId", product.getpId());
+                intent.putExtra("stock", product.getStock());
+                intent.putExtra("sName", product.getStoreName());
                 context.startActivity(intent);
             }
         });
