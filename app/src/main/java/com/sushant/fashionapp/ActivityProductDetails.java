@@ -1,13 +1,15 @@
 package com.sushant.fashionapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.denzcoskun.imageslider.models.SlideModel;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -95,11 +97,32 @@ public class ActivityProductDetails extends AppCompatActivity {
                 }
             }
         });
+
+        binding.btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     private void addProductToCart() {
         Product product = new Product(pId, pName, pPic, price, sName, stock);
         database.getReference().child("Cart").child(auth.getUid()).child(pId).setValue(product);
-        Toast.makeText(this, "Added to cart", Toast.LENGTH_SHORT).show();
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.parent), "Added to cart",
+                Snackbar.LENGTH_SHORT).setAction("Go to Cart", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ActivityProductDetails.this, CartActivity.class));
+            }
+        }).setAnchorView(binding.cardView);
+        TextView snackbarActionTextView = (TextView) snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_action);
+        snackbarActionTextView.setAllCaps(false);
+        snackbar.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }

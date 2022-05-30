@@ -1,12 +1,11 @@
-package com.sushant.fashionapp.fragments;
+package com.sushant.fashionapp;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,17 +19,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.CartAdapter;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Models.Product;
-import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.databinding.FragmentCartBinding;
+import com.sushant.fashionapp.databinding.ActivityCartBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
+public class CartActivity extends AppCompatActivity {
 
-public class CartFragment extends Fragment {
-
-    FragmentCartBinding binding;
+    ActivityCartBinding binding;
     CartAdapter cartAdapter;
     ArrayList<Product> products = new ArrayList<>();
     FirebaseDatabase database;
@@ -43,25 +40,20 @@ public class CartFragment extends Fragment {
     int size = 0;
     BottomNavigationView bottomNavigationView;
 
-    public CartFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        binding = FragmentCartBinding.inflate(inflater, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityCartBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setVisibility(View.GONE);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         binding.imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                replaceFragment();
+                onBackPressed();
             }
         });
 
@@ -132,7 +124,7 @@ public class CartFragment extends Fragment {
                     refreshAdapter();
                     size = 0;
                     binding.btnDelete.setVisibility(View.GONE);
-                    Snackbar snackbar = Snackbar.make(requireActivity().findViewById(R.id.cartLayout), "Cart Deleted",
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
                             Snackbar.LENGTH_SHORT).setAction("Undo", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -162,30 +154,24 @@ public class CartFragment extends Fragment {
         binding.btnShopNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                replaceFragment();
+                startActivity(new Intent(CartActivity.this, ActivityHomePage.class));
             }
         });
 
-
-        return binding.getRoot();
     }
 
     private void initRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(CartActivity.this, LinearLayoutManager.VERTICAL, false);
         binding.cartRecycler.setLayoutManager(layoutManager);
-        cartAdapter = new CartAdapter(products, getContext(), productClickListener);
+        cartAdapter = new CartAdapter(products, CartActivity.this, productClickListener);
         binding.cartRecycler.setAdapter(cartAdapter);
     }
 
     private void refreshAdapter() {
-        cartAdapter = new CartAdapter(products, getContext(), productClickListener);
+        cartAdapter = new CartAdapter(products, CartActivity.this, productClickListener);
         binding.cartRecycler.setAdapter(cartAdapter);
     }
 
-    private void replaceFragment() {
-        bottomNavigationView.setSelectedItemId(R.id.page_1);
-        bottomNavigationView.setVisibility(View.VISIBLE);
-    }
 
     @Override
     public void onDestroy() {
@@ -193,4 +179,8 @@ public class CartFragment extends Fragment {
         super.onDestroy();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

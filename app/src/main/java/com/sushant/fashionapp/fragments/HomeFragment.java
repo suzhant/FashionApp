@@ -30,12 +30,13 @@ import java.util.Objects;
 
 public class HomeFragment extends Fragment {
 
+    private static final String LIST_STATE_KEY = "abc";
     FragmentHomeBinding binding;
     FirebaseAuth auth;
     CardAdapters popularAdapters;
     ArrayList<Product> products = new ArrayList<>();
     FirebaseDatabase database;
-
+    public GridLayoutManager layoutManager;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -97,7 +98,7 @@ public class HomeFragment extends Fragment {
         products.add(new Product("7", "sushant", R.drawable.demo_rect, 700, "store7", 11));
         products.add(new Product("8", "sushant", R.drawable.demo_rect, 800, "store8", 12));
 
-        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         binding.popularRecycler.setLayoutManager(layoutManager);
         popularAdapters = new CardAdapters(products, getActivity());
         popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
@@ -114,5 +115,11 @@ public class HomeFragment extends Fragment {
             }
         }
         return new String(array);
+    }
+
+    @Override
+    public void onResume() {
+        binding.popularRecycler.scrollToPosition(3);
+        super.onResume();
     }
 }

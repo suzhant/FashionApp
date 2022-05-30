@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
 import com.sushant.fashionapp.fragments.AccountFragment;
-import com.sushant.fashionapp.fragments.CartFragment;
 import com.sushant.fashionapp.fragments.HomeFragment;
 import com.sushant.fashionapp.fragments.MessageFragment;
 
@@ -72,7 +72,8 @@ public class ActivityHomePage extends AppCompatActivity {
                         replaceFragment(new MessageFragment());
                         break;
                     case R.id.page_3:
-                        replaceFragment(new CartFragment());
+                        startActivity(new Intent(ActivityHomePage.this, CartActivity.class));
+                        // replaceFragment(new CartFragment());
                         break;
                     case R.id.page_4:
                         replaceFragment(new AccountFragment());
@@ -97,7 +98,15 @@ public class ActivityHomePage extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        logoutDialog();
+        if (binding.bottomNavigation.getSelectedItemId() == R.id.page_1) {
+            logoutDialog();
+        } else {
+            binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+            if (binding.bottomNavigation.getVisibility() == View.GONE) {
+                binding.bottomNavigation.setVisibility(View.VISIBLE);
+            }
+
+        }
     }
 
 
@@ -123,5 +132,11 @@ public class ActivityHomePage extends AppCompatActivity {
         } else {
             CheckConnection.showCustomDialog(ActivityHomePage.this);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+        super.onResume();
     }
 }
