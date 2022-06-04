@@ -1,7 +1,10 @@
 package com.sushant.fashionapp.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,25 +14,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.sushant.fashionapp.ActivityProductDetails;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CartDiffUtils;
+import com.sushant.fashionapp.Utils.TextUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     ArrayList<Product> products;
     Context context;
     ProductClickListener productClickListener;
-
 
     public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
@@ -73,10 +81,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
         Glide.with(context).load(product.getpPic()).placeholder(R.drawable.avatar).into(holder.imgProduct);
-        holder.txtStoreName.setText(product.getStoreName());
-        holder.txtPrice.setText(MessageFormat.format("Rs {0}", product.getpPrice()));
-        holder.txtProductName.setText(product.getpName());
-        holder.txtStock.setText(MessageFormat.format("Stocks: {0}", product.getStock()));
+        holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(product.getStoreName()));
+        holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getQuantity() * product.getpPrice())));
+        holder.txtProductName.setText(TextUtils.captializeAllFirstLetter(product.getpName()));
+        holder.txtStock.setText(MessageFormat.format("Stock: {0}", product.getStock()));
+        holder.txtQuantity.setText(String.valueOf(product.getQuantity()));
 
         holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -88,6 +97,69 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                 } else {
                     holder.cardView.setStrokeWidth(1);
                 }
+            }
+        });
+
+
+        if (product.getQuantity() > 1) {
+            holder.imgMinus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.red)));
+        }
+        if (product.getQuantity() == product.getStock()) {
+            holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+        }
+        if (product.getQuantity() < product.getStock()) {
+            holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
+        }
+        if (product.getQuantity() < 2) {
+            holder.imgMinus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+        }
+
+        holder.imgPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (product.getStock() > product.getQuantity()) {
+                    product.setQuantity(product.getQuantity() + 1);
+                    updateCartQuantity(product);
+                }
+
+            }
+        });
+
+        holder.imgMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (product.getQuantity() > 1) {
+                    product.setQuantity(product.getQuantity() - 1);
+                    updateCartQuantity(product);
+                }
+            }
+        });
+
+        holder.imgProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ActivityProductDetails.class);
+                intent.putExtra("pPic", product.getpPic());
+                intent.putExtra("pName", product.getpName());
+                intent.putExtra("pPrice", product.getpPrice());
+                intent.putExtra("pId", product.getpId());
+                intent.putExtra("stock", product.getStock());
+                intent.putExtra("sName", product.getStoreName());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.txtProductName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ActivityProductDetails.class);
+                intent.putExtra("pPic", product.getpPic());
+                intent.putExtra("pName", product.getpName());
+                intent.putExtra("pPrice", product.getpPrice());
+                intent.putExtra("pId", product.getpId());
+                intent.putExtra("stock", product.getStock());
+                intent.putExtra("sName", product.getStoreName());
+                context.startActivity(intent);
             }
         });
 
@@ -135,4 +207,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         this.products.addAll(products);
         diffResult.dispatchUpdatesTo(this);
     }
+
+    private void updateCartQuantity(Product product) {
+        HashMap<String, Object> quantity = new HashMap<>();
+        quantity.put("quantity", product.getQuantity());
+        FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child(product.getpId())
+                .updateChildren(quantity);
+    }
+
 }

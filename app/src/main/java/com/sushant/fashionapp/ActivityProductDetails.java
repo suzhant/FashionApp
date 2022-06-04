@@ -2,6 +2,7 @@ package com.sushant.fashionapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
 import java.text.MessageFormat;
@@ -47,9 +49,9 @@ public class ActivityProductDetails extends AppCompatActivity {
         pName = getIntent().getStringExtra("pName");
         sName = getIntent().getStringExtra("sName");
         pId = getIntent().getStringExtra("pId");
-        binding.txtPrice.setText(MessageFormat.format("Rs. {0}", price));
-        binding.txtPrdtName.setText(pName);
-        binding.txtStoreName.setText(sName);
+        binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
+        binding.txtPrdtName.setText(TextUtils.captializeAllFirstLetter(pName));
+        binding.txtStoreName.setText(TextUtils.captializeAllFirstLetter(sName));
 
 
         List<SlideModel> list = new ArrayList<>();
@@ -75,10 +77,12 @@ public class ActivityProductDetails extends AppCompatActivity {
         database.getReference().child("Cart").child(auth.getUid()).child(pId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
+                if (snapshot.child("pId").exists()) {
                     binding.btnAddCart.setEnabled(false);
                     binding.btnAddCart.setText("Added to Cart");
-                    added = true;
+                } else {
+                    binding.btnAddCart.setEnabled(true);
+                    binding.btnAddCart.setText("Add to Cart");
                 }
 
             }
@@ -92,9 +96,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         binding.btnAddCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!added) {
                     addProductToCart();
-                }
             }
         });
 

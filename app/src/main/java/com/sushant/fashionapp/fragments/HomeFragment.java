@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.CardAdapters;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.FragmentHomeBinding;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class HomeFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String name = snapshot.child("userName").getValue(String.class);
                 assert name != null;
-                binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">" + captializeAllFirstLetter(name) + "</font"));
+                binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">" + TextUtils.captializeAllFirstLetter(name) + "</font"));
             }
 
             @Override
@@ -89,7 +90,7 @@ public class HomeFragment extends Fragment {
 
     private void initReyclerView() {
         products.clear();
-        products.add(new Product("1", "shirt", R.drawable.demo_rect, 100, "French Store", 10));
+        products.add(new Product("1", "Tailor stitch Cotton Oversize Korean T-shirt and Shirts", R.drawable.demo_rect, 100, "French Store", 10));
         products.add(new Product("2", "paint", R.drawable.demo_rect, 200, "Nepali Store", 100));
         products.add(new Product("3", "bag", R.drawable.demo_rect, 300, "Korean Store", 101));
         products.add(new Product("4", "shoes", R.drawable.demo_rect, 400, "Chinese store", 102));
@@ -105,17 +106,7 @@ public class HomeFragment extends Fragment {
         binding.popularRecycler.setAdapter(popularAdapters);
     }
 
-    private String captializeAllFirstLetter(String name) {
-        char[] array = name.toCharArray();
-        array[0] = Character.toUpperCase(array[0]);
 
-        for (int i = 1; i < array.length; i++) {
-            if (Character.isWhitespace(array[i - 1])) {
-                array[i] = Character.toUpperCase(array[i]);
-            }
-        }
-        return new String(array);
-    }
 
     @Override
     public void onResume() {

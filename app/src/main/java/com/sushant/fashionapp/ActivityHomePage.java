@@ -11,15 +11,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
 import com.sushant.fashionapp.fragments.AccountFragment;
 import com.sushant.fashionapp.fragments.HomeFragment;
 import com.sushant.fashionapp.fragments.MessageFragment;
+
+import java.util.Objects;
 
 
 public class ActivityHomePage extends AppCompatActivity {
@@ -27,6 +34,9 @@ public class ActivityHomePage extends AppCompatActivity {
     ActivityHomePageBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
+    double cartNumber;
+    ValueEventListener cartListener;
+    DatabaseReference cartRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +46,8 @@ public class ActivityHomePage extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        BadgeDrawable badge = binding.bottomNavigation.getOrCreateBadge(R.id.page_3);
+
 
         replaceFragment(new HomeFragment());
 
@@ -83,6 +95,29 @@ public class ActivityHomePage extends AppCompatActivity {
                 return true;
             }
         });
+
+        cartRef = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid()));
+        cartListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                cartNumber = snapshot.getChildrenCount();
+                if (cartNumber > 0) {
+                    badge.setVisible(true);
+                    badge.setNumber((int) cartNumber);
+                } else {
+                    badge.setVisible(false);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        cartRef.addValueEventListener(cartListener);
+
+
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -137,6 +172,17 @@ public class ActivityHomePage extends AppCompatActivity {
     @Override
     protected void onResume() {
         binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+        if (cartRef != null) {
+            cartRef.addValueEventListener(cartListener);
+        }
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (cartRef != null) {
+            cartRef.removeEventListener(cartListener);
+        }
+        super.onDestroy();
     }
 }

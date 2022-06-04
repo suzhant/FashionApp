@@ -40,16 +40,24 @@
                 android:text="My Cart"
                 android:textSize="24sp" />
 
-            <Button
-                android:id="@+id/btnDelete"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            <!--            <Button-->
+            <!--                android:id="@+id/btnDelete"-->
+            <!--                style="@style/Widget.AppCompat.Button.Borderless.Colored"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:text="Delete"-->
+            <!--                android:textAllCaps="false"-->
+            <!--                android:textColor="@color/black"-->
+            <!--                android:textSize="20sp"-->
+            <!--                android:visibility="gone" />-->
+
+            <ImageView
+                android:id="@+id/imgDelete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:visibility="gone" />
+                android:layout_marginEnd="10dp"
+                android:visibility="gone"
+                android:src="@drawable/ic_fluent_delete_24_regular" />
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -138,8 +146,7 @@
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/gilroy_bold"
+                    android:fontFamily="@font/gilroy_medium"
                     android:text="Rs. 1000"
                     android:textSize="24sp" />
             </LinearLayout>

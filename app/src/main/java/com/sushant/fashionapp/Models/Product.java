@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Product implements Serializable {
     private String pId, pName, storeName;
-    private int pPrice, pPic, love = 0, stock;
+    private int pPrice, pPic, love = 0, stock, quantity = 1;
 
     public Product() {
     }
@@ -94,5 +94,13 @@ public class Product implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(pId, pName, storeName, pPrice, pPic, love, stock);
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

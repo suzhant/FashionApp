@@ -21,6 +21,7 @@ import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.databinding.ActivityCartBinding;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -69,9 +70,9 @@ public class CartActivity extends AppCompatActivity {
                     size--;
                 }
                 if (size > 0) {
-                    binding.btnDelete.setVisibility(View.VISIBLE);
+                    binding.imgDelete.setVisibility(View.VISIBLE);
                 } else {
-                    binding.btnDelete.setVisibility(View.GONE);
+                    binding.imgDelete.setVisibility(View.GONE);
                 }
             }
         };
@@ -82,16 +83,18 @@ public class CartActivity extends AppCompatActivity {
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
                 products.clear();
+                int sum = 0;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     assert product != null;
                     if (product.getpId() != null) {
                         products.add(product);
+                        sum = sum + product.getpPrice() * product.getQuantity();
                     }
                 }
                 cartAdapter.notifyDataSetChanged();
+                binding.txtPrice.setText(MessageFormat.format("Rs. {0}", sum));
 //                    cartAdapter.updateProductList(products);
 //                    oldProductList.clear();
 //                    oldProductList.addAll(products);
@@ -112,7 +115,7 @@ public class CartActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(valueEventListener);
 
 
-        binding.btnDelete.setOnClickListener(new View.OnClickListener() {
+        binding.imgDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (size > 0) {
@@ -123,9 +126,9 @@ public class CartActivity extends AppCompatActivity {
                     }
                     refreshAdapter();
                     size = 0;
-                    binding.btnDelete.setVisibility(View.GONE);
+                    binding.imgDelete.setVisibility(View.GONE);
                     Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
-                            Snackbar.LENGTH_SHORT).setAction("Undo", new View.OnClickListener() {
+                            Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             for (Product p : checkedProducts) {

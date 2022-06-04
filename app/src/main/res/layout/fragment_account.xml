@@ -11,18 +11,35 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:backgroundTint="@color/white"
+        android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.Toolbar
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fontFamily="@font/gilroy_medium"
-            android:textSize="24sp"
-            app:title="Profile"
-            android:layout_marginStart="32dp"
-            app:titleTextColor="@color/black" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imgBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:tint="@color/skyBlue"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/ic_arrow_back_24" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_weight="@integer/material_motion_duration_long_1"
+                android:fontFamily="@font/gilroy_medium"
+                android:text="Profile"
+                android:textSize="24sp" />
+        </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -49,7 +66,7 @@
         app:layout_constraintTop_toBottomOf="@+id/circleImageView2" />
 
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/txtUserCat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="9dp"
@@ -65,13 +82,14 @@
         android:layout_marginTop="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView11">
+        app:layout_constraintTop_toBottomOf="@+id/txtUserCat">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardChgPrf"
+            android:id="@+id/cardSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="5dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             app:cardBackgroundColor="#F9F9F9">
@@ -96,7 +114,7 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="24dp"
                     android:layout_weight="1"
-                    android:text="Change Profile" />
+                    android:text="Switch to seller" />
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -193,6 +211,49 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#F9F9F9">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:orientation="horizontal"
+                android:layout_gravity="center">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="15dp"
+                    app:tint="@color/black"
+                    android:src="@drawable/ic_setting" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="24dp"
+                    android:layout_weight="1"
+                    android:text="Settings" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_arrow_forward_ios_24"
+                    android:layout_marginEnd="20dp"
+                    android:layout_gravity="center"
+                    app:tint="@color/black" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -200,6 +261,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="5dp"
             app:cardBackgroundColor="#F9F9F9">
 
             <LinearLayout
