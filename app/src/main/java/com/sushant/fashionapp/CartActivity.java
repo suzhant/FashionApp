@@ -2,7 +2,9 @@ package com.sushant.fashionapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +37,6 @@ public class CartActivity extends AppCompatActivity {
     FirebaseAuth auth;
     ProductClickListener productClickListener;
     ArrayList<Product> checkedProducts = new ArrayList<>();
-    ArrayList<Product> oldProductList = new ArrayList<>();
     ValueEventListener valueEventListener;
     DatabaseReference databaseReference;
     int size = 0;
@@ -73,6 +74,7 @@ public class CartActivity extends AppCompatActivity {
                     binding.imgDelete.setVisibility(View.VISIBLE);
                 } else {
                     binding.imgDelete.setVisibility(View.GONE);
+                    binding.chkAll.setChecked(false);
                 }
             }
         };
@@ -94,17 +96,8 @@ public class CartActivity extends AppCompatActivity {
                     }
                 }
                 cartAdapter.notifyDataSetChanged();
-                binding.txtPrice.setText(MessageFormat.format("Rs. {0}", sum));
-//                    cartAdapter.updateProductList(products);
-//                    oldProductList.clear();
-//                    oldProductList.addAll(products);
-                if (products.size() == 0) {
-                    binding.emptyCartLyt.setVisibility(View.VISIBLE);
-                    binding.cardView.setVisibility(View.GONE);
-                } else {
-                    binding.cardView.setVisibility(View.VISIBLE);
-                    binding.emptyCartLyt.setVisibility(View.GONE);
-                }
+                binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("<small>Rs.</small> {0}", sum)));
+                showorhideCartBottomlyt();
             }
 
             @Override
@@ -119,37 +112,11 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (size > 0) {
-                    for (Product p : checkedProducts) {
-                        HashMap<String, Object> map = new HashMap<>();
-                        map.put(p.getpId(), null);
-                        database.getReference().child("Cart").child(auth.getUid()).updateChildren(map);
-                    }
+                    deleteProductFromCart();
                     refreshAdapter();
                     size = 0;
                     binding.imgDelete.setVisibility(View.GONE);
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
-                            Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            for (Product p : checkedProducts) {
-                                database.getReference().child("Cart").child(auth.getUid()).child(p.getpId()).setValue(p);
-                            }
-                            checkedProducts.clear();
-                        }
-                    });
-                    snackbar.show();
-                    snackbar.addCallback(new Snackbar.Callback() {
-                        @Override
-                        public void onDismissed(Snackbar snackbar, int event) {
-                            //see Snackbar.Callback docs for event details
-                            checkedProducts.clear();
-                        }
-
-                        @Override
-                        public void onShown(Snackbar snackbar) {
-
-                        }
-                    });
+                    showSnackbar();
                 }
             }
         });
@@ -161,6 +128,66 @@ public class CartActivity extends AppCompatActivity {
             }
         });
 
+        binding.chkAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    cartAdapter.showAllBoxes();
+                } else {
+                    cartAdapter.hideAllBoxes();
+                }
+            }
+        });
+
+
+    }
+
+    private void showSnackbar() {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
+                Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                undoDeleteActionFromCart();
+            }
+        });
+        snackbar.show();
+        snackbar.addCallback(new Snackbar.Callback() {
+            @Override
+            public void onDismissed(Snackbar snackbar, int event) {
+                //see Snackbar.Callback docs for event details
+                checkedProducts.clear();
+            }
+
+            @Override
+            public void onShown(Snackbar snackbar) {
+
+            }
+        });
+    }
+
+    private void showorhideCartBottomlyt() {
+        if (products.size() == 0) {
+            binding.emptyCartLyt.setVisibility(View.VISIBLE);
+            binding.cardView.setVisibility(View.GONE);
+        } else {
+            binding.cardView.setVisibility(View.VISIBLE);
+            binding.emptyCartLyt.setVisibility(View.GONE);
+        }
+    }
+
+    private void undoDeleteActionFromCart() {
+        for (Product p : checkedProducts) {
+            database.getReference().child("Cart").child(auth.getUid()).child(p.getpId()).setValue(p);
+        }
+        checkedProducts.clear();
+    }
+
+    private void deleteProductFromCart() {
+        for (Product p : checkedProducts) {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put(p.getpId(), null);
+            database.getReference().child("Cart").child(auth.getUid()).updateChildren(map);
+        }
     }
 
     private void initRecyclerView() {

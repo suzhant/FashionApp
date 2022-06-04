@@ -32,7 +32,6 @@ public class ActivityProductDetails extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseDatabase database;
     String pName, sName, pId;
-    boolean added;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

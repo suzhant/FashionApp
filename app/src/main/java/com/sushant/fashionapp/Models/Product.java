@@ -6,6 +6,7 @@ import java.util.Objects;
 public class Product implements Serializable {
     private String pId, pName, storeName;
     private int pPrice, pPic, love = 0, stock, quantity = 1;
+    private boolean isChecked;
 
     public Product() {
     }
@@ -103,4 +104,13 @@ public class Product implements Serializable {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
 }

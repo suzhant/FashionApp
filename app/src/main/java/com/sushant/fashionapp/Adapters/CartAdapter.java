@@ -3,7 +3,7 @@ package com.sushant.fashionapp.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -26,18 +25,17 @@ import com.sushant.fashionapp.ActivityProductDetails;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.Utils.CartDiffUtils;
 import com.sushant.fashionapp.Utils.TextUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     ArrayList<Product> products;
     Context context;
     ProductClickListener productClickListener;
+    public boolean isSelectAll;
 
     public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
@@ -53,31 +51,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull viewHolder holder, int position, @NonNull List<Object> payloads) {
-        if (payloads.isEmpty()) {
-            super.onBindViewHolder(holder, position, payloads);
-        } else {
-            Bundle bundle = (Bundle) payloads.get(0);
-            for (String key : bundle.keySet()) {
-                switch (key) {
-                    case "newName":
-                        holder.txtProductName.setText(bundle.getString("newName"));
-                        break;
-                    case "newStoreName":
-                        holder.txtStoreName.setText(bundle.getString("newStoreName"));
-                        break;
-                    case "newPrice":
-                        holder.txtPrice.setText(MessageFormat.format("Rs {0}", bundle.getInt("newPrice")));
-                        break;
-                    case "newStock":
-                        holder.txtStock.setText(MessageFormat.format("Stocks: {0}", bundle.getInt("newStock")));
-                        break;
-                }
-            }
-        }
-    }
-
-    @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
         Glide.with(context).load(product.getpPic()).placeholder(R.drawable.avatar).into(holder.imgProduct);
@@ -87,18 +60,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         holder.txtStock.setText(MessageFormat.format("Stock: {0}", product.getStock()));
         holder.txtQuantity.setText(String.valueOf(product.getQuantity()));
 
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                productClickListener.onClick(product, b);
-                if (b) {
-                    holder.cardView.setStrokeWidth(5);
-                    //    holder.cardView.setStrokeColor(ContextCompat.getColor(context,R.color.skyBlue));
-                } else {
-                    holder.cardView.setStrokeWidth(1);
-                }
-            }
-        });
 
 
         if (product.getQuantity() > 1) {
@@ -163,6 +124,27 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             }
         });
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                holder.checkBox.setChecked(isSelectAll);
+            }
+        }, 100);
+
+        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                productClickListener.onClick(product, b);
+                if (b) {
+                    holder.cardView.setStrokeWidth(5);
+                    product.setChecked(true);
+                    //    holder.cardView.setStrokeColor(ContextCompat.getColor(context,R.color.skyBlue));
+                } else {
+                    holder.cardView.setStrokeWidth(1);
+                    product.setChecked(false);
+                }
+            }
+        });
 
     }
 
@@ -200,19 +182,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         }
     }
 
-    public void updateProductList(ArrayList<Product> products) {
-        final CartDiffUtils diffCallback = new CartDiffUtils(this.products, products);
-        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
-        this.products.clear();
-        this.products.addAll(products);
-        diffResult.dispatchUpdatesTo(this);
-    }
-
     private void updateCartQuantity(Product product) {
         HashMap<String, Object> quantity = new HashMap<>();
         quantity.put("quantity", product.getQuantity());
         FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child(product.getpId())
                 .updateChildren(quantity);
+    }
+
+    public void showAllBoxes() {
+        isSelectAll = true;
+        notifyDataSetChanged();
+    }
+
+    public void hideAllBoxes() {
+        isSelectAll = false;
+        notifyDataSetChanged();
     }
 
 }
