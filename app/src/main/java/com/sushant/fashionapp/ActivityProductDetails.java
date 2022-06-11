@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.denzcoskun.imageslider.models.SlideModel;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +25,7 @@ import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ActivityProductDetails extends AppCompatActivity {
@@ -32,6 +36,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseDatabase database;
     String pName, sName, pId;
+    String checkId = "S";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,43 +78,56 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
-        database.getReference().child("Cart").child(auth.getUid()).child(pId).addValueEventListener(new ValueEventListener() {
+        binding.chipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("pId").exists()) {
-                    binding.btnAddCart.setEnabled(false);
-                    binding.btnAddCart.setText("Added to Cart");
-                } else {
-                    binding.btnAddCart.setEnabled(true);
-                    binding.btnAddCart.setText("Add to Cart");
+            public void onCheckedChanged(@NonNull ChipGroup group, @NonNull List<Integer> checkedIds) {
+                for (int i = 0; i < binding.chipGroup.getChildCount(); i++) {
+                    Chip chip = (Chip) binding.chipGroup.getChildAt(i);
+                    if (chip.isChecked()) {
+                        //this chip is selected.....
+                        checkId = chip.getText().toString();
+                    }
                 }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
+
+//        database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(pId).addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.child("pId").exists()) {
+//                 //   binding.btnAddCart.setEnabled(false);
+//                   // binding.btnAddCart.setText("Added to Cart");
+//                } else {
+//                  //  binding.btnAddCart.setEnabled(true);
+//                  //  binding.btnAddCart.setText("Add to Cart");
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         binding.btnAddCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    addProductToCart();
+                addProductToCart();
             }
         });
 
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+                startActivity(new Intent(ActivityProductDetails.this, ActivityHomePage.class));
+                finishAfterTransition();
+                //  onBackPressed();
             }
         });
     }
 
     private void addProductToCart() {
-        Product product = new Product(pId, pName, pPic, price, sName, stock);
-        database.getReference().child("Cart").child(auth.getUid()).child(pId).setValue(product);
         Snackbar snackbar = Snackbar.make(findViewById(R.id.parent), "Added to cart",
                 Snackbar.LENGTH_SHORT).setAction("Go to Cart", new View.OnClickListener() {
             @Override
@@ -119,8 +137,43 @@ public class ActivityProductDetails extends AppCompatActivity {
         }).setAnchorView(binding.cardView);
         TextView snackbarActionTextView = (TextView) snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_action);
         snackbarActionTextView.setAllCaps(false);
-        snackbar.show();
+        database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(pId + checkId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    int quantity = snapshot.child("quantity").getValue(Integer.class);
+                    updateCartQuantity(quantity);
+                    snackbar.show();
+                } else {
+                    Product product = new Product(pId, pName, pPic, price, sName, stock);
+                    product.setSize(checkId);
+                    database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(pId + checkId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            snackbar.show();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
     }
+
+    private void updateCartQuantity(int q) {
+        q = q + 1;
+        HashMap<String, Object> quantity = new HashMap<>();
+        quantity.put("quantity", q);
+        FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details").child(pId + checkId)
+                .updateChildren(quantity);
+
+    }
+
 
     @Override
     public void onBackPressed() {

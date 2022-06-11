@@ -18,13 +18,6 @@
         android:padding="6dp"
         android:gravity="center_vertical">
 
-        <CheckBox
-            android:id="@+id/checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:minHeight="0dp" />
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,14 +61,22 @@
                 android:ellipsize="end"
                 android:text="Product Name" />
 
+                <!--                <TextView-->
+                <!--                    android:id="@+id/txtStock"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:layout_marginTop="4dp"-->
+                <!--                    android:textSize="12sp"-->
+                <!--                    android:textColor="@color/red"-->
+                <!--                    android:text="Stock: 50" />    -->
                 <TextView
-                    android:id="@+id/txtStock"
+                    android:id="@+id/txtSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:textSize="12sp"
                     android:textColor="@color/red"
-                    android:text="Stock: 50" />
+                    android:text="Size: Small" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -94,6 +95,7 @@
                         android:text="Rs. 100" />
 
                 <LinearLayout
+                    android:id="@+id/quantityLyt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"

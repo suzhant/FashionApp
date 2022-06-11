@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
-import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,14 +32,17 @@ public class CartActivity extends AppCompatActivity {
     ActivityCartBinding binding;
     CartAdapter cartAdapter;
     ArrayList<Product> products = new ArrayList<>();
+    ArrayList<Product> oldProducts = new ArrayList<>();
     FirebaseDatabase database;
     FirebaseAuth auth;
     ProductClickListener productClickListener;
-    ArrayList<Product> checkedProducts = new ArrayList<>();
+    public ArrayList<Product> checkedProducts = new ArrayList<>();
     ValueEventListener valueEventListener;
     DatabaseReference databaseReference;
     int size = 0;
     BottomNavigationView bottomNavigationView;
+    int sum;
+    public boolean isActionMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,12 @@ public class CartActivity extends AppCompatActivity {
         binding.imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+                if (isActionMode) {
+                    disableActionMode();
+                } else {
+                    onBackPressed();
+                }
+
             }
         });
 
@@ -70,23 +77,18 @@ public class CartActivity extends AppCompatActivity {
                     checkedProducts.remove(product);
                     size--;
                 }
-                if (size > 0) {
-                    binding.imgDelete.setVisibility(View.VISIBLE);
-                } else {
-                    binding.imgDelete.setVisibility(View.GONE);
-                    binding.chkAll.setChecked(false);
-                }
+                updateToolbarText(size);
             }
         };
 
 
         initRecyclerView();
-        databaseReference = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid()));
+        databaseReference = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid())).child("Product Details");
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
-                int sum = 0;
+                sum = 0;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     assert product != null;
@@ -95,8 +97,8 @@ public class CartActivity extends AppCompatActivity {
                         sum = sum + product.getpPrice() * product.getQuantity();
                     }
                 }
+                binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", sum)));
                 cartAdapter.notifyDataSetChanged();
-                binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("<small>Rs.</small> {0}", sum)));
                 showorhideCartBottomlyt();
             }
 
@@ -115,8 +117,14 @@ public class CartActivity extends AppCompatActivity {
                     deleteProductFromCart();
                     refreshAdapter();
                     size = 0;
-                    binding.imgDelete.setVisibility(View.GONE);
+                    updateToolbarText(size);
                     showSnackbar();
+                    isActionMode = false;
+                    cartAdapter.notifyDataSetChanged();
+                } else {
+                    Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "No Item Selected!!",
+                            Snackbar.LENGTH_SHORT);
+                    snackbar.show();
                 }
             }
         });
@@ -128,18 +136,16 @@ public class CartActivity extends AppCompatActivity {
             }
         });
 
-        binding.chkAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    cartAdapter.showAllBoxes();
-                } else {
-                    cartAdapter.hideAllBoxes();
-                }
-            }
-        });
 
+    }
 
+    private void disableActionMode() {
+        layoutInNormalMode();
+        binding.cardView.setVisibility(View.VISIBLE);
+        isActionMode = false;
+        size = 0;
+        checkedProducts.clear();
+        cartAdapter.notifyDataSetChanged();
     }
 
     private void showSnackbar() {
@@ -173,11 +179,14 @@ public class CartActivity extends AppCompatActivity {
             binding.cardView.setVisibility(View.VISIBLE);
             binding.emptyCartLyt.setVisibility(View.GONE);
         }
+        if (!isActionMode) {
+            layoutInNormalMode();
+        }
     }
 
     private void undoDeleteActionFromCart() {
         for (Product p : checkedProducts) {
-            database.getReference().child("Cart").child(auth.getUid()).child(p.getpId()).setValue(p);
+            database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getpId() + p.getSize()).setValue(p);
         }
         checkedProducts.clear();
     }
@@ -185,8 +194,8 @@ public class CartActivity extends AppCompatActivity {
     private void deleteProductFromCart() {
         for (Product p : checkedProducts) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put(p.getpId(), null);
-            database.getReference().child("Cart").child(auth.getUid()).updateChildren(map);
+            map.put(p.getpId() + p.getSize(), null);
+            database.getReference().child("Cart").child(auth.getUid()).child("Product Details").updateChildren(map);
         }
     }
 
@@ -202,6 +211,39 @@ public class CartActivity extends AppCompatActivity {
         binding.cartRecycler.setAdapter(cartAdapter);
     }
 
+    public void selectedItem() {
+        if (!isActionMode) {
+            isActionMode = true;
+            layoutInActionMode();
+            binding.cardView.setVisibility(View.GONE);
+            cartAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private void layoutInActionMode() {
+        binding.toolbarTxt.setVisibility(View.GONE);
+        binding.count.setVisibility(View.VISIBLE);
+        binding.imgBack.setImageResource(R.drawable.ic_close_24);
+        binding.imgDelete.setVisibility(View.VISIBLE);
+    }
+
+    private void layoutInNormalMode() {
+        binding.imgBack.setImageResource(R.drawable.ic_arrow_back_24);
+        binding.count.setVisibility(View.GONE);
+        binding.toolbarTxt.setVisibility(View.VISIBLE);
+        binding.imgDelete.setVisibility(View.GONE);
+    }
+
+    private void updateToolbarText(int size) {
+        if (size == 0) {
+            binding.count.setText(size + " item selected");
+        } else if (size == 1) {
+            binding.count.setText(size + " item selected");
+        } else if (size > 1) {
+            binding.count.setText(size + " items selected");
+        }
+    }
+
 
     @Override
     public void onDestroy() {
@@ -211,6 +253,10 @@ public class CartActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (isActionMode) {
+            disableActionMode();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

@@ -74,6 +74,10 @@ dependencies {
     //dexter
     implementation 'com.karumi:dexter:6.2.3'
 
+    //carousel
+    // Circle Indicator (To fix the xml preview "Missing classes" error)
+    implementation 'me.relex:circleindicator:2.1.6'
 
-    //tinycart
-    implementation 'com.github.hishd:TinyCart:1.0.1'}
+    implementation 'org.imaginativeworld.whynotimagecarousel:whynotimagecarousel:2.1.0'
+
+}

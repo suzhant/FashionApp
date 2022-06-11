@@ -25,7 +25,10 @@ import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.FragmentHomeBinding;
 
+import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -70,6 +73,15 @@ public class HomeFragment extends Fragment {
 
         Glide.with(this).load(R.drawable.profile).placeholder(R.drawable.avatar).into(binding.circleImageView);
         initReyclerView();
+
+        //banner slider
+        binding.imgBanner.registerLifecycle(getLifecycle());
+        List<CarouselItem> list = new ArrayList<>();
+        // Just image URL
+        list.add(new CarouselItem(R.drawable.summer_banner));
+        list.add(new CarouselItem(R.drawable.banner_2));
+        list.add(new CarouselItem(R.drawable.banner_3));
+        binding.imgBanner.setData(list);
 
         binding.chip1.setOnClickListener(new View.OnClickListener() {
             @Override

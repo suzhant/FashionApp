@@ -12,53 +12,60 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
-        android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="?actionBarSize">
 
-            <ImageView
-                android:id="@+id/imgBack"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tint="@color/skyBlue"
-                android:layout_marginStart="10dp"
-                android:src="@drawable/ic_arrow_back_24" />
+                android:gravity="center"
+                android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_weight="@integer/material_motion_duration_long_1"
-                android:fontFamily="@font/gilroy_medium"
-                android:text="My Cart"
-                android:textSize="24sp" />
+                <ImageView
+                    android:id="@+id/imgBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:tint="@color/skyBlue"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_arrow_back_24" />
 
-            <!--            <Button-->
-            <!--                android:id="@+id/btnDelete"-->
-            <!--                style="@style/Widget.AppCompat.Button.Borderless.Colored"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:text="Delete"-->
-            <!--                android:textAllCaps="false"-->
-            <!--                android:textColor="@color/black"-->
-            <!--                android:textSize="20sp"-->
-            <!--                android:visibility="gone" />-->
+                <TextView
+                    android:id="@+id/toolbarTxt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_weight="@integer/material_motion_duration_long_1"
+                    android:fontFamily="@font/gilroy_medium"
+                    android:text="My Cart"
+                    android:textSize="24sp" />
 
-            <ImageView
-                android:id="@+id/imgDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:visibility="gone"
-                android:src="@drawable/ic_fluent_delete_24_regular" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/count"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="@integer/material_motion_duration_long_1"
+                    android:fontFamily="@font/gilroy_medium"
+                    android:text="item selected"
+                    android:visibility="gone"
+                    android:gravity="center"
+                    android:textSize="20sp" />
+
+                <ImageView
+                    android:id="@+id/imgDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_fluent_delete_24_regular" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -126,26 +133,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <CheckBox
-                android:id="@+id/chkAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_gravity="center" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All"
-                android:textSize="16sp"
-                android:layout_gravity="center" />
-
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="end"
-                android:layout_marginEnd="10dp"
+                android:gravity="start"
+                android:layout_marginStart="20dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -162,7 +155,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/gilroy_bold"
-                    android:text="Rs. 1000"
+                    android:text="Rs. 0"
                     android:textColor="@color/skyBlue"
                     android:textSize="24sp" />
             </LinearLayout>

@@ -1,12 +1,11 @@
 package com.sushant.fashionapp.Models;
 
-import java.io.Serializable;
 import java.util.Objects;
 
-public class Product implements Serializable {
-    private String pId, pName, storeName;
+public class Product {
+    private String pId, pName, storeName, size;
     private int pPrice, pPic, love = 0, stock, quantity = 1;
-    private boolean isChecked;
+    private boolean checked = false;
 
     public Product() {
     }
@@ -89,7 +88,9 @@ public class Product implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return pPrice == product.pPrice && pPic == product.pPic && love == product.love && stock == product.stock && Objects.equals(pId, product.pId) && Objects.equals(pName, product.pName) && Objects.equals(storeName, product.storeName);
+        return pPrice == product.pPrice && pPic == product.pPic && love == product.love && stock == product.stock
+                && Objects.equals(pId, product.pId) && Objects.equals(pName, product.pName)
+                && Objects.equals(storeName, product.storeName) && quantity == product.quantity;
     }
 
     @Override
@@ -105,12 +106,20 @@ public class Product implements Serializable {
         this.quantity = quantity;
     }
 
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+
     public boolean isChecked() {
-        return isChecked;
+        return checked;
     }
 
     public void setChecked(boolean checked) {
-        isChecked = checked;
+        this.checked = checked;
     }
-
 }

@@ -56,6 +56,8 @@ public class CartDiffUtils extends DiffUtil.Callback {
             bundle.putString("newStoreName", newProduct.getStoreName());
         } else if (oldProduct.getStock() != newProduct.getStock()) {
             bundle.putInt("newStock", newProduct.getStock());
+        } else if (oldProduct.getQuantity() != newProduct.getQuantity()) {
+            bundle.putInt("newQuantity", newProduct.getQuantity());
         }
 
 
