@@ -15,6 +15,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:focusable="true"
+        android:visibility="gone"
         android:src="@drawable/ic_arrow_back_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
-        android:layout_marginTop="111dp"
+        android:layout_marginTop="70sp"
         android:fontFamily="@font/gilroy_bold"
         android:text="Login"
         android:textSize="32sp"
@@ -40,16 +41,14 @@
         android:fontFamily="@font/open_sans"
         android:text="Welcome back ! Please login to your account."
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.252"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4">
@@ -104,13 +103,13 @@
             android:layout_marginTop="40dp"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:fontFamily="@font/open_sans"
-            android:text="Sign In"
+            android:fontFamily="sans-serif-medium"
+            android:text="Login"
             android:textStyle="bold"
-            android:textAllCaps="false"
+            android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             app:backgroundTint="@color/skyBlue"
             app:cornerRadius="8dp" />
 
@@ -131,14 +130,18 @@
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp" />
 
-        <TextView
+        <Button
             android:id="@+id/txtForgotPass"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:text="Forgot Password"
             android:layout_marginTop="20dp"
-            android:textColor="@color/hintColor"
-            android:layout_gravity="center" />
+            android:fontFamily="sans-serif"
+            android:textAllCaps="false"
+            android:layout_gravity="center"
+            android:textColor="@color/hintColor" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -155,9 +158,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/open_sans"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="15sp"
+            android:layout_gravity="center"
             android:text="Don't have an account?" />
 
         <TextView
@@ -165,11 +168,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/open_sans"
-            android:textSize="14sp"
+            android:textSize="15sp"
             android:textStyle="bold"
             android:layout_marginStart="5dp"
             android:textColor="@color/skyBlue"
-            android:text="Create one" />
+            android:text="Create" />
 
     </LinearLayout>
 

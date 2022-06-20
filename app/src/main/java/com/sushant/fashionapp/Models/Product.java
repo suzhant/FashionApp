@@ -5,7 +5,6 @@ import java.util.Objects;
 public class Product {
     private String pId, pName, storeName, size;
     private int pPrice, pPic, love = 0, stock, quantity = 1;
-    private boolean checked = false;
 
     public Product() {
     }
@@ -115,11 +114,4 @@ public class Product {
         this.size = size;
     }
 
-    public boolean isChecked() {
-        return checked;
-    }
-
-    public void setChecked(boolean checked) {
-        this.checked = checked;
-    }
 }

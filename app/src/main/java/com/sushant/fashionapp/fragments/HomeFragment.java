@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -20,6 +21,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.CardAdapters;
+import com.sushant.fashionapp.Adapters.CategoryAdapter;
+import com.sushant.fashionapp.Models.Category;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
@@ -41,6 +44,8 @@ public class HomeFragment extends Fragment {
     ArrayList<Product> products = new ArrayList<>();
     FirebaseDatabase database;
     public GridLayoutManager layoutManager;
+    ArrayList<Category> categories = new ArrayList<>();
+    CategoryAdapter categoryAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -73,6 +78,7 @@ public class HomeFragment extends Fragment {
 
         Glide.with(this).load(R.drawable.profile).placeholder(R.drawable.avatar).into(binding.circleImageView);
         initReyclerView();
+        initCategoryRecycler();
 
         //banner slider
         binding.imgBanner.registerLifecycle(getLifecycle());
@@ -111,13 +117,25 @@ public class HomeFragment extends Fragment {
         products.add(new Product("7", "sushant", R.drawable.demo_rect, 700, "store7", 11));
         products.add(new Product("8", "sushant", R.drawable.demo_rect, 800, "store8", 12));
 
-        layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        //    layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.popularRecycler.setLayoutManager(layoutManager);
         popularAdapters = new CardAdapters(products, getActivity());
         popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         binding.popularRecycler.setAdapter(popularAdapters);
     }
 
+    private void initCategoryRecycler() {
+        categories.add(new Category(R.drawable.bussiness_man, "Men"));
+        categories.add(new Category(R.drawable.businesswoman, "Women"));
+        categories.add(new Category(R.drawable.children, "Kid"));
+        categories.add(new Category(R.drawable.baby, "Toddler"));
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        binding.categoryRecycler.setLayoutManager(layoutManager);
+        categoryAdapter = new CategoryAdapter(categories, getActivity());
+        binding.categoryRecycler.setAdapter(categoryAdapter);
+    }
 
 
     @Override

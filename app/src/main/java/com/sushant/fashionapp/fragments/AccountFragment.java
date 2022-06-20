@@ -10,8 +10,8 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.sushant.fashionapp.ActivitySignIn;
 import com.sushant.fashionapp.Utils.CheckConnection;
-import com.sushant.fashionapp.WelcomeScreen;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
 
 public class AccountFragment extends Fragment {
@@ -32,7 +32,7 @@ public class AccountFragment extends Fragment {
             public void onClick(View view) {
                 if (CheckConnection.isOnline(getContext())) {
                     auth.signOut();
-                    Intent intentLogout = new Intent(getContext(), WelcomeScreen.class);
+                    Intent intentLogout = new Intent(getContext(), ActivitySignIn.class);
                     intentLogout.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intentLogout);
                     Toast.makeText(getContext(), "Logged Out", Toast.LENGTH_SHORT).show();

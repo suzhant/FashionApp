@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="5dp"
+        app:cardCornerRadius="5dp"
+        android:background="@drawable/category_rectangle_bg"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/imgCategory"
+            android:layout_width="80dp"
+            android:layout_height="90dp"
+            android:src="@drawable/man2"
+            android:padding="5dp"
+            android:background="@drawable/rectangle_layout"
+            android:backgroundTint="@color/white" />
+
+        <TextView
+            android:id="@+id/txtCatName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Men"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</LinearLayout>

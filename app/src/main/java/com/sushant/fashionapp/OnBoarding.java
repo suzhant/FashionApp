@@ -25,7 +25,7 @@ public class OnBoarding extends AppCompatActivity {
         binding.fabNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(OnBoarding.this, WelcomeScreen.class);
+                Intent intent = new Intent(OnBoarding.this, ActivitySignIn.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }

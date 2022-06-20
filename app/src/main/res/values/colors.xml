@@ -14,6 +14,8 @@
     <color name="tea_900">#004D40</color>
     <color name="teal_100">#B2DFDB</color>
     <color name="medium_gray">#E5E5E5</color>
+    <color name="yellow_700">#FFD600</color>
+    <color name="amber_400">#FFC400</color>
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:overide="true">@color/hintColor
     </color>

@@ -19,6 +19,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgProductPic"
                 android:layout_width="match_parent"
@@ -35,7 +41,7 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/open_sans"
                 android:maxWidth="180dp"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:ellipsize="end"
                 android:text="Floral skirt"
                 android:textSize="14sp" />
@@ -43,7 +49,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
                 android:layout_marginTop="6dp"
                 android:gravity="center"
                 android:orientation="horizontal">
@@ -64,8 +69,30 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="0.5"
+                    android:visibility="gone"
                     android:src="@drawable/ic_favorite_border_24"
                     app:tint="@color/skyBlue" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <com.iarcuschin.simpleratingbar.SimpleRatingBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srb_maxStarSize="15dp"
+                    app:srb_numberOfStars="5"
+                    android:padding="10dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="(10)"
+                    android:textSize="12sp"
+                    android:textColor="@color/hintColor" />
             </LinearLayout>
 
 

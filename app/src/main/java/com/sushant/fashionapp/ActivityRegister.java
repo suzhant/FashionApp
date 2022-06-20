@@ -3,6 +3,7 @@ package com.sushant.fashionapp;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -13,16 +14,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -104,6 +106,14 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
             }
         });
 
+        binding.btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ActivityRegister.this, ActivitySignIn.class));
+                finishAfterTransition();
+            }
+        });
+
         binding.btnCreateAcc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,6 +123,18 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                 }
                 if (isFieldEmpty() | !validateRePass() | !validatePass() | !validateEmail() | !validatePhoneNumber()
                         | !validateDOB() | !genderValidation() | !nameValidation()) {
+                    return;
+                }
+                boolean check = binding.chkBox.isChecked();
+                if (!check) {
+                    Snackbar snackbar;
+                    snackbar = Snackbar.make(binding.ActivityRegisterParent, "Please agree to the terms and conditions", Snackbar.LENGTH_SHORT);
+                    TextView textView = (TextView) snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+                    textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_error_24, 0, 0, 0);
+                    textView.setCompoundDrawableTintList(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue)));
+                    textView.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(com.google.android.material.R.dimen.design_snackbar_padding_horizontal));
+                    textView.setGravity(Gravity.CENTER);
+                    snackbar.show();
                     return;
                 }
                 hideSoftKeyboard();
@@ -147,11 +169,12 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(getApplicationContext(), "Verification link couldn't be sent", Toast.LENGTH_SHORT).show();
+                                            Snackbar.make(binding.ActivityRegisterParent, "Verification link couldn't be sent", Snackbar.LENGTH_SHORT).show();
                                         }
                                     });
                                 } else {
-                                    Toast.makeText(ActivityRegister.this, Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                                    Snackbar.make(binding.ActivityRegisterParent, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()), Snackbar.LENGTH_SHORT)
+                                            .setTextMaxLines(1).show();
                                 }
 
                             }
@@ -221,22 +244,30 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String email = binding.edMail.getText().toString();
         String Password = binding.edPass.getText().toString();
         String Repass = binding.edRePass.getText().toString();
-        boolean check = binding.chkBox.isChecked();
-        if (!check | name.isEmpty() | Gender.isEmpty() | DOB.isEmpty() |PhoneNum.isEmpty()|email.isEmpty()|Password.isEmpty()|Repass.isEmpty()){
-            binding.txtError.setVisibility(View.VISIBLE);
-            binding.txtError.setText("Please fill all the fields");
+
+        if (name.isEmpty() | Gender.isEmpty() | DOB.isEmpty() | PhoneNum.isEmpty() | email.isEmpty() | Password.isEmpty() | Repass.isEmpty()) {
+//            binding.txtError.setVisibility(View.VISIBLE);
+//            binding.txtError.setText("Please fill all the fields");
+            Snackbar snackbar;
+            snackbar = Snackbar.make(binding.ActivityRegisterParent, "Please fill all the fields", Snackbar.LENGTH_SHORT);
+            TextView textView = (TextView) snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_error_24, 0, 0, 0);
+            textView.setCompoundDrawableTintList(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue)));
+            textView.setCompoundDrawablePadding(getResources().getDimensionPixelOffset(com.google.android.material.R.dimen.design_snackbar_padding_horizontal));
+            textView.setGravity(Gravity.CENTER);
+            snackbar.show();
             return true;
         }
-        binding.txtError.setVisibility(View.GONE);
+//        binding.txtError.setVisibility(View.GONE);
         return false;
     }
 
     private boolean nameValidation(){
         String name=binding.edUserName.getText().toString();
-        if (name.isEmpty()){
+        if (name.isEmpty()) {
             binding.ipUserName.requestFocus();
-            binding.ipUserName.setErrorEnabled(true);
-            binding.ipUserName.setError("Empty UserName!");
+            //    binding.ipUserName.setErrorEnabled(true);
+            //    binding.ipUserName.setError("Empty UserName!");
             return false;
         }else {
             binding.ipUserName.setErrorEnabled(false);
@@ -248,7 +279,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String gender=binding.autoComplete.getText().toString();
         if (gender.isEmpty()){
             binding.ipGender.requestFocus();
-            binding.ipGender.setError("Empty Field!");
+            //    binding.ipGender.setError("Empty Field!");
             return false;
         }
         binding.ipGender.setErrorEnabled(false);
@@ -259,7 +290,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String DOB=binding.edDOB.getMasked();
         if (DOB.isEmpty()){
             binding.ipDOB.requestFocus();
-            binding.ipDOB.setError("Empty field!");
+            //    binding.ipDOB.setError("Empty field!");
             return false;
         }
         if (DOB.length()<10){
@@ -288,7 +319,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String phone=binding.edPhone.getText().toString();
         if (phone.isEmpty()){
             binding.ipPhoneNumber.requestFocus();
-            binding.ipPhoneNumber.setError("Empty Phone Number!");
+            //   binding.ipPhoneNumber.setError("Empty Phone Number!");
             return false;
         }
 
@@ -304,7 +335,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String email = binding.edMail.getText().toString().trim();
         if (email.isEmpty()){
             binding.ipEmail.requestFocus();
-            binding.ipEmail.setError("Empty Email!");
+            //   binding.ipEmail.setError("Empty Email!");
             return false;
         }
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
@@ -323,7 +354,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         Matcher m = p.matcher(pass);
         if (pass.isEmpty()){
             binding.ipPass.requestFocus();
-            binding.ipPass.setError("Empty Password!");
+            //    binding.ipPass.setError("Empty Password!");
             return false;
         }
         if (!m.matches()) {
@@ -340,7 +371,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         String pass=binding.edPass.getText().toString();
         if (RePass.isEmpty()){
             binding.ipRePass.requestFocus();
-            binding.ipRePass.setError("Empty Field!");
+            //     binding.ipRePass.setError("Empty Field!");
             return false;
         }
         if (!RePass.equals(pass)){

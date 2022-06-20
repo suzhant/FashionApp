@@ -1,8 +1,10 @@
 package com.sushant.fashionapp.Models;
 
+import com.sushant.fashionapp.Utils.TextUtils;
+
 public class Users {
     private String userName, userEmail, userGender, userDOB, userPhone, userId, userPic;
-
+    public Gender gender;
 
     public Users() {
     }
@@ -20,7 +22,7 @@ public class Users {
     }
 
     public void setUserName(String userName) {
-        this.userName = userName;
+        this.userName = TextUtils.captializeAllFirstLetter(userName);
     }
 
     public String getUserEmail() {
