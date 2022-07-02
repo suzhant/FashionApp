@@ -1,4 +1,4 @@
-package com.sushant.fashionapp;
+package com.sushant.fashionapp.Buyer;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,9 +17,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.CartAdapter;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityCartBinding;
 
 import java.text.MessageFormat;

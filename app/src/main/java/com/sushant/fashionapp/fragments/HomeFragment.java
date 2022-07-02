@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,6 +32,7 @@ import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 
 public class HomeFragment extends Fragment {
@@ -77,8 +77,9 @@ public class HomeFragment extends Fragment {
         });
 
         Glide.with(this).load(R.drawable.profile).placeholder(R.drawable.avatar).into(binding.circleImageView);
-        initReyclerView();
+        initPopularRecyclerView();
         initCategoryRecycler();
+        initRecentRecycler();
 
         //banner slider
         binding.imgBanner.registerLifecycle(getLifecycle());
@@ -89,33 +90,56 @@ public class HomeFragment extends Fragment {
         list.add(new CarouselItem(R.drawable.banner_3));
         binding.imgBanner.setData(list);
 
-        binding.chip1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                initReyclerView();
-            }
-        });
 
-        binding.appBarLayout2.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                binding.topbar.setAlpha(1.0f - Math.abs(verticalOffset / (float)
-                        appBarLayout.getTotalScrollRange()));
-            }
-        });
+//        binding.appBarLayout2.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
+//            @Override
+//            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+//                binding.topbar.setAlpha(1.0f - Math.abs(verticalOffset / (float)
+//                        appBarLayout.getTotalScrollRange()));
+//            }
+//        });
         return binding.getRoot();
     }
 
-    private void initReyclerView() {
+    private void initPopularRecyclerView() {
         products.clear();
-        products.add(new Product("1", "Tailor stitch Cotton Oversize Korean T-shirt and Shirts", R.drawable.demo_rect, 100, "French Store", 10));
-        products.add(new Product("2", "paint", R.drawable.demo_rect, 200, "Nepali Store", 100));
-        products.add(new Product("3", "bag", R.drawable.demo_rect, 300, "Korean Store", 101));
-        products.add(new Product("4", "shoes", R.drawable.demo_rect, 400, "Chinese store", 102));
-        products.add(new Product("5", "hat", R.drawable.demo_rect, 500, "Japanese Store", 103));
-        products.add(new Product("6", "glasses", R.drawable.demo_rect, 600, "English Store", 1));
-        products.add(new Product("7", "sushant", R.drawable.demo_rect, 700, "store7", 11));
-        products.add(new Product("8", "sushant", R.drawable.demo_rect, 800, "store8", 12));
+        UUID pid = UUID.randomUUID();
+        String pid1 = String.valueOf(pid);
+        Product product1 = new Product(pid1, "Denim black jean style", "French Store", R.drawable.denim_black_jean_style);
+        product1.setMaxLimit(String.valueOf(2));
+        product1.setLove(0);
+        product1.setpPrice(100);
+        ArrayList<Product> variant1 = new ArrayList<>();
+        Product black = new Product(pid1 + "B", "Black", R.drawable.denim_black_jean_style);
+        ArrayList<Product> size1 = new ArrayList<>();
+        size1.add(new Product(pid1 + "BS", "S", 100, 10));
+        size1.add(new Product(pid1 + "BM", "M", 120, 10));
+        size1.add(new Product(pid1 + "BL", "L", 150, 10));
+        black.setSizes(size1);
+        variant1.add(black);
+
+        Product red = new Product(pid1 + "R", "Red", R.drawable.boy_sweeter);
+        ArrayList<Product> size2 = new ArrayList<>();
+        size2.add(new Product(pid1 + "RS", "S", 100, 10));
+        size2.add(new Product(pid1 + "RM", "M", 120, 10));
+        size2.add(new Product(pid1 + "RL", "L", 150, 10));
+        red.setSizes(size2);
+        variant1.add(red);
+        product1.setVariants(variant1);
+        products.add(product1);
+
+        Product product2 = new Product("2", "boots", R.drawable.boots, 200, "Nepali Store", 10);
+        product2.setMaxLimit(String.valueOf(5));
+        products.add(product2);
+        products.add(new Product("3", "boxer", R.drawable.boxer, 300, "Korean Store", 11));
+        products.add(new Product("4", "sweeter", R.drawable.boy_sweeter, 400, "Chinese store", 102));
+        products.add(new Product("5", "leather gloves", R.drawable.leather_gloves, 500, "Japanese Store", 103));
+        products.add(new Product("6", "stripe turtle neck top", R.drawable.stripe_turtle_neck_shirt, 600, "English Store", 1));
+        database.getReference().child("Products").setValue(null);
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            database.getReference().child("Products").child(product.getpId()).setValue(product);
+        }
 
         //    layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -123,24 +147,34 @@ public class HomeFragment extends Fragment {
         popularAdapters = new CardAdapters(products, getActivity());
         popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         binding.popularRecycler.setAdapter(popularAdapters);
+
     }
 
     private void initCategoryRecycler() {
-        categories.add(new Category(R.drawable.bussiness_man, "Men"));
-        categories.add(new Category(R.drawable.businesswoman, "Women"));
-        categories.add(new Category(R.drawable.children, "Kid"));
-        categories.add(new Category(R.drawable.baby, "Toddler"));
+        categories.add(new Category(R.drawable.indian_male, "Men"));
+        categories.add(new Category(R.drawable.model_with_coffee, "Women"));
+        categories.add(new Category(R.drawable.boy_kid, "Kid"));
+        categories.add(new Category(R.drawable.little_boy, "Toddler"));
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.categoryRecycler.setLayoutManager(layoutManager);
         categoryAdapter = new CategoryAdapter(categories, getActivity());
+        categoryAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         binding.categoryRecycler.setAdapter(categoryAdapter);
+    }
+
+    private void initRecentRecycler() {
+        //    layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        binding.recentRecycler.setLayoutManager(layoutManager);
+        popularAdapters = new CardAdapters(products, getActivity());
+        popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+        binding.recentRecycler.setAdapter(popularAdapters);
     }
 
 
     @Override
     public void onResume() {
-        binding.popularRecycler.scrollToPosition(3);
         super.onResume();
     }
 }

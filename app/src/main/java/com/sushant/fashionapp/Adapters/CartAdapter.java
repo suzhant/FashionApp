@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,10 +21,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
-import com.sushant.fashionapp.ActivityProductDetails;
-import com.sushant.fashionapp.CartActivity;
+import com.sushant.fashionapp.Buyer.ActivityProductDetails;
+import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
@@ -119,8 +122,23 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
                     if (product.getStock() > product.getQuantity()) {
-                        product.setQuantity(product.getQuantity() + 1);
-                        updateCartQuantity(product);
+                        if (product.getMaxLimit() != null) {
+                            int maxLimit = Integer.parseInt(product.getMaxLimit());
+                            if (product.getQuantity() < maxLimit) {
+                                product.setQuantity(product.getQuantity() + 1);
+                                updateCartQuantity(product);
+                            } else {
+                                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "MaxLimit is reached!", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                }, 200);
+                            }
+                        } else {
+                            product.setQuantity(product.getQuantity() + 1);
+                            updateCartQuantity(product);
+                        }
                     }
                 }
 
@@ -160,7 +178,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    {
                         Intent intent = new Intent(context, ActivityProductDetails.class);
                         intent.putExtra("pPic", product.getpPic());
                         intent.putExtra("pName", product.getpName());
@@ -169,7 +186,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         intent.putExtra("stock", product.getStock());
                         intent.putExtra("sName", product.getStoreName());
                         context.startActivity(intent);
-                    }
                 }
 
             }
@@ -195,9 +211,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public boolean onLongClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    cartActivity.selectedItem();
                     productClickListener.onClick(product, true);
                     holder.cardView.setStrokeWidth(5);
+                    cartActivity.selectedItem();
                 }
                 return false;
             }

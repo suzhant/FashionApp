@@ -79,11 +79,15 @@
         <item name="colorPrimary">@color/skyBlue</item>
     </style>
 
+    //chips
+
     <style name="CustomChipStyle" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="chipBackgroundColor">@color/chip_background_color</item>
         <item name="android:textColor">@color/chip_text_color</item>
         <item name="rippleColor">@color/mdtp_white</item>
         <item name="chipStrokeColor">@color/chip_stroke_color</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">8dp</item>
     </style>
 
     //shapeable imageview

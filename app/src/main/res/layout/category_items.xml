@@ -8,19 +8,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="5dp"
         app:cardCornerRadius="5dp"
-        android:background="@drawable/category_rectangle_bg"
         android:padding="10dp">
 
         <ImageView
             android:id="@+id/imgCategory"
             android:layout_width="80dp"
-            android:layout_height="90dp"
-            android:src="@drawable/man2"
-            android:padding="5dp"
-            android:background="@drawable/rectangle_layout"
-            android:backgroundTint="@color/white" />
+            android:layout_height="80dp"
+            android:src="@drawable/children"
+            android:padding="10dp"
+            android:background="@drawable/circle_bg" />
 
         <TextView
             android:id="@+id/txtCatName"

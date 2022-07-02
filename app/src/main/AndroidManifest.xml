@@ -14,10 +14,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
-            android:name=".CartActivity"
+            android:name=".seller.SellerRegistration"
             android:exported="false" />
         <activity
-            android:name=".ActivityProductDetails"
+            android:name=".Buyer.CartActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Buyer.ActivityProductDetails"
             android:exported="false" />
         <activity
             android:name=".ActivityHomePage"

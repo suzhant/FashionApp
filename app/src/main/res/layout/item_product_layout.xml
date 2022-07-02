@@ -12,7 +12,7 @@
         app:cardBackgroundColor="#FCFCFF"
         app:cardPreventCornerOverlap="false"
         app:cardCornerRadius="12dp"
-        app:cardElevation="4dp">
+        app:cardElevation="2dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,8 +29,8 @@
                 android:id="@+id/imgProductPic"
                 android:layout_width="match_parent"
                 android:layout_height="170dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/demo_rect" />
+                android:scaleType="centerInside"
+                android:src="@drawable/denim_black_jean_style" />
 
             <TextView
                 android:id="@+id/txtProductName"
@@ -39,8 +39,9 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="10dp"
-                android:fontFamily="@font/open_sans"
+                android:fontFamily="sans-serif"
                 android:maxWidth="180dp"
+                android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:text="Floral skirt"
@@ -59,19 +60,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_weight="1"
-                    android:fontFamily="@font/open_sans"
+                    android:fontFamily="sans-serif-condensed"
                     android:text="Rs 900"
                     android:textSize="14sp" />
 
-                <ImageView
-                    android:id="@+id/imgLove"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="0.5"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_favorite_border_24"
-                    app:tint="@color/skyBlue" />
             </LinearLayout>
 
             <LinearLayout

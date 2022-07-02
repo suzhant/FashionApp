@@ -1,15 +1,18 @@
 package com.sushant.fashionapp.Models;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Product {
-    private String pId, pName, storeName, size;
-    private int pPrice, pPic, love = 0, stock, quantity = 1;
+    private String pId, pName, storeName, size, maxLimit, color;
+    private Integer pPrice, pPic, stock, love, quantity;
+    private ArrayList<Product> variants;
+    private ArrayList<Product> sizes;
 
     public Product() {
     }
 
-    public Product(String pId, String pName, int pPic, int pPrice, String storeName, int stock) {
+    public Product(String pId, String pName, Integer pPic, Integer pPrice, String storeName, Integer stock) {
         this.pId = pId;
         this.pName = pName;
         this.pPic = pPic;
@@ -18,11 +21,24 @@ public class Product {
         this.stock = stock;
     }
 
-    public Product(String pId, String pName, int pPic, int pPrice) {
+    public Product(String pId, String size, Integer pPrice, Integer stock) {
+        this.pId = pId;
+        this.size = size;
+        this.pPrice = pPrice;
+        this.stock = stock;
+    }
+
+    public Product(String pId, String pName, String storeName, Integer pPic) {
         this.pId = pId;
         this.pName = pName;
+        this.storeName = storeName;
         this.pPic = pPic;
-        this.pPrice = pPrice;
+    }
+
+    public Product(String pId, String color, Integer pPic) {
+        this.pId = pId;
+        this.color = color;
+        this.pPic = pPic;
     }
 
     public String getpId() {
@@ -42,37 +58,6 @@ public class Product {
     }
 
 
-    public int getpPrice() {
-        return pPrice;
-    }
-
-    public void setpPrice(int pPrice) {
-        this.pPrice = pPrice;
-    }
-
-    public int getpPic() {
-        return pPic;
-    }
-
-    public void setpPic(int pPic) {
-        this.pPic = pPic;
-    }
-
-    public int getLove() {
-        return love;
-    }
-
-    public void setLove(int love) {
-        this.love = love;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
 
     public String getStoreName() {
         return storeName;
@@ -97,15 +82,6 @@ public class Product {
         return Objects.hash(pId, pName, storeName, pPrice, pPic, love, stock);
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-
     public String getSize() {
         return size;
     }
@@ -114,4 +90,75 @@ public class Product {
         this.size = size;
     }
 
+    public String getMaxLimit() {
+        return maxLimit;
+    }
+
+    public void setMaxLimit(String maxLimit) {
+        this.maxLimit = maxLimit;
+    }
+
+    public ArrayList<Product> getVariants() {
+        return variants;
+    }
+
+    public void setVariants(ArrayList<Product> variants) {
+        this.variants = variants;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public ArrayList<Product> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(ArrayList<Product> sizes) {
+        this.sizes = sizes;
+    }
+
+    public Integer getpPrice() {
+        return pPrice;
+    }
+
+    public void setpPrice(Integer pPrice) {
+        this.pPrice = pPrice;
+    }
+
+    public Integer getpPic() {
+        return pPic;
+    }
+
+    public void setpPic(Integer pPic) {
+        this.pPic = pPic;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public Integer getLove() {
+        return love;
+    }
+
+    public void setLove(Integer love) {
+        this.love = love;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

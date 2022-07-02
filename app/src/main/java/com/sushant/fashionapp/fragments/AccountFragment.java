@@ -7,17 +7,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
+import com.sushant.fashionapp.Models.Users;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
+import com.sushant.fashionapp.seller.SellerRegistration;
 
 public class AccountFragment extends Fragment {
 
     FragmentAccountBinding binding;
     FirebaseAuth auth;
+    FirebaseDatabase database;
+    boolean isSeller = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,6 +35,7 @@ public class AccountFragment extends Fragment {
         binding = FragmentAccountBinding.inflate(inflater, container, false);
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
 
         binding.cardLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +50,33 @@ public class AccountFragment extends Fragment {
                     CheckConnection.showCustomDialog(getContext());
                 }
 
+            }
+        });
+        database.getReference().child("Seller").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Users users = snapshot1.getValue(Users.class);
+                    if (users.getUserId().equals(auth.getUid())) {
+                        isSeller = true;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        binding.cardSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isSeller) {
+                    startActivity(new Intent(getContext(), SellerRegistration.class));
+                } else {
+                    Toast.makeText(getContext(), "You are a seller", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         return binding.getRoot();

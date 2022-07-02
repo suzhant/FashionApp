@@ -83,4 +83,7 @@ dependencies {
     //rating bar
     implementation 'com.iarcuschin:simpleratingbar:0.1.5'
 
+    //readmore
+    implementation 'com.github.devendroid:ReadMoreOption:1.0.2'
+
 }

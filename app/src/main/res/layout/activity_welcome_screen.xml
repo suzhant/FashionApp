@@ -32,13 +32,27 @@
         app:layout_constraintStart_toStartOf="@+id/imgBoarding"
         app:layout_constraintTop_toBottomOf="@+id/imgBoarding" />
 
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Who are you?"
+        android:textColor="@color/skyBlue"
+        android:textSize="15sp"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toTopOf="@+id/btnRegister"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="140dp"
         android:layout_height="60dp"
         android:layout_marginEnd="20dp"
         android:fontFamily="@font/gilroy_medium"
-        android:text="Register"
+        android:text="Admin"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textSize="18sp"
@@ -53,10 +67,9 @@
         style="?attr/materialButtonOutlinedStyle"
         android:layout_width="140dp"
         android:layout_height="60dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="20dp"
         android:fontFamily="@font/gilroy_medium"
-        android:text="Sign In"
+        android:text="Buyer"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:textColor="@color/black"
@@ -64,7 +77,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/txtBoarding"
         app:layout_constraintStart_toEndOf="@+id/btnRegister"
-        app:layout_constraintTop_toBottomOf="@+id/txtBoarding"
         app:strokeColor="@color/skyBlue" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
