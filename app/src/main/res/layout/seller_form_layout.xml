@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:importantForAutofill="no"
-                android:inputType="text"
+                android:inputType="text|textCapWords"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 

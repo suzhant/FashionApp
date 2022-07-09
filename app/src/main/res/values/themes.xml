@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.FashionApp" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.FashionApp" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/skyBlue</item>
         <item name="colorPrimaryVariant">@color/black</item>
@@ -11,6 +11,8 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor">@color/alice_blue</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
         <!-- Customize your theme here. -->
         <item name="android:textColor">@color/black</item>
         <item name="android:windowActivityTransitions">true</item>
@@ -18,6 +20,8 @@
         <item name="circularProgressIndicatorStyle">@style/Widget.App.CircularProgressIndicator
         </item>
         <item name="chipStyle">@style/CustomChipStyle</item>
+
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
 
     </style>
 
@@ -123,6 +127,28 @@
         <item name="android:textSize">24sp</item>
         <item name="fontFamily">@font/gilroy_medium</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+
+    //bottom navigation bar
+
+    <style name="Widget.App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <!--        <item name="colorSurface">@color/anti_flash_white</item>-->
+        <!--        <item name="colorOnSurfaceVariant">@color/anti_flash_white</item>-->
+    </style>
+
+    <style name="TextAppearance.Active" parent="">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.Inactive" parent="">
+        <item name="android:textSize">13sp</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 
 

@@ -36,12 +36,13 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     ArrayList<Product> products;
     Context context;
     ProductClickListener productClickListener;
-    private CartActivity cartActivity;
+    private final CartActivity cartActivity;
 
     public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
@@ -261,8 +262,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     private void updateCartQuantity(Product product) {
         HashMap<String, Object> quantity = new HashMap<>();
         quantity.put("quantity", product.getQuantity());
-        FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).
-                child("Product Details").child(product.getpId() + product.getSize()).updateChildren(quantity);
+        FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).
+                child("Product Details").child(product.getpId()).updateChildren(quantity);
 
     }
 

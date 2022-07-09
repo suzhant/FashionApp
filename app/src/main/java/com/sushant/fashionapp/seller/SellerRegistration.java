@@ -9,11 +9,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -35,14 +36,22 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.hbb20.CountryCodePicker;
+import com.sushant.fashionapp.Models.Store;
+import com.sushant.fashionapp.Models.Users;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.SellerHomePage;
+import com.sushant.fashionapp.Utils.ImageUtils;
 import com.sushant.fashionapp.Utils.TextFieldValidation;
 import com.sushant.fashionapp.databinding.ActivitySellerRegistrationBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 public class SellerRegistration extends AppCompatActivity {
 
@@ -54,7 +63,14 @@ public class SellerRegistration extends AppCompatActivity {
     android.app.DatePickerDialog.OnDateSetListener setListener;
     FirebaseDatabase database;
     FirebaseAuth auth;
+    FirebaseStorage storage;
     int year, month, day;
+    private String storeName, dob, storeAddress, storeDesc, storeEmail, vatNo, panNo, citizenNo, sellerPhoneNum, storePhoneNum, sellerName, sellerEmail;
+    private Drawable citizenFront, citizenBack, panFront, panBack;
+    //   private List<Uri> images= new ArrayList<>();
+    private HashMap<String, Uri> images = new HashMap<>();
+    private Uri citizenFrontUri, citizenBackUri, panFrontUri, panBackUri;
+    UUID storeId;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -65,6 +81,7 @@ public class SellerRegistration extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
 
         database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -83,18 +100,18 @@ public class SellerRegistration extends AppCompatActivity {
             }
         });
 
-        binding.storeLayout.edShopDescription.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (view.getId() == R.id.edShopDescription) {
-                    view.getParent().requestDisallowInterceptTouchEvent(true);
-                    if ((motionEvent.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
-                        view.getParent().requestDisallowInterceptTouchEvent(false);
-                    }
-                }
-                return false;
-            }
-        });
+//        binding.storeLayout.edShopDescription.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                if (view.getId() == R.id.edShopDescription) {
+//                    view.getParent().requestDisallowInterceptTouchEvent(true);
+//                    if ((motionEvent.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
+//                        view.getParent().requestDisallowInterceptTouchEvent(false);
+//                    }
+//                }
+//                return false;
+//            }
+//        });
 
         binding.sellerLayout.cardCitizenFront.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,6 +153,7 @@ public class SellerRegistration extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 deleteImage(binding.sellerLayout.imgCitizenFront, binding.sellerLayout.linearCitizenFront, binding.sellerLayout.cardCitizenFront, binding.sellerLayout.imgCitizenFrontClose);
+                images.remove("citizenFrontUri");
             }
         });
 
@@ -143,6 +161,7 @@ public class SellerRegistration extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 deleteImage(binding.sellerLayout.imgCitizenBack, binding.sellerLayout.linearCitizenBack, binding.sellerLayout.cardCitizenBack, binding.sellerLayout.imgCitizenBackClose);
+                images.remove("citizenBackUri");
             }
         });
 
@@ -150,6 +169,7 @@ public class SellerRegistration extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 deleteImage(binding.sellerLayout.imgPANFront, binding.sellerLayout.linearPANFront, binding.sellerLayout.cardPANFront, binding.sellerLayout.imgPANFrontClose);
+                images.remove("panFrontUri");
             }
         });
 
@@ -157,6 +177,7 @@ public class SellerRegistration extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 deleteImage(binding.sellerLayout.imgPANBack, binding.sellerLayout.linearPANBack, binding.sellerLayout.cardPANBack, binding.sellerLayout.imgPANBackClose);
+                images.remove("panBackUri");
             }
         });
 
@@ -186,11 +207,12 @@ public class SellerRegistration extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             // There are no request codes
                             if (result.getData().getData() != null) {
-                                Uri selectedImage = result.getData().getData();
+                                citizenFrontUri = result.getData().getData();
                                 binding.sellerLayout.linearCitizenFront.setVisibility(View.GONE);
-                                binding.sellerLayout.imgCitizenFront.setImageURI(selectedImage);
+                                binding.sellerLayout.imgCitizenFront.setImageURI(citizenFrontUri);
                                 binding.sellerLayout.cardCitizenFront.setEnabled(false);
                                 binding.sellerLayout.imgCitizenFrontClose.setVisibility(View.VISIBLE);
+                                images.put("citizenFrontUri", citizenFrontUri);
                                 //     createImageBitmap(selectedImage);
                             }
                         }
@@ -205,11 +227,12 @@ public class SellerRegistration extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             // There are no request codes
                             if (result.getData().getData() != null) {
-                                Uri selectedImage = result.getData().getData();
+                                citizenBackUri = result.getData().getData();
                                 binding.sellerLayout.linearCitizenBack.setVisibility(View.GONE);
-                                binding.sellerLayout.imgCitizenBack.setImageURI(selectedImage);
+                                binding.sellerLayout.imgCitizenBack.setImageURI(citizenBackUri);
                                 binding.sellerLayout.cardCitizenBack.setEnabled(false);
                                 binding.sellerLayout.imgCitizenBackClose.setVisibility(View.VISIBLE);
+                                images.put("citizenBackUri", citizenBackUri);
                                 //     createImageBitmap(selectedImage);
                             }
                         }
@@ -224,11 +247,12 @@ public class SellerRegistration extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             // There are no request codes
                             if (result.getData().getData() != null) {
-                                Uri selectedImage = result.getData().getData();
+                                panFrontUri = result.getData().getData();
                                 binding.sellerLayout.linearPANFront.setVisibility(View.GONE);
-                                binding.sellerLayout.imgPANFront.setImageURI(selectedImage);
+                                binding.sellerLayout.imgPANFront.setImageURI(panFrontUri);
                                 binding.sellerLayout.cardPANFront.setEnabled(false);
                                 binding.sellerLayout.imgPANFrontClose.setVisibility(View.VISIBLE);
+                                images.put("panFrontUri", panFrontUri);
                                 //     createImageBitmap(selectedImage);
                             }
                         }
@@ -243,11 +267,12 @@ public class SellerRegistration extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                             // There are no request codes
                             if (result.getData().getData() != null) {
-                                Uri selectedImage = result.getData().getData();
+                                panBackUri = result.getData().getData();
                                 binding.sellerLayout.linearPANBack.setVisibility(View.GONE);
-                                binding.sellerLayout.imgPANBack.setImageURI(selectedImage);
+                                binding.sellerLayout.imgPANBack.setImageURI(panBackUri);
                                 binding.sellerLayout.cardPANBack.setEnabled(false);
                                 binding.sellerLayout.imgPANBackClose.setVisibility(View.VISIBLE);
+                                images.put("panBackUri", panBackUri);
                                 //     createImageBitmap(selectedImage);
                             }
                         }
@@ -267,6 +292,8 @@ public class SellerRegistration extends AppCompatActivity {
                 if (isFieldEmpty() | !validStorePhone | !validStoreEmail | !validSellerPhone | !validDOB | !validSellerEmail) {
                     return;
                 }
+                createStoreAccount();
+                createSellerAccount();
             }
         });
 
@@ -348,24 +375,71 @@ public class SellerRegistration extends AppCompatActivity {
 
     }
 
+    private void uploadImageToFirebase(String sellerId) {
+        for (Map.Entry<String, Uri> set : images.entrySet()) {
+            ImageUtils.createImageBitmap(set.getValue(), set.getKey(), sellerId, SellerRegistration.this);
+        }
+        startActivity(new Intent(SellerRegistration.this, SellerHomePage.class));
+    }
+
+    private void createSellerAccount() {
+        UUID uuid = UUID.randomUUID();
+        String sellerId = uuid.toString();
+        Users users = new Users(sellerName, sellerEmail, sellerPhoneNum);
+        users.setUserDOB(dob);
+        users.setPanNo(panNo);
+        users.setCitizenNo(citizenNo);
+        users.setSellerId(sellerId);
+        database.getReference().child("Seller").child(sellerId).setValue(users).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                HashMap<String, Object> buyer = new HashMap<>();
+                buyer.put("sellerId", sellerId);
+                database.getReference().child("Users").child(auth.getUid()).updateChildren(buyer).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                uploadImageToFirebase(sellerId);
+                            }
+                        }, 100);
+                    }
+                });
+            }
+        });
+    }
+
+    private void createStoreAccount() {
+        storeId = UUID.randomUUID();
+        Store store = new Store.StoreBuilder(storeName, storePhoneNum, storeEmail)
+                .storeAddress(storeAddress).storeVAT(vatNo).storeDesc(storeDesc)
+                .ownerId(auth.getUid()).storeId(String.valueOf(storeId)).build();
+        database.getReference().child("Store").child(String.valueOf(storeId)).setValue(store);
+    }
+
     private boolean isFieldEmpty() {
-        String storeName = binding.storeLayout.edStoreName.getText().toString();
-        String DOB = binding.sellerLayout.edDOB.getMasked();
-        String PhoneNum = binding.storeLayout.edPhone.getText().toString();
-        String email = binding.storeLayout.edMail.getText().toString();
-        String shopAddress = binding.storeLayout.edShopAddress.getText().toString();
-        String vatNo = binding.storeLayout.edVatNo.getText().toString();
-        String panNo = binding.sellerLayout.edPanNo.getText().toString();
-        String citizenNo = binding.sellerLayout.edCitizenNo.getText().toString();
-        String shopDesc = binding.storeLayout.edShopDescription.getText().toString();
-        Drawable citizenFront = binding.sellerLayout.imgCitizenFront.getDrawable();
-        Drawable citizenBack = binding.sellerLayout.imgCitizenBack.getDrawable();
-        Drawable panFront = binding.sellerLayout.imgPANFront.getDrawable();
-        Drawable panBack = binding.sellerLayout.imgPANBack.getDrawable();
+        storeName = binding.storeLayout.edStoreName.getText().toString();
+        dob = binding.sellerLayout.edDOB.getMasked();
+        storePhoneNum = binding.storeLayout.edPhone.getText().toString();
+        storeEmail = binding.storeLayout.edMail.getText().toString();
+        storeAddress = binding.storeLayout.edShopAddress.getText().toString();
+        vatNo = binding.storeLayout.edVatNo.getText().toString();
+        panNo = binding.sellerLayout.edPanNo.getText().toString();
+        citizenNo = binding.sellerLayout.edCitizenNo.getText().toString();
+        sellerPhoneNum = binding.sellerLayout.edPhone.getText().toString();
+        storeDesc = binding.storeLayout.edShopDescription.getText().toString();
+        sellerName = binding.sellerLayout.edUserName.getText().toString();
+        sellerEmail = binding.sellerLayout.edMail.getText().toString();
+        citizenFront = binding.sellerLayout.imgCitizenFront.getDrawable();
+        citizenBack = binding.sellerLayout.imgCitizenBack.getDrawable();
+        panFront = binding.sellerLayout.imgPANFront.getDrawable();
+        panBack = binding.sellerLayout.imgPANBack.getDrawable();
 
 
-        if (storeName.isEmpty() | DOB.isEmpty() | PhoneNum.isEmpty() | email.isEmpty() | shopAddress.isEmpty() | vatNo.isEmpty()
-                | panNo.isEmpty() | citizenNo.isEmpty() | shopDesc.isEmpty() | citizenFront == null | citizenBack == null | panFront == null | panBack == null) {
+        if (storeName.isEmpty() | dob.isEmpty() | storePhoneNum.isEmpty() | storeEmail.isEmpty() | storeAddress.isEmpty() | storeDesc.isEmpty() | sellerName.isEmpty() | sellerPhoneNum.isEmpty() | dob.isEmpty() |
+                sellerEmail.isEmpty() | vatNo.isEmpty() | panNo.isEmpty() | citizenNo.isEmpty() | citizenFront == null | citizenBack == null | panFront == null | panBack == null) {
             Snackbar snackbar;
             snackbar = Snackbar.make(binding.parent, "Please fill all the fields", Snackbar.LENGTH_SHORT);
             TextView textView = (TextView) snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);

@@ -1,7 +1,7 @@
 package com.sushant.fashionapp.Inteface;
 
-import com.denzcoskun.imageslider.models.SlideModel;
+import com.sushant.fashionapp.Models.Product;
 
 public interface VariantClickListener {
-    void onClick(SlideModel slideModel, boolean b);
+    void onClick(Product product, int pos);
 }

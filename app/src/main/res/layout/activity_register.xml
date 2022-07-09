@@ -90,7 +90,7 @@
                     android:id="@+id/edUserName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
+                    android:inputType="textPersonName|textCapWords"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -218,6 +218,7 @@
                 android:hint="Password"
                 android:textColorHint="@color/hintColor"
                 app:boxStrokeColor="@color/skyBlue"
+                app:errorIconDrawable="@null"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -239,6 +240,7 @@
                 android:hint="Confirm Password"
                 android:textColorHint="@color/hintColor"
                 app:boxStrokeColor="@color/skyBlue"
+                app:errorIconDrawable="@null"
                 app:endIconMode="password_toggle">
 
                 <com.google.android.material.textfield.TextInputEditText

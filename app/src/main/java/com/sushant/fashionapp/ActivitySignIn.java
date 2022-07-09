@@ -21,11 +21,11 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.Utils.CheckConnection;
-import com.sushant.fashionapp.Utils.TextFieldValidation;
 import com.sushant.fashionapp.databinding.ActivitySignInBinding;
 
 import java.util.concurrent.Executor;
@@ -170,7 +170,7 @@ public class ActivitySignIn extends AppCompatActivity {
                 }
                 String email = binding.edMail.getText().toString().trim();
                 String pass = binding.edPass.getText().toString().trim();
-                if (isFieldEmpty() | !TextFieldValidation.validateEmail(binding.ipEmail, email) | !passwordValidation()) {
+                if (isFieldEmpty()) {
                     return;
                 }
                 performAuth(email, pass);
@@ -181,18 +181,10 @@ public class ActivitySignIn extends AppCompatActivity {
     private boolean isFieldEmpty() {
         String email = binding.edMail.getText().toString();
         String Password = binding.edPass.getText().toString();
-        return email.isEmpty() | Password.isEmpty();
-    }
-
-    private boolean passwordValidation() {
-        String pass = binding.edPass.getText().toString().trim();
-        if (pass.isEmpty()) {
-            binding.ipPass.setError("Empty Field!");
-            binding.ipPass.requestFocus();
-            return false;
+        if (email.isEmpty() | Password.isEmpty()) {
+            Snackbar.make(binding.parent, "Please fill all the fields", Snackbar.LENGTH_SHORT).show();
         }
-        binding.ipPass.setErrorEnabled(false);
-        return true;
+        return email.isEmpty() | Password.isEmpty();
     }
 
     //Firebase Email Authentication
@@ -220,7 +212,8 @@ public class ActivitySignIn extends AppCompatActivity {
                             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                             Toast.makeText(ActivitySignIn.this, "Sign In Successful", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(ActivitySignIn.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Snackbar.make(binding.parent, task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
+                            //   Toast.makeText(ActivitySignIn.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

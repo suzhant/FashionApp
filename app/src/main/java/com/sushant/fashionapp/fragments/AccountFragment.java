@@ -16,7 +16,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
-import com.sushant.fashionapp.Models.Users;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
 import com.sushant.fashionapp.seller.SellerRegistration;
@@ -52,14 +51,11 @@ public class AccountFragment extends Fragment {
 
             }
         });
-        database.getReference().child("Seller").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Users users = snapshot1.getValue(Users.class);
-                    if (users.getUserId().equals(auth.getUid())) {
-                        isSeller = true;
-                    }
+                if (snapshot.child("sellerId").exists()) {
+                    isSeller = true;
                 }
             }
 
@@ -76,6 +72,7 @@ public class AccountFragment extends Fragment {
                     startActivity(new Intent(getContext(), SellerRegistration.class));
                 } else {
                     Toast.makeText(getContext(), "You are a seller", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getContext(), SellerRegistration.class));
                 }
             }
         });

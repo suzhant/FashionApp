@@ -25,9 +25,10 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
     VariantClickListener productClickListener;
     int selectedItemPos = 0;
 
-    public VariantAdapter(ArrayList<Product> products, Context context) {
+    public VariantAdapter(ArrayList<Product> products, Context context, VariantClickListener productClickListener) {
         this.products = products;
         this.context = context;
+        this.productClickListener = productClickListener;
     }
 
     @NonNull
@@ -43,10 +44,9 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
         Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
         if (holder.getAbsoluteAdapterPosition() == selectedItemPos) {
             holder.cardVariant.setStrokeColor(ContextCompat.getColorStateList(context, R.color.black));
-            //     productClickListener.onClick(products.get(position),true);
+            productClickListener.onClick(product, holder.getAbsoluteAdapterPosition());
         } else {
             holder.cardVariant.setStrokeColor(ContextCompat.getColorStateList(context, R.color.medium_gray));
-            //     productClickListener.onClick(products.get(position),false);
         }
         holder.cardVariant.setOnClickListener(new View.OnClickListener() {
             @Override

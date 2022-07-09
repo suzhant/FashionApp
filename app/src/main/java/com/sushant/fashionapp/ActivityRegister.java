@@ -121,8 +121,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                     CheckConnection.showCustomDialog(ActivityRegister.this);
                     return;
                 }
-                if (isFieldEmpty() | !validateRePass() | !validatePass() | !validateEmail() | !validatePhoneNumber()
-                        | !validateDOB() | !genderValidation() | !nameValidation()) {
+                if (isFieldEmpty() | !validateRePass() | !validatePass() | !validateEmail() | !validatePhoneNumber() | !nameValidation()) {
                     return;
                 }
                 boolean check = binding.chkBox.isChecked();
@@ -141,7 +140,6 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                 binding.btnCreateAcc.setVisibility(View.GONE);
                 binding.circularProgressIndicator.setVisibility(View.VISIBLE);
                 String name = binding.edUserName.getText().toString();
-                String DOB = binding.edDOB.getMasked();
                 String PhoneNum = binding.edPhone.getText().toString().trim();
                 String email = binding.edMail.getText().toString().trim();
                 String Password = binding.edPass.getText().toString().trim();
@@ -155,9 +153,9 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                 if (task.isSuccessful()) {
                                     showCreatingDialog();
                                     FirebaseUser users = auth.getCurrentUser();
-                                    Users user = new Users(name, email, gender, DOB, PhoneNum);
+                                    Users user = new Users(name, email, PhoneNum);
                                     String id = task.getResult().getUser().getUid();
-                                    user.setUserId(id);
+                                    user.setBuyerId(id);
                                     database.getReference().child("Users").child(id).setValue(user);
                                     resetAllFields();
                                     assert users != null;
@@ -174,7 +172,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                     });
                                 } else {
                                     Snackbar.make(binding.ActivityRegisterParent, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()), Snackbar.LENGTH_SHORT)
-                                            .setTextMaxLines(1).show();
+                                            .setTextMaxLines(2).show();
                                 }
 
                             }
@@ -238,14 +236,12 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
 
     private boolean isFieldEmpty() {
         String name = binding.edUserName.getText().toString();
-        String Gender = binding.autoComplete.getText().toString();
-        String DOB = binding.edDOB.getMasked();
         String PhoneNum = binding.edPhone.getText().toString();
         String email = binding.edMail.getText().toString();
         String Password = binding.edPass.getText().toString();
         String Repass = binding.edRePass.getText().toString();
 
-        if (name.isEmpty() | Gender.isEmpty() | DOB.isEmpty() | PhoneNum.isEmpty() | email.isEmpty() | Password.isEmpty() | Repass.isEmpty()) {
+        if (name.isEmpty() | PhoneNum.isEmpty() | email.isEmpty() | Password.isEmpty() | Repass.isEmpty()) {
 //            binding.txtError.setVisibility(View.VISIBLE);
 //            binding.txtError.setText("Please fill all the fields");
             Snackbar snackbar;

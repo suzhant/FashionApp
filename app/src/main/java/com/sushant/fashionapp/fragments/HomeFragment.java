@@ -32,7 +32,6 @@ import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 
 public class HomeFragment extends Fragment {
@@ -103,26 +102,27 @@ public class HomeFragment extends Fragment {
 
     private void initPopularRecyclerView() {
         products.clear();
-        UUID pid = UUID.randomUUID();
-        String pid1 = String.valueOf(pid);
-        Product product1 = new Product(pid1, "Denim black jean style", "French Store", R.drawable.denim_black_jean_style);
+        //    UUID pid = UUID.randomUUID();
+        //   String pid1 = String.valueOf(pid);
+        String key = database.getReference().child("Products").push().getKey();
+
+        Product product1 = new Product(key, "Denim black jean style", "French Store", R.drawable.denim_black_jean_style);
         product1.setMaxLimit(String.valueOf(2));
         product1.setLove(0);
         product1.setpPrice(100);
         ArrayList<Product> variant1 = new ArrayList<>();
-        Product black = new Product(pid1 + "B", "Black", R.drawable.denim_black_jean_style);
+        Product black = new Product(key + "B", "Black", R.drawable.denim_black_jean_style);
         ArrayList<Product> size1 = new ArrayList<>();
-        size1.add(new Product(pid1 + "BS", "S", 100, 10));
-        size1.add(new Product(pid1 + "BM", "M", 120, 10));
-        size1.add(new Product(pid1 + "BL", "L", 150, 10));
+        size1.add(new Product(key + "BS", "S", 100, 10));
+        size1.add(new Product(key + "BM", "M", 120, 10));
+        size1.add(new Product(key + "BL", "L", 150, 10));
         black.setSizes(size1);
         variant1.add(black);
 
-        Product red = new Product(pid1 + "R", "Red", R.drawable.boy_sweeter);
+        Product red = new Product(key + "R", "Red", R.drawable.boy_sweeter);
         ArrayList<Product> size2 = new ArrayList<>();
-        size2.add(new Product(pid1 + "RS", "S", 100, 10));
-        size2.add(new Product(pid1 + "RM", "M", 120, 10));
-        size2.add(new Product(pid1 + "RL", "L", 150, 10));
+        size2.add(new Product(key + "RS", "S", 100, 10));
+        size2.add(new Product(key + "RL", "L", 150, 10));
         red.setSizes(size2);
         variant1.add(red);
         product1.setVariants(variant1);

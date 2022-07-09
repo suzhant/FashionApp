@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.FashionApp" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.FashionApp" parent="Theme.Material3.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/skyBlue</item>
         <item name="colorPrimaryVariant">@color/white</item>
@@ -12,6 +12,8 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:navigationBarColor">@color/alice_blue</item>
+        <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
         <!-- Customize your theme here. -->
         <item name="android:textColor">@color/black</item>
         <item name="android:windowActivityTransitions">true</item>
@@ -24,7 +26,7 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeStyle">@style/Widget.App.ActionMode</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close_24</item>
-
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
 
     </style>
 </resources>

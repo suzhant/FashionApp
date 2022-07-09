@@ -8,12 +8,33 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class ImageUtils {
+    private static final FirebaseStorage storage = FirebaseStorage.getInstance();
+    private static final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private static final FirebaseAuth auth = FirebaseAuth.getInstance();
 
     public static Bitmap handleSamplingAndRotationBitmap(Context context, Uri selectedImage)
             throws IOException {
@@ -105,7 +126,7 @@ public class ImageUtils {
         return rotatedImg;
     }
 
-    public static void createImageBitmap(Uri imageUrl, ProgressDialog dialog, String name, String pp, Context context) {
+    public static void createImageBitmap(Uri imageUrl, String imageName, String sellerId, Context context) {
         Bitmap bitmap = null;
         try {
             bitmap = ImageUtils.handleSamplingAndRotationBitmap(context, imageUrl);
@@ -117,6 +138,59 @@ public class ImageUtils {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] bytes = baos.toByteArray();
         int length = bytes.length / 1024;
+        uploadImageToFirebase(bytes, length, imageName, sellerId, context);
+    }
+
+    private static void uploadImageToFirebase(byte[] uri, int length, String imageName, String sellerId, Context context) {
+        Calendar calendar = Calendar.getInstance();
+        ProgressDialog dialog = new ProgressDialog(context);
+        if (length > 256) {
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        }
+        dialog.setProgress(0);
+        dialog.setMessage("Uploading Image");
+        dialog.show();
+        final StorageReference reference = storage.getReference().child("Seller").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child(calendar.getTimeInMillis() + "");
+        UploadTask uploadTask = reference.putBytes(uri);
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.P)
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                // Uri fdelete = Uri.fromFile(new File(uri.toString()));
+                // File fdelete= new File(uri.toString());
+                //File fdelete = new File(Objects.requireNonNull(getFilePath(uri)));
+
+                if (task.isSuccessful()) {
+                    dialog.dismiss();
+                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @RequiresApi(api = Build.VERSION_CODES.P)
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String filePath = uri.toString();
+                            HashMap<String, Object> image = new HashMap<>();
+                            image.put(imageName, filePath);
+                            database.getReference().child("Seller").child(sellerId).updateChildren(image);
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+                //only works if image size is greater than 256kb!
+                if (length > 256) {
+                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+                    int currentProgress = (int) progress;
+                    dialog.setProgress(currentProgress);
+                }
+            }
+        });
     }
 
 }

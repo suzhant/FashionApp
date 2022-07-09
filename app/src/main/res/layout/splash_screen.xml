@@ -12,22 +12,26 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     app:flow_horizontalBias="0.6"
-    android:layout_marginTop="285dp"
+    android:layout_marginTop="200dp"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent">
+    <!--    <ImageView-->
+    <!--        android:id="@+id/imgLogo"-->
+    <!--        android:layout_width="80dp"-->
+    <!--        android:layout_height="80dp"-->
+    <!--        android:src="@drawable/splash_square"-->
+    <!--        app:tint="#09AEA3" />-->
+    <!--    <ImageView-->
+    <!--        android:layout_width="50dp"-->
+    <!--        android:layout_height="70dp"-->
+    <!--        android:layout_gravity="center"-->
+    <!--        app:tint="@color/white"-->
+    <!--        android:src="@drawable/check_48px"/>-->
     <ImageView
-        android:id="@+id/imgLogo"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:src="@drawable/splash_square"
-        app:tint="#09AEA3" />
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="70dp"
-        android:layout_gravity="center"
-        app:tint="@color/white"
-        android:src="@drawable/check_48px"/>
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/fashion_logo" />
 </FrameLayout>
 
 

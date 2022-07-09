@@ -188,7 +188,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void undoDeleteActionFromCart() {
         for (Product p : checkedProducts) {
-            database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getpId() + p.getSize()).setValue(p);
+            database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getpId()).setValue(p);
         }
         checkedProducts.clear();
     }
@@ -196,7 +196,7 @@ public class CartActivity extends AppCompatActivity {
     private void deleteProductFromCart() {
         for (Product p : checkedProducts) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put(p.getpId() + p.getSize(), null);
+            map.put(p.getpId(), null);
             database.getReference().child("Cart").child(auth.getUid()).child("Product Details").updateChildren(map);
         }
     }
