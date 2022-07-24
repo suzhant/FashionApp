@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 public class TextFieldValidation {
 
+
     public static boolean validateName(TextInputLayout input, String name) {
         if (name.isEmpty()) {
             input.requestFocus();
@@ -69,6 +70,7 @@ public class TextFieldValidation {
         ipDOB.setErrorEnabled(false);
         return true;
     }
+
 
     static boolean validateDOBFormat(String DOB) {
         int day = Integer.parseInt(DOB.substring(0, 2));

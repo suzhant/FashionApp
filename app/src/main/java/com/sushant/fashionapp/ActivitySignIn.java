@@ -4,6 +4,7 @@ import static android.hardware.biometrics.BiometricManager.Authenticators.BIOMET
 import static android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -164,6 +166,7 @@ public class ActivitySignIn extends AppCompatActivity {
         binding.btnSingIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                hideSoftKeyboard();
                 if (!CheckConnection.isOnline(ActivitySignIn.this)) {
                     CheckConnection.showCustomDialog(ActivitySignIn.this);
                     return;
@@ -218,6 +221,14 @@ public class ActivitySignIn extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    public void hideSoftKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
 }

@@ -15,7 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
-            android:name=".SellerHomePage"
+            android:name=".seller.ActivityAddProduct"
+            android:exported="false" />
+        <activity
+            android:name=".seller.SellerHomePage"
             android:exported="false" />
         <activity
             android:name=".seller.SellerRegistration"

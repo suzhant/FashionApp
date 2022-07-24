@@ -1,6 +1,7 @@
 package com.sushant.fashionapp;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -8,11 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.sushant.fashionapp.databinding.ActivityOnBoardingBinding;
+import com.sushant.fashionapp.seller.SellerHomePage;
 
 public class OnBoarding extends AppCompatActivity {
 
     ActivityOnBoardingBinding binding;
     FirebaseAuth auth;
+    SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,10 +35,15 @@ public class OnBoarding extends AppCompatActivity {
         });
 
         if (auth.getCurrentUser() != null) {
-            startActivity(new Intent(OnBoarding.this, ActivityHomePage.class));
+            sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
+            boolean isSeller = sharedPreferences.getBoolean("isSeller", false);
+            if (isSeller) {
+                startActivity(new Intent(OnBoarding.this, SellerHomePage.class));
+            } else {
+                startActivity(new Intent(OnBoarding.this, ActivityHomePage.class));
+            }
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
         }
-
-
     }
 }

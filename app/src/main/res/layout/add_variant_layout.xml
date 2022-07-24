@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/variantLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bg"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"
+        android:textSize="16sp"
+        android:text="Enter variant details" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/ipColorName"
+        style="@style/Widget.App.TextInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:hint="Color Name"
+        android:textColorHint="@color/hintColor"
+        app:boxStrokeColor="@color/skyBlue"
+        app:endIconMode="clear_text">
+
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edColorName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="no"
+            android:inputType="text|textCapWords"
+            android:textSize="14sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddSize"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Sizes"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        app:icon="@drawable/ic_plus"
+        app:iconTint="@color/skyBlue"
+        app:iconSize="30dp"
+        android:paddingStart="0dp"
+        android:textColor="@color/skyBlue"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerSize"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
+
+    <!--    <com.google.android.material.textfield.TextInputLayout-->
+    <!--        android:id="@+id/ipSize"-->
+    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="20dp"-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:layout_marginRight="20dp"-->
+    <!--        android:layout_gravity="start"-->
+    <!--        android:hint="Select Size"-->
+    <!--        app:boxCornerRadiusBottomEnd="10dp"-->
+    <!--        app:boxCornerRadiusBottomStart="10dp"-->
+    <!--        app:boxCornerRadiusTopEnd="10dp"-->
+    <!--        app:boxCornerRadiusTopStart="10dp"-->
+    <!--        app:boxStrokeColor="@color/skyBlue">-->
+
+    <!--        <AutoCompleteTextView-->
+    <!--            android:id="@+id/autoSize"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:inputType="none"-->
+    <!--            android:textSize="14sp" />-->
+    <!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--    <com.google.android.material.textfield.TextInputLayout-->
+    <!--        android:id="@+id/ipStock"-->
+    <!--        style="@style/Widget.App.TextInputLayout"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="20dp"-->
+    <!--        android:layout_marginRight="20dp"-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:hint="Number of Stocks"-->
+    <!--        android:textColorHint="@color/hintColor"-->
+    <!--        app:boxStrokeColor="@color/skyBlue"-->
+    <!--        app:endIconMode="clear_text">-->
+
+
+    <!--        <com.google.android.material.textfield.TextInputEditText-->
+    <!--            android:id="@+id/edStock"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:importantForAutofill="no"-->
+    <!--            android:inputType="number"-->
+    <!--            android:textSize="14sp" />-->
+    <!--    </com.google.android.material.textfield.TextInputLayout>-->
+
+    <!--    <TextView-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="Select Sizes"-->
+    <!--        android:fontFamily="sans-serif-medium"-->
+    <!--        android:textStyle="bold"-->
+    <!--        android:layout_marginLeft="20dp"-->
+    <!--        android:layout_marginRight="20dp"-->
+    <!--        android:layout_marginTop="10dp" />-->
+
+    <!--    <com.google.android.material.chip.ChipGroup-->
+    <!--        android:id="@+id/chip_group"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="20dp"-->
+    <!--        android:layout_marginTop="10dp"-->
+    <!--        android:layout_marginRight="20dp"-->
+    <!--        app:selectionRequired="true"-->
+    <!--        app:singleSelection="false">-->
+
+    <!--        <com.google.android.material.chip.Chip-->
+    <!--            android:id="@+id/chipSml"-->
+    <!--            android:layout_width="40dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:layout_marginEnd="10dp"-->
+    <!--            android:fontFamily="@font/gilroy_bold"-->
+    <!--            android:text="S"-->
+    <!--            android:textAlignment="center"-->
+    <!--            app:chipCornerRadius="4dp"-->
+    <!--            app:chipMinTouchTargetSize="0dp"-->
+    <!--            app:chipStrokeWidth="1dp" />-->
+
+    <!--        <com.google.android.material.chip.Chip-->
+    <!--            android:id="@+id/chipMed"-->
+    <!--            android:layout_width="40dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:layout_marginEnd="10dp"-->
+    <!--            android:text="M"-->
+    <!--            android:textAlignment="center"-->
+    <!--            app:chipCornerRadius="4dp"-->
+    <!--            app:chipMinTouchTargetSize="0dp"-->
+    <!--            app:chipStrokeWidth="1dp" />-->
+
+    <!--        <com.google.android.material.chip.Chip-->
+    <!--            android:id="@+id/chipLrg"-->
+    <!--            android:layout_width="40dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:layout_marginEnd="10dp"-->
+    <!--            android:text="L"-->
+    <!--            android:textAlignment="center"-->
+    <!--            app:chipCornerRadius="4dp"-->
+    <!--            app:chipMinTouchTargetSize="0dp"-->
+    <!--            app:chipStrokeWidth="1dp" />-->
+
+    <!--        <com.google.android.material.chip.Chip-->
+    <!--            android:id="@+id/chipXl"-->
+    <!--            android:layout_width="40dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:text="XL"-->
+    <!--            android:textAlignment="center"-->
+    <!--            app:chipCornerRadius="4dp"-->
+    <!--            app:chipMinTouchTargetSize="0dp"-->
+    <!--            app:chipStrokeWidth="1dp" />-->
+
+    <!--        <com.google.android.material.chip.Chip-->
+    <!--            android:id="@+id/chipXXl"-->
+    <!--            android:layout_width="50dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:text="XXL"-->
+    <!--            android:textAlignment="center"-->
+    <!--            app:chipCornerRadius="4dp"-->
+    <!--            app:chipMinTouchTargetSize="0dp"-->
+    <!--            app:chipStrokeWidth="1dp" />-->
+    <!--    </com.google.android.material.chip.ChipGroup>-->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload Photo"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="bold"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardUpload"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="8dp"
+            android:layout_marginTop="10dp"
+            app:cardBackgroundColor="@color/medium_gray">
+
+            <LinearLayout
+                android:id="@+id/linearCitizenFront"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_add_24"
+                    app:tint="@color/black"
+                    android:layout_marginVertical="10dp" />
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnAddVariant"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Add Variant"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp" />
+</LinearLayout>

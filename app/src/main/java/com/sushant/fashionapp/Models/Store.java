@@ -64,16 +64,19 @@ public class Store {
     }
 
     public static class StoreBuilder {
+        //required
         private final String storeName;
-        private String storeId;
-        private String storeRating;
         private final String storePhone;
         private final String storeEmail;
+        //optional
+        private String storeId;
+        private String storeRating;
         private String storeAddress;
         private String storeVAT;
         private String storeDesc;
         private String ownerId;
 
+        //required fields
         public StoreBuilder(String storeName, String storePhone, String storeEmail) {
             this.storeName = storeName;
             this.storePhone = storePhone;
@@ -111,7 +114,7 @@ public class Store {
         }
 
 
-        //Return the finally consrcuted User object
+        //Return the finally consrcuted Store object
         public Store build() {
             return new Store(this);
         }

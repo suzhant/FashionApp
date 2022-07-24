@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardLyt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+        app:cardBackgroundColor="#FCFCFF"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
+        android:layout_marginEnd="10dp"
+        app:cardPreventCornerOverlap="false">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtColorName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:maxWidth="180dp"
+                android:maxLines="1"
+                android:text="Color: black"
+                android:textSize="14sp" />
+
+
+            <TextView
+                android:id="@+id/txtSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtColorName"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxWidth="180dp"
+                android:maxLines="1"
+                android:text="Sizes"
+                android:textSize="14sp" />
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/txtSize"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_below="@id/txtColorName"-->
+            <!--                android:layout_marginStart="10dp"-->
+            <!--                android:layout_marginTop="5dp"-->
+            <!--                android:fontFamily="sans-serif-condensed"-->
+            <!--                android:text="Size: M"-->
+            <!--                android:textSize="14sp" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/txtStock"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="10dp"-->
+            <!--                android:layout_marginTop="5dp"-->
+            <!--                android:layout_weight="1"-->
+            <!--                android:layout_below="@id/txtSize"-->
+            <!--                android:fontFamily="sans-serif-condensed"-->
+            <!--                android:text="Stock: 10"-->
+            <!--                android:textSize="14sp" />-->
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSizes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtSize"
+                android:padding="5dp" />
+
+            <TextView
+                android:id="@+id/txtPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/recyclerSizes"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxWidth="180dp"
+                android:maxLines="1"
+                android:text="Photos"
+                android:textSize="14sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtPhoto"
+                android:padding="5dp" />
+
+            <ImageView
+                android:id="@+id/imgDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:padding="5dp"
+                android:layout_margin="6dp"
+                android:src="@drawable/ic_fluent_delete_24_regular"
+                app:tint="@color/red" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

@@ -41,7 +41,7 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
-        Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
+        Glide.with(context).load(product.getPhotos().get(0)).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
         if (holder.getAbsoluteAdapterPosition() == selectedItemPos) {
             holder.cardVariant.setStrokeColor(ContextCompat.getColorStateList(context, R.color.black));
             productClickListener.onClick(product, holder.getAbsoluteAdapterPosition());

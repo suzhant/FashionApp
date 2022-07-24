@@ -2,6 +2,7 @@ package com.sushant.fashionapp.Utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -20,15 +21,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sushant.fashionapp.seller.SellerHomePage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class ImageUtils {
@@ -126,71 +129,93 @@ public class ImageUtils {
         return rotatedImg;
     }
 
-    public static void createImageBitmap(Uri imageUrl, String imageName, String sellerId, Context context) {
-        Bitmap bitmap = null;
-        try {
-            bitmap = ImageUtils.handleSamplingAndRotationBitmap(context, imageUrl);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public static void createImageBitmap(HashMap<String, Uri> imageUrl, String sellerId, Context context) {
+        ArrayList<byte[]> images = new ArrayList<>();
+        ArrayList<String> imageName = new ArrayList<>();
+        for (Map.Entry<String, Uri> set : imageUrl.entrySet()) {
+            Bitmap bitmap = null;
+            try {
+                bitmap = ImageUtils.handleSamplingAndRotationBitmap(context, set.getValue());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            assert bitmap != null;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] bytes = baos.toByteArray();
+            images.add(bytes);
+            imageName.add(set.getKey());
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        assert bitmap != null;
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] bytes = baos.toByteArray();
-        int length = bytes.length / 1024;
-        uploadImageToFirebase(bytes, length, imageName, sellerId, context);
+
+        int totalLength = totalLength(images);
+        uploadMultipleImageToFirebase(images, totalLength, imageName, sellerId, context);
     }
 
-    private static void uploadImageToFirebase(byte[] uri, int length, String imageName, String sellerId, Context context) {
+    private static void uploadMultipleImageToFirebase(ArrayList<byte[]> uri, int length, ArrayList<String> imageName, String sellerId, Context context) {
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(context);
-        if (length > 256) {
-            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        }
-        dialog.setProgress(0);
+//        if (length > 256) {
+//            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//        }
+//        dialog.setProgress(0);
+        dialog.setTitle("Images");
         dialog.setMessage("Uploading Image");
+        dialog.setCancelable(false);
         dialog.show();
-        final StorageReference reference = storage.getReference().child("Seller").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child(calendar.getTimeInMillis() + "");
-        UploadTask uploadTask = reference.putBytes(uri);
-        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-            @RequiresApi(api = Build.VERSION_CODES.P)
-            @Override
-            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                // Uri fdelete = Uri.fromFile(new File(uri.toString()));
-                // File fdelete= new File(uri.toString());
-                //File fdelete = new File(Objects.requireNonNull(getFilePath(uri)));
-
-                if (task.isSuccessful()) {
+        for (int i = 0; i < uri.size(); i++) {
+            final StorageReference reference = storage.getReference().child("Seller").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child(calendar.getTimeInMillis() + "");
+            UploadTask uploadTask = reference.putBytes(uri.get(i));
+            int finalI = i;
+            int size = uri.size();
+            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @RequiresApi(api = Build.VERSION_CODES.P)
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                String filePath = uri.toString();
+                                HashMap<String, Object> image = new HashMap<>();
+                                image.put(imageName.get(finalI), filePath);
+                                database.getReference().child("Seller").child(sellerId).updateChildren(image);
+                                if (finalI == size - 1) {
+                                    dialog.dismiss();
+                                    context.startActivity(new Intent(context, SellerHomePage.class));
+                                }
+                            }
+                        });
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
-                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @RequiresApi(api = Build.VERSION_CODES.P)
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            String filePath = uri.toString();
-                            HashMap<String, Object> image = new HashMap<>();
-                            image.put(imageName, filePath);
-                            database.getReference().child("Seller").child(sellerId).updateChildren(image);
-                        }
-                    });
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, "Upload failed", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-            }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                //only works if image size is greater than 256kb!
-                if (length > 256) {
-                    double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
-                    int currentProgress = (int) progress;
-                    dialog.setProgress(currentProgress);
-                }
-            }
-        });
+            });
+//                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
+//                    //only works if image size is greater than 256kb!
+//                    if (length > 256) {
+//                        double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+//                        int currentProgress = (int) progress;
+//                        dialog.setProgress(currentProgress);
+//                    }
+//                }
+//            });
+        }
+
+    }
+
+    private static int totalLength(ArrayList<byte[]> images) {
+        int sum = 0;
+        for (byte[] bytes : images) {
+            sum += bytes.length / 1024;
+        }
+        return sum;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.sushant.fashionapp.fragments;
+package com.sushant.fashionapp.fragments.Seller;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,26 +15,57 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.ActivitySignIn;
 import com.sushant.fashionapp.Utils.CheckConnection;
-import com.sushant.fashionapp.databinding.FragmentAccountBinding;
-import com.sushant.fashionapp.seller.SellerRegistration;
+import com.sushant.fashionapp.Utils.TextUtils;
+import com.sushant.fashionapp.databinding.FragmentSellerAccountBinding;
 
-public class AccountFragment extends Fragment {
+public class SellerAccountFragment extends Fragment {
 
-    FragmentAccountBinding binding;
+    FragmentSellerAccountBinding binding;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    boolean isSeller = false;
+    String sellerId, name, email, phone;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        binding = FragmentAccountBinding.inflate(inflater, container, false);
+        binding = FragmentSellerAccountBinding.inflate(inflater, container, false);
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+
+        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                sellerId = snapshot.child("sellerId").getValue(String.class);
+                database.getReference().child("Seller").child(sellerId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        name = snapshot.child("userName").getValue(String.class);
+                        email = snapshot.child("userEmail").getValue(String.class);
+                        phone = snapshot.child("userPhone").getValue(String.class);
+                        binding.txtName.setText(TextUtils.captializeAllFirstLetter(name));
+                        binding.txtEmail.setText(email);
+                        binding.txtPhone.setText(phone);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         binding.cardLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,29 +82,11 @@ public class AccountFragment extends Fragment {
 
             }
         });
-        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("sellerId").exists()) {
-                    isSeller = true;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
         binding.cardSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isSeller) {
-                    startActivity(new Intent(getContext(), SellerRegistration.class));
-                } else {
-                    Toast.makeText(getContext(), "You are a seller", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getContext(), SellerRegistration.class));
-                }
+                startActivity(new Intent(getContext(), ActivityHomePage.class));
             }
         });
         return binding.getRoot();

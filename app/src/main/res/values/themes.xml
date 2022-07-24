@@ -97,8 +97,8 @@
     //shapeable imageview
 
     <style name="ShapeAppearanceOverlay.App.Card.Media" parent="">
-        <item name="cornerSizeBottomLeft">0dp</item>
-        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">10dp</item>
+        <item name="cornerSizeBottomRight">10dp</item>
         <item name="cornerSizeTopLeft">10dp</item>
         <item name="cornerSizeTopRight">10dp</item>
     </style>

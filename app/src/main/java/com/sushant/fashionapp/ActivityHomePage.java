@@ -1,7 +1,7 @@
 package com.sushant.fashionapp;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -21,11 +20,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.CartActivity;
-import com.sushant.fashionapp.Utils.CheckConnection;
+import com.sushant.fashionapp.Utils.Dialogs;
 import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
-import com.sushant.fashionapp.fragments.AccountFragment;
-import com.sushant.fashionapp.fragments.HomeFragment;
-import com.sushant.fashionapp.fragments.MessageFragment;
+import com.sushant.fashionapp.fragments.Buyer.AccountFragment;
+import com.sushant.fashionapp.fragments.Buyer.HomeFragment;
+import com.sushant.fashionapp.fragments.Buyer.MessageFragment;
 
 import java.util.Objects;
 
@@ -48,7 +47,9 @@ public class ActivityHomePage extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         BadgeDrawable badge = binding.bottomNavigation.getOrCreateBadge(R.id.page_3);
-
+        SharedPreferences.Editor editor = getSharedPreferences("userData", MODE_PRIVATE).edit();
+        editor.putBoolean("isSeller", false);
+        editor.apply();
 
         replaceFragment(new HomeFragment());
 
@@ -135,38 +136,13 @@ public class ActivityHomePage extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (binding.bottomNavigation.getSelectedItemId() == R.id.page_1) {
-            logoutDialog();
+            Dialogs.logoutDialog(ActivityHomePage.this, this);
         } else {
             binding.bottomNavigation.setSelectedItemId(R.id.page_1);
             if (binding.bottomNavigation.getVisibility() == View.GONE) {
                 binding.bottomNavigation.setVisibility(View.VISIBLE);
             }
 
-        }
-    }
-
-
-    private void logoutDialog() {
-        if (CheckConnection.isOnline(ActivityHomePage.this)) {
-            new MaterialAlertDialogBuilder(this, R.style.RoundShapeTheme)
-                    .setMessage("Do you want to logout?")
-                    .setTitle("Logout")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            startActivity(new Intent(getApplicationContext(), ActivitySignIn.class));
-                            auth.signOut();
-                            finishAfterTransition();
-                        }
-                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.dismiss();
-                }
-            }).show();
-        } else {
-            CheckConnection.showCustomDialog(ActivityHomePage.this);
         }
     }
 

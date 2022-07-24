@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Product {
-    private String pId, pName, storeName, size, maxLimit, color;
-    private Integer pPrice, pPic, stock, love, quantity;
+    private String pId, pName, storeName, size, maxLimit, color, desc, pPic;
+    private Integer pPrice, stock, love, quantity;
     private ArrayList<Product> variants;
     private ArrayList<Product> sizes;
+    private ArrayList<String> photos;
+    private String previewPic;
+    private String category, subCategory;
 
     public Product() {
     }
 
-    public Product(String pId, String pName, Integer pPic, Integer pPrice, String storeName, Integer stock) {
+    public Product(String pId, String pName, String pPic, Integer pPrice, String storeName, Integer stock) {
         this.pId = pId;
         this.pName = pName;
         this.pPic = pPic;
@@ -28,14 +31,14 @@ public class Product {
         this.stock = stock;
     }
 
-    public Product(String pId, String pName, String storeName, Integer pPic) {
+    public Product(String pId, String pName, String storeName, String previewPic) {
         this.pId = pId;
         this.pName = pName;
         this.storeName = storeName;
-        this.pPic = pPic;
+        this.previewPic = previewPic;
     }
 
-    public Product(String pId, String color, Integer pPic) {
+    public Product(String pId, String color, String pPic) {
         this.pId = pId;
         this.color = color;
         this.pPic = pPic;
@@ -130,14 +133,6 @@ public class Product {
         this.pPrice = pPrice;
     }
 
-    public Integer getpPic() {
-        return pPic;
-    }
-
-    public void setpPic(Integer pPic) {
-        this.pPic = pPic;
-    }
-
     public Integer getStock() {
         return stock;
     }
@@ -160,5 +155,53 @@ public class Product {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public String getPreviewPic() {
+        return previewPic;
+    }
+
+    public void setPreviewPic(String previewPic) {
+        this.previewPic = previewPic;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public ArrayList<String> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(ArrayList<String> photos) {
+        this.photos = photos;
+    }
+
+    public String getpPic() {
+        return pPic;
+    }
+
+    public void setpPic(String pPic) {
+        this.pPic = pPic;
     }
 }

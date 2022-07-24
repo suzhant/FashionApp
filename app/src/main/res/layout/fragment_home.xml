@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:overScrollMode="never"
     android:touchscreenBlocksFocus="true"
-    tools:context=".fragments.HomeFragment">
+    tools:context=".fragments.Buyer.HomeFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topbar"
@@ -17,7 +17,7 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/circleImageView"
             android:layout_width="60dp"
-                    android:layout_height="60dp"
+            android:layout_height="60dp"
                     android:layout_marginStart="20dp"
                     android:src="@drawable/avatar"
                     app:civ_border_color="@color/white"

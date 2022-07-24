@@ -9,7 +9,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,7 +27,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,7 +42,6 @@ import com.hbb20.CountryCodePicker;
 import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.Models.Users;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.SellerHomePage;
 import com.sushant.fashionapp.Utils.ImageUtils;
 import com.sushant.fashionapp.Utils.TextFieldValidation;
 import com.sushant.fashionapp.databinding.ActivitySellerRegistrationBinding;
@@ -50,7 +50,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class SellerRegistration extends AppCompatActivity {
@@ -66,7 +66,6 @@ public class SellerRegistration extends AppCompatActivity {
     FirebaseStorage storage;
     int year, month, day;
     private String storeName, dob, storeAddress, storeDesc, storeEmail, vatNo, panNo, citizenNo, sellerPhoneNum, storePhoneNum, sellerName, sellerEmail;
-    private Drawable citizenFront, citizenBack, panFront, panBack;
     //   private List<Uri> images= new ArrayList<>();
     private HashMap<String, Uri> images = new HashMap<>();
     private Uri citizenFrontUri, citizenBackUri, panFrontUri, panBackUri;
@@ -375,16 +374,17 @@ public class SellerRegistration extends AppCompatActivity {
 
     }
 
-    private void uploadImageToFirebase(String sellerId) {
-        for (Map.Entry<String, Uri> set : images.entrySet()) {
-            ImageUtils.createImageBitmap(set.getValue(), set.getKey(), sellerId, SellerRegistration.this);
-        }
-        startActivity(new Intent(SellerRegistration.this, SellerHomePage.class));
+    private void uploadImageToFirebase(String sellerId, HashMap<String, Uri> image) {
+//        for (Map.Entry<String, Uri> set : image.entrySet()) {
+//
+//        }
+        ImageUtils.createImageBitmap(image, sellerId, SellerRegistration.this);
     }
 
     private void createSellerAccount() {
-        UUID uuid = UUID.randomUUID();
-        String sellerId = uuid.toString();
+//        UUID uuid = UUID.randomUUID();
+//        String sellerId = uuid.toString();
+        String sellerId = database.getReference().child("Seller").push().getKey();
         Users users = new Users(sellerName, sellerEmail, sellerPhoneNum);
         users.setUserDOB(dob);
         users.setPanNo(panNo);
@@ -395,16 +395,14 @@ public class SellerRegistration extends AppCompatActivity {
             public void onSuccess(Void unused) {
                 HashMap<String, Object> buyer = new HashMap<>();
                 buyer.put("sellerId", sellerId);
-                database.getReference().child("Users").child(auth.getUid()).updateChildren(buyer).addOnSuccessListener(new OnSuccessListener<Void>() {
+                database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).updateChildren(buyer).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                uploadImageToFirebase(sellerId);
-                            }
-                        }, 100);
+                        uploadImageToFirebase(sellerId, images);
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
                     }
                 });
             }
@@ -420,6 +418,7 @@ public class SellerRegistration extends AppCompatActivity {
     }
 
     private boolean isFieldEmpty() {
+        Drawable citizenFront, citizenBack, panFront, panBack;
         storeName = binding.storeLayout.edStoreName.getText().toString();
         dob = binding.sellerLayout.edDOB.getMasked();
         storePhoneNum = binding.storeLayout.edPhone.getText().toString();

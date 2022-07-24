@@ -42,13 +42,15 @@ import java.util.Objects;
 public class ActivityProductDetails extends AppCompatActivity {
 
     ActivityProductDetailsBinding binding;
-    int price, stock, pPic, quantity, variantPos, index;
+    int price, stock, quantity, variantPos, index;
+    String pic;
     String maxLimit;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, sName, pId, color;
+    String pName, sName, pId, color, pDesc;
     String sizeId, actualProductId, variantId;
     ArrayList<Product> products = new ArrayList<>();
+    ArrayList<String> images = new ArrayList<>();
     VariantAdapter variantAdapter;
     List<SlideModel> list = new ArrayList<>();
     VariantClickListener variantClickListener;
@@ -66,17 +68,16 @@ public class ActivityProductDetails extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
 
         price = getIntent().getIntExtra("pPrice", 0);
-        pPic = getIntent().getIntExtra("pPic", 0);
+        pic = getIntent().getStringExtra("pPic");
         sName = getIntent().getStringExtra("sName");
         pId = getIntent().getStringExtra("pId");
+        pDesc = getIntent().getStringExtra("pDesc");
         binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
 
-        list.add(new SlideModel(pPic, null));
-        list.add(new SlideModel(R.drawable.red_skirt, null));
-        list.add(new SlideModel(R.drawable.red_dress2, null));
+        list.add(new SlideModel(pic, null));
         binding.imgSlider.setImageList(list);
 
-
+        binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
 //        binding.txtDescription.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -92,14 +93,14 @@ public class ActivityProductDetails extends AppCompatActivity {
         variantClickListener = new VariantClickListener() {
             @Override
             public void onClick(Product product, int pos) {
-                pPic = product.getpPic();
+                pic = product.getPhotos().get(0);
                 color = product.getColor();
                 variantPos = pos;
                 sizes.clear();
                 binding.chipGroup.clearCheck();
-                variantId = product.getpId();
                 sizeId = null;
                 sizes.addAll(product.getSizes());
+
                 for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
                     Chip chip = (Chip) binding.chipGroup.getChildAt(j);
                     chip.setEnabled(false);
@@ -108,13 +109,21 @@ public class ActivityProductDetails extends AppCompatActivity {
                 for (int i = 0; i < sizes.size(); i++) {
                     for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
                         Chip chip = (Chip) binding.chipGroup.getChildAt(j);
-                        if (sizes.get(i).getSize().equals(chip.getText().toString())) {
+                        if (chip.getText().toString().equals(sizes.get(i).getSize())) {
                             chip.setEnabled(true);
                             chip.setChipBackgroundColorResource(R.color.chip_background_color);
                             break;
                         }
                     }
                 }
+
+                //adding pic in slider
+                list.clear();
+                for (int i = 0; i < product.getPhotos().size(); i++) {
+                    list.add(new SlideModel(product.getPhotos().get(i), null));
+                    binding.imgSlider.setImageList(list);
+                }
+
             }
         };
 
@@ -151,7 +160,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                 .labelUnderLine(true)
                 .expandAnimation(true)
                 .build();
-        readMoreOption.addReadMoreTo(binding.txtDescription, binding.txtDescription.getText().toString());
+        readMoreOption.addReadMoreTo(binding.txtDescription, pDesc);
 
         binding.chipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
             @Override
@@ -161,14 +170,12 @@ public class ActivityProductDetails extends AppCompatActivity {
                     if (chip.isChecked()) {
                         //this chip is selected.....
                         sizeId = chip.getText().toString();
-                        actualProductId = variantId + sizeId;
+                        actualProductId = pId + TextUtils.getFirstLetter(color) + sizeId;
                         for (int j = 0; j < sizes.size(); j++) {
                             Product p = sizes.get(j);
-                            if (p.getpId().equals(actualProductId)) {
-                                price = p.getpPrice();
+                            if (sizeId.equals(p.getSize())) {
                                 stock = p.getStock();
                                 index = j;
-                                binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
                                 break;
                             }
                         }
@@ -203,12 +210,13 @@ public class ActivityProductDetails extends AppCompatActivity {
                     }
                 });
                 if (stock > 0) {
-                    int limit = Integer.parseInt(maxLimit);
-                    if (quantity < limit) {
-                        addProductToCart();
-                    } else {
-                        Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
-                    }
+                    addProductToCart();
+//                    int limit = Integer.parseInt(maxLimit);
+//                    if (quantity < limit) {
+//                        addProductToCart();
+//                    } else {
+//                        Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
+//                    }
                 } else {
                     Snackbar.make(findViewById(R.id.parent), "Out of stock!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
                 }
@@ -265,7 +273,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     updateStock(stock);
                     snackbar.show();
                 } else {
-                    Product product = new Product(actualProductId, pName, pPic, price, sName, stock);
+                    Product product = new Product(actualProductId, pName, pic, price, sName, stock);
                     product.setSize(sizeId);
                     product.setMaxLimit(maxLimit);
                     product.setColor(color);

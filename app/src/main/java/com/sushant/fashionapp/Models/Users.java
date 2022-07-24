@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class Users {
     private String userName;
     private String userEmail;
-    private String userGender;
     private String userDOB;
     private String userPhone;
     private String buyerId;
@@ -17,7 +16,6 @@ public class Users {
     private String citizenNo;
     private String imgCitizenFront, imgCitizenBack, imgPanFront, imgPanBack;
     private ArrayList<Users> images;
-    public Gender gender;
 
     public Users() {
     }
@@ -42,10 +40,6 @@ public class Users {
 
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
-    }
-
-    public String getUserGender() {
-        return userGender;
     }
 
     public String getUserDOB() {

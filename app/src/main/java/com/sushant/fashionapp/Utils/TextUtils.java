@@ -13,4 +13,13 @@ public class TextUtils {
         }
         return new String(array);
     }
+
+    public static StringBuilder getFirstLetter(String name) {
+        StringBuilder initials = new StringBuilder();
+        String[] myName = name.split(" ");
+        for (String s : myName) {
+            initials.append(s.charAt(0));
+        }
+        return initials;
+    }
 }

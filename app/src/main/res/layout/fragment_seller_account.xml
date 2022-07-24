@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.Buyer.AccountFragment">
+    tools:context=".fragments.Seller.SellerAccountFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -67,7 +67,7 @@
         app:layout_constraintTop_toBottomOf="@+id/circleImageView2">
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/txtName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/gilroy_medium"
@@ -75,6 +75,7 @@
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/txtEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -84,6 +85,7 @@
             android:drawablePadding="5dp" />
 
         <TextView
+            android:id="@+id/txtPhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -97,7 +99,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="Buyer"
+            android:text="Seller"
             android:textColor="@color/skyBlue"
             app:layout_constraintEnd_toEndOf="@+id/textView8"
             app:layout_constraintStart_toStartOf="@+id/textView8"
@@ -144,7 +146,7 @@
                     android:layout_gravity="center"
                     android:layout_marginStart="24dp"
                     android:layout_weight="1"
-                    android:text="Switch to seller" />
+                    android:text="Switch to buyer" />
 
                 <ImageView
                     android:layout_width="wrap_content"
