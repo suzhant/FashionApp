@@ -112,6 +112,7 @@
             android:layout_marginTop="16dp"
             android:orientation="vertical">
 
+
             <com.denzcoskun.imageslider.ImageSlider
                 android:id="@+id/imgSlider"
                 android:layout_width="wrap_content"
@@ -129,7 +130,7 @@
                     android:id="@+id/materialDivider"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
+                    android:layout_marginTop="20dp"
                     app:dividerColor="#F0F0F0"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -207,12 +208,14 @@
 
                     <!--                </LinearLayout>-->
                     <ImageView
+                        android:id="@+id/imgWish"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="5dp"
                         android:src="@drawable/ic_love"
+                        android:visibility="gone"
                         app:tint="@color/black"
                         tools:layout_editor_absoluteX="352dp"
                         tools:layout_editor_absoluteY="30dp" />
@@ -255,24 +258,36 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chip_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:checkedChip="@id/chipSml"
-                app:selectionRequired="true"
-                app:singleSelection="true">
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:checkedChip="@id/chipSml"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipSml"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="10dp"
-                    android:fontFamily="@font/gilroy_bold"
-                    android:text="S"
-                    android:textAlignment="center"
-                    app:chipCornerRadius="4dp"
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipXSml"
+                        android:layout_width="45dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="10dp"
+                        android:fontFamily="@font/gilroy_bold"
+                        android:text="XS"
+                        android:textAlignment="center"
+                        app:chipCornerRadius="4dp"
+                        app:chipMinTouchTargetSize="0dp"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipSml"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="10dp"
+                        android:fontFamily="@font/gilroy_bold"
+                        android:text="S"
+                        android:textAlignment="center"
+                        app:chipCornerRadius="4dp"
                     app:chipMinTouchTargetSize="0dp"
                     app:chipStrokeWidth="1dp" />
 
@@ -298,16 +313,27 @@
                     app:chipMinTouchTargetSize="0dp"
                     app:chipStrokeWidth="1dp" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipXl"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:text="XL"
-                    android:textAlignment="center"
-                    app:chipCornerRadius="4dp"
-                    app:chipMinTouchTargetSize="0dp"
-                    app:chipStrokeWidth="1dp" />
-            </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipXl"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="10dp"
+                        android:text="XL"
+                        android:textAlignment="center"
+                        app:chipCornerRadius="4dp"
+                        app:chipMinTouchTargetSize="0dp"
+                        app:chipStrokeWidth="1dp" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipXXl"
+                        android:layout_width="50dp"
+                        android:layout_height="40dp"
+                        android:text="XXL"
+                        android:textAlignment="center"
+                        app:chipCornerRadius="4dp"
+                        app:chipMinTouchTargetSize="0dp"
+                        app:chipStrokeWidth="1dp" />
+                </com.google.android.material.chip.ChipGroup>
 
             <TextView
                 android:id="@+id/textView10"

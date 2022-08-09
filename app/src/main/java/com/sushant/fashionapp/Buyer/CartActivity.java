@@ -1,6 +1,8 @@
 package com.sushant.fashionapp.Buyer;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
@@ -8,7 +10,9 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,13 +24,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.CartAdapter;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
+import com.sushant.fashionapp.Inteface.SwipeHelper;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Utils.ImageUtils;
 import com.sushant.fashionapp.databinding.ActivityCartBinding;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class CartActivity extends AppCompatActivity {
@@ -45,6 +52,8 @@ public class CartActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     int sum;
     public boolean isActionMode = false;
+    int stock;
+    SwipeHelper helper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +78,7 @@ public class CartActivity extends AppCompatActivity {
         });
 
 
+
         productClickListener = new ProductClickListener() {
             @Override
             public void onClick(Product product, boolean b) {
@@ -81,6 +91,46 @@ public class CartActivity extends AppCompatActivity {
                 }
                 updateToolbarText(size);
             }
+        };
+
+        helper = new SwipeHelper(this, binding.cartRecycler) {
+            @Override
+            public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
+                int deleteId = R.drawable.ic_fluent_delete_24_regular;
+                Bitmap deleteIcon = ImageUtils.getBitmapFromVectorDrawable(getApplicationContext(), deleteId);
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "Delete",
+                        deleteIcon,
+                        Color.parseColor("#FF3C30"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                // TODO: onDelete
+                                Product product = products.get(pos);
+                                showDeleteMessage(product);
+                                deleteProductFromDB(product);
+                                products.remove(pos);
+                                cartAdapter.notifyItemRemoved(pos);
+                            }
+                        }
+                ));
+                int idWishList = R.drawable.fav_icon;
+                Bitmap favIcon = ImageUtils.getBitmapFromVectorDrawable(getApplicationContext(), idWishList);
+                underlayButtons.add(new SwipeHelper.UnderlayButton(
+                        "WishList",
+                        favIcon,
+                        Color.parseColor("#FF9502"),
+                        new SwipeHelper.UnderlayButtonClickListener() {
+                            @Override
+                            public void onClick(int pos) {
+                                // TODO: onWishList
+                                Product product = products.get(pos);
+                                addToWishList(product, pos);
+                            }
+                        }
+                ));
+            }
+
         };
 
 
@@ -112,6 +162,7 @@ public class CartActivity extends AppCompatActivity {
         databaseReference.addValueEventListener(valueEventListener);
 
 
+
         binding.imgDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,7 +171,7 @@ public class CartActivity extends AppCompatActivity {
                     refreshAdapter();
                     size = 0;
                     updateToolbarText(size);
-                    showSnackbar();
+                    showDeleteMessage(null);
                     isActionMode = false;
                     cartAdapter.notifyDataSetChanged();
                 } else {
@@ -141,6 +192,21 @@ public class CartActivity extends AppCompatActivity {
 
     }
 
+    private void addToWishList(Product product, int pos) {
+        deleteProductFromDB(product);
+        database.getReference().child("WishList").child(product.getVariantPId()).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Snackbar.make(findViewById(R.id.cartLayout), "Added to WishList", Snackbar.LENGTH_SHORT).setAction("Go to WishList", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(getApplicationContext(), WishListActivity.class));
+                    }
+                }).show();
+            }
+        });
+    }
+
     private void disableActionMode() {
         layoutInNormalMode();
         binding.cardView.setVisibility(View.VISIBLE);
@@ -150,12 +216,18 @@ public class CartActivity extends AppCompatActivity {
         cartAdapter.notifyDataSetChanged();
     }
 
-    private void showSnackbar() {
+    private void showDeleteMessage(Product product) {
         Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
                 Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                undoDeleteActionFromCart();
+                if (product != null) {
+                    undoDeleteFromDB(product);
+                    products.add(product);
+                } else {
+                    undoDeleteActionFromCart();
+                }
+
             }
         });
         snackbar.show();
@@ -188,17 +260,64 @@ public class CartActivity extends AppCompatActivity {
 
     private void undoDeleteActionFromCart() {
         for (Product p : checkedProducts) {
-            database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getpId()).setValue(p);
+            undoDeleteFromDB(p);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         checkedProducts.clear();
     }
 
+    private void undoDeleteFromDB(Product p) {
+        FirebaseDatabase.getInstance().getReference().child("Products").child(p.getpId()).child("variants").child(String.valueOf(p.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(p.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                stock = snapshot.child("stock").getValue(Integer.class);
+                updateStock(p, stock - p.getQuantity());
+                database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getVariantPId()).setValue(p);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void deleteProductFromCart() {
         for (Product p : checkedProducts) {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put(p.getpId(), null);
-            database.getReference().child("Cart").child(auth.getUid()).child("Product Details").updateChildren(map);
+            deleteProductFromDB(p);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
+    }
+
+    private void deleteProductFromDB(Product p) {
+        FirebaseDatabase.getInstance().getReference().child("Products").child(p.getpId()).child("variants").child(String.valueOf(p.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(p.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                stock = snapshot.child("stock").getValue(Integer.class);
+                updateStock(p, stock + p.getQuantity());
+                HashMap<String, Object> map = new HashMap<>();
+                map.put(p.getVariantPId(), null);
+                database.getReference().child("Cart").child(auth.getUid()).child("Product Details").updateChildren(map);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void initRecyclerView() {
@@ -260,5 +379,13 @@ public class CartActivity extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void updateStock(Product product, int s) {
+        HashMap<String, Object> stock = new HashMap<>();
+        stock.put("stock", s);
+        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(product.getSizeIndex())).updateChildren(stock);
     }
 }

@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
+import com.sushant.fashionapp.Buyer.WishListActivity;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
 import com.sushant.fashionapp.seller.SellerHomePage;
@@ -93,6 +94,13 @@ public class AccountFragment extends Fragment {
                     Toast.makeText(getContext(), "You are a seller", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(getContext(), SellerHomePage.class));
                 }
+            }
+        });
+
+        binding.cardWishList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), WishListActivity.class));
             }
         });
         return binding.getRoot();

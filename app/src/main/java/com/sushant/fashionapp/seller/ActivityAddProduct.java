@@ -220,6 +220,8 @@ public class ActivityAddProduct extends AppCompatActivity {
                             product1.setCategory(cat);
                             product1.setSubCategory(subCat);
                             product1.setDesc(pDes);
+                            product1.setBrandName("Gucci");
+                            product1.setProductCode(123);
                             product1.setVariants(variants);
                             HashMap<String, Object> store = new HashMap<>();
                             store.put("storeId", storeId);

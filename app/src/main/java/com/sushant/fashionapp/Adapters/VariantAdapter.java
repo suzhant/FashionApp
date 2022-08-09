@@ -23,12 +23,13 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
     ArrayList<Product> products;
     Context context;
     VariantClickListener productClickListener;
-    int selectedItemPos = 0;
+    int selectedItemPos;
 
-    public VariantAdapter(ArrayList<Product> products, Context context, VariantClickListener productClickListener) {
+    public VariantAdapter(ArrayList<Product> products, Context context, VariantClickListener productClickListener, int selectedItemPos) {
         this.products = products;
         this.context = context;
         this.productClickListener = productClickListener;
+        this.selectedItemPos = selectedItemPos;
     }
 
     @NonNull

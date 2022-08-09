@@ -1,16 +1,17 @@
 package com.sushant.fashionapp.Buyer;
 
+import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
+
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.denzcoskun.imageslider.models.SlideModel;
@@ -33,6 +34,8 @@ import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
+import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +45,7 @@ import java.util.Objects;
 public class ActivityProductDetails extends AppCompatActivity {
 
     ActivityProductDetailsBinding binding;
-    int price, stock, quantity, variantPos, index;
+    int price, stock, quantity, variantPos, sizeIndex;
     String pic;
     String maxLimit;
     FirebaseAuth auth;
@@ -54,15 +57,19 @@ public class ActivityProductDetails extends AppCompatActivity {
     VariantAdapter variantAdapter;
     List<SlideModel> list = new ArrayList<>();
     VariantClickListener variantClickListener;
-    ValueEventListener variantListener;
-    DatabaseReference variantRef;
+    ValueEventListener variantListener, wishListListener;
+    DatabaseReference variantRef, wishListRef;
     ArrayList<Product> sizes = new ArrayList<>();
+    List<CarouselItem> listCarousel = new ArrayList<>();
+
+    int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityProductDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        Log.d("oncreate", "created");
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -72,27 +79,19 @@ public class ActivityProductDetails extends AppCompatActivity {
         sName = getIntent().getStringExtra("sName");
         pId = getIntent().getStringExtra("pId");
         pDesc = getIntent().getStringExtra("pDesc");
-        binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
+        pName = getIntent().getStringExtra("pName");
+        index = getIntent().getIntExtra("index", 0);
 
-        list.add(new SlideModel(pic, null));
-        binding.imgSlider.setImageList(list);
 
         binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
-//        binding.txtDescription.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (!isTextViewClicked) {
-//                    binding.txtDescription.setMaxLines(Integer.MAX_VALUE);
-//                    isTextViewClicked = true;
-//                } else {
-//                    binding.txtDescription.setMaxLines(2);
-//                    isTextViewClicked = false;
-//                }
-//            }
-//        });
+        binding.txtPrdtName.setText(captializeAllFirstLetter(pName));
+        binding.txtStoreName.setText(captializeAllFirstLetter(sName));
+
+
         variantClickListener = new VariantClickListener() {
             @Override
             public void onClick(Product product, int pos) {
+                Log.d("variants", "called");
                 pic = product.getPhotos().get(0);
                 color = product.getColor();
                 variantPos = pos;
@@ -103,21 +102,19 @@ public class ActivityProductDetails extends AppCompatActivity {
 
                 for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
                     Chip chip = (Chip) binding.chipGroup.getChildAt(j);
-                    chip.setEnabled(false);
-                    chip.setChipBackgroundColor(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.medium_gray)));
+                    chip.setVisibility(View.GONE);
                 }
                 for (int i = 0; i < sizes.size(); i++) {
                     for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
                         Chip chip = (Chip) binding.chipGroup.getChildAt(j);
                         if (chip.getText().toString().equals(sizes.get(i).getSize())) {
-                            chip.setEnabled(true);
-                            chip.setChipBackgroundColorResource(R.color.chip_background_color);
+                            chip.setVisibility(View.VISIBLE);
                             break;
                         }
                     }
                 }
 
-                //adding pic in slider
+                //  adding pic in slider
                 list.clear();
                 for (int i = 0; i < product.getPhotos().size(); i++) {
                     list.add(new SlideModel(product.getPhotos().get(i), null));
@@ -134,12 +131,39 @@ public class ActivityProductDetails extends AppCompatActivity {
         variantListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("variantListener", "called");
                 products.clear();
+                //  list.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     products.add(product);
                 }
+//                for (Product product:products) {
+//                    if (product.getPhotos()!=null){
+//                        for (String image:product.getPhotos()){
+//                            list.add(new SlideModel(image, null));
+//                        }
+//                    }
+//                }
+
                 variantAdapter.notifyDataSetChanged();
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        variantRef.addValueEventListener(variantListener);
+
+        wishListListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Product product = snapshot1.getValue(Product.class);
+
+                }
             }
 
             @Override
@@ -147,7 +171,6 @@ public class ActivityProductDetails extends AppCompatActivity {
 
             }
         };
-        variantRef.addListenerForSingleValueEvent(variantListener);
 
         //expandable description
         ReadMoreOption readMoreOption = new ReadMoreOption.Builder(this)
@@ -175,7 +198,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                             Product p = sizes.get(j);
                             if (sizeId.equals(p.getSize())) {
                                 stock = p.getStock();
-                                index = j;
+                                sizeIndex = j;
                                 break;
                             }
                         }
@@ -191,39 +214,14 @@ public class ActivityProductDetails extends AppCompatActivity {
                     Snackbar.make(binding.parent, "Please select size", Snackbar.LENGTH_SHORT).setAnchorView(binding.btnAddCart).show();
                     return;
                 }
-                database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid())).child("Product Details").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                            Product product = snapshot1.getValue(Product.class);
-                            assert product != null;
-                            if (actualProductId.equals(product.getpId())) {
-                                quantity = product.getQuantity();
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 if (stock > 0) {
                     addProductToCart();
-//                    int limit = Integer.parseInt(maxLimit);
-//                    if (quantity < limit) {
-//                        addProductToCart();
-//                    } else {
-//                        Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
-//                    }
                 } else {
                     Snackbar.make(findViewById(R.id.parent), "Out of stock!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
                 }
             }
         });
 
-        getProductInfo();
 
 
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
@@ -234,32 +232,15 @@ public class ActivityProductDetails extends AppCompatActivity {
                 //  onBackPressed();
             }
         });
-    }
 
-    private void getProductInfo() {
-        database.getReference().child("Products").child(pId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("maxLimit").exists()) {
-                    maxLimit = snapshot.child("maxLimit").getValue(String.class);
-                }
-                pName = snapshot.child("pName").getValue(String.class);
-                sName = snapshot.child("storeName").getValue(String.class);
-                binding.txtPrdtName.setText(TextUtils.captializeAllFirstLetter(pName));
-                binding.txtStoreName.setText(TextUtils.captializeAllFirstLetter(sName));
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
     }
 
     private void initVariantRecycler() {
+        Log.d("variantAdapter", "created");
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.variantRecycler.setLayoutManager(layoutManager);
-        variantAdapter = new VariantAdapter(products, this, variantClickListener);
+        variantAdapter = new VariantAdapter(products, this, variantClickListener, index);
         binding.variantRecycler.setAdapter(variantAdapter);
     }
 
@@ -269,11 +250,20 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    updateCartQuantity(quantity);
-                    updateStock(stock);
-                    snackbar.show();
+                    quantity = snapshot.child("quantity").getValue(Integer.class);
+                    if (quantity < 5) {
+                        updateCartQuantity(quantity);
+                        updateStock(stock);
+                        snackbar.show();
+                    } else {
+                        Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
+                    }
                 } else {
-                    Product product = new Product(actualProductId, pName, pic, price, sName, stock);
+                    Product product = new Product(pId, pName, pic, price, sName, stock);
+                    product.setVariantPId(actualProductId);
+                    product.setVariantIndex(variantPos);
+                    product.setSizeIndex(sizeIndex);
+                    product.setDesc(pDesc);
                     product.setSize(sizeId);
                     product.setMaxLimit(maxLimit);
                     product.setColor(color);
@@ -313,11 +303,10 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     private void updateStock(int s) {
         s = s - 1;
-        stock = s;
         HashMap<String, Object> stock = new HashMap<>();
         stock.put("stock", s);
         database.getReference().child("Products").child(pId).child("variants").child(String.valueOf(variantPos)).child("sizes")
-                .child(String.valueOf(index)).updateChildren(stock);
+                .child(String.valueOf(sizeIndex)).updateChildren(stock);
     }
 
     private void updateCartQuantity(int q) {
@@ -328,9 +317,16 @@ public class ActivityProductDetails extends AppCompatActivity {
                 .updateChildren(quantity);
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        variantRef.removeEventListener(variantListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("ondestroy", "destroyed");
+        variantRef.removeEventListener(variantListener);
     }
 }

@@ -3,9 +3,6 @@ package com.sushant.fashionapp.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +20,10 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
@@ -35,7 +35,6 @@ import com.sushant.fashionapp.Utils.TextUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
@@ -43,6 +42,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     Context context;
     ProductClickListener productClickListener;
     private final CartActivity cartActivity;
+    int stock;
 
     public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
@@ -55,33 +55,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.cart_items_layout, parent, false);
-        return new viewHolder(view, cartActivity);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull viewHolder holder, int position, @NonNull List<Object> payloads) {
-        if (payloads.isEmpty()) {
-            super.onBindViewHolder(holder, position, payloads);
-        } else {
-            Bundle bundle = (Bundle) payloads.get(0);
-            for (String key : bundle.keySet()) {
-                switch (key) {
-                    case "newName":
-                        holder.txtProductName.setText(bundle.getString("newName"));
-                        break;
-                    case "newPrice":
-                        holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", bundle.getInt("newPrice"))));
-                        break;
-                    case "newStoreName":
-                        holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(bundle.getString("newStoreName")));
-                        break;
-                    case "newQuantity":
-                        holder.txtQuantity.setText(String.valueOf(bundle.getInt("newQuantity")));
-                        break;
-                }
-            }
-        }
-
+        return new viewHolder(view);
     }
 
     @Override
@@ -91,20 +65,40 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(product.getStoreName()));
         holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getpPrice())));
         holder.txtProductName.setText(TextUtils.captializeAllFirstLetter(product.getpName()));
-        //     holder.txtStock.setText(MessageFormat.format("Stock: {0}", product.getStock()));
         holder.txtSize.setText(MessageFormat.format("Size: {0}", product.getSize()));
         holder.txtQuantity.setText(String.valueOf(product.getQuantity()));
+        holder.txtColor.setText(MessageFormat.format("Color: {0}", product.getColor()));
 
 
+        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(product.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                stock = snapshot.child("stock").getValue(Integer.class);
+                if (stock < 5) {
+                    holder.txtStock.setVisibility(View.VISIBLE);
+                    holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+                } else {
+                    holder.txtStock.setVisibility(View.GONE);
+                }
+                if (stock == 0) {
+                    holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+                }
+                if (product.getQuantity() < stock) {
+                    holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         if (product.getQuantity() > 1) {
             holder.imgMinus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.red)));
         }
-        if (product.getQuantity() == product.getStock()) {
-            holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
-        }
-        if (product.getQuantity() < product.getStock()) {
-            holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
-        }
+
         if (product.getQuantity() < 2) {
             holder.imgMinus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
         }
@@ -122,27 +116,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    if (product.getStock() > product.getQuantity()) {
-                        if (product.getMaxLimit() != null) {
-                            int maxLimit = Integer.parseInt(product.getMaxLimit());
-                            if (product.getQuantity() < maxLimit) {
-                                product.setQuantity(product.getQuantity() + 1);
-                                updateCartQuantity(product);
-                            } else {
-                                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "MaxLimit is reached!", Snackbar.LENGTH_SHORT).show();
-                                    }
-                                }, 200);
-                            }
-                        } else {
+                    if (stock != 0) {
+                        if (product.getQuantity() < 5) {
                             product.setQuantity(product.getQuantity() + 1);
                             updateCartQuantity(product);
+                            updateStock(product, stock - 1);
+                        } else {
+                            Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "Max limit is 5", Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
-
             }
         });
 
@@ -153,6 +136,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                     if (product.getQuantity() > 1) {
                         product.setQuantity(product.getQuantity() - 1);
                         updateCartQuantity(product);
+                        updateStock(product, stock + 1);
                     }
                 }
             }
@@ -163,12 +147,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
                     Intent intent = new Intent(context, ActivityProductDetails.class);
-                    intent.putExtra("pPic", product.getpPic());
+                    intent.putExtra("pPic", product.getPreviewPic());
                     intent.putExtra("pName", product.getpName());
                     intent.putExtra("pPrice", product.getpPrice());
                     intent.putExtra("pId", product.getpId());
-                    intent.putExtra("stock", product.getStock());
                     intent.putExtra("sName", product.getStoreName());
+                    intent.putExtra("pDesc", product.getDesc());
+                    intent.putExtra("index", product.getVariantIndex());
                     context.startActivity(intent);
                 }
 
@@ -185,8 +170,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         intent.putExtra("pPrice", product.getpPrice());
                         intent.putExtra("pId", product.getpId());
                         intent.putExtra("stock", product.getStock());
-                        intent.putExtra("sName", product.getStoreName());
-                        context.startActivity(intent);
+                    intent.putExtra("sName", product.getStoreName());
+                    intent.putExtra("index", product.getVariantIndex());
+                    context.startActivity(intent);
                 }
 
             }
@@ -238,11 +224,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         private final ImageView imgPlus;
         private final TextView txtQuantity;
         private final TextView txtSize;
+        private final TextView txtColor;
+        private final TextView txtStock;
         private final MaterialCardView cardView;
         private final LinearLayout quantityLayout;
-        private CartActivity cartActivity;
 
-        public viewHolder(@NonNull View itemView, CartActivity cartActivity) {
+        public viewHolder(@NonNull View itemView) {
             super(itemView);
             imgProduct = itemView.findViewById(R.id.imgProduct);
             txtStoreName = itemView.findViewById(R.id.txtStoreName);
@@ -251,11 +238,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             imgMinus = itemView.findViewById(R.id.imgMinus);
             imgPlus = itemView.findViewById(R.id.imgPlus);
             txtQuantity = itemView.findViewById(R.id.txtQuantity);
-            //      txtStock = itemView.findViewById(R.id.txtStock);
             cardView = itemView.findViewById(R.id.cart_layout_parent);
             txtSize = itemView.findViewById(R.id.txtSize);
             quantityLayout = itemView.findViewById(R.id.quantityLyt);
-            this.cartActivity = cartActivity;
+            txtColor = itemView.findViewById(R.id.txtColor);
+            txtStock = itemView.findViewById(R.id.txtStock);
         }
     }
 
@@ -263,8 +250,16 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         HashMap<String, Object> quantity = new HashMap<>();
         quantity.put("quantity", product.getQuantity());
         FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).
-                child("Product Details").child(product.getpId()).updateChildren(quantity);
+                child("Product Details").child(product.getVariantPId()).updateChildren(quantity);
 
+    }
+
+    private void updateStock(Product product, int s) {
+        HashMap<String, Object> stock = new HashMap<>();
+        stock.put("stock", s);
+        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(product.getSizeIndex())).updateChildren(stock);
     }
 
     public void updateCartList(ArrayList<Product> products) {

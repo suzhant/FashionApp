@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Product {
-    private String pId, pName, storeName, size, maxLimit, color, desc, pPic;
-    private Integer pPrice, stock, love, quantity;
+    private String pId, pName, storeName, size, maxLimit, color, desc, pPic, brandName, variantPId;
+    private Integer pPrice, stock, love, quantity, productCode, variantIndex, sizeIndex;
     private ArrayList<Product> variants;
     private ArrayList<Product> sizes;
     private ArrayList<String> photos;
@@ -203,5 +203,45 @@ public class Product {
 
     public void setpPic(String pPic) {
         this.pPic = pPic;
+    }
+
+    public Integer getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(Integer productCode) {
+        this.productCode = productCode;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public String getVariantPId() {
+        return variantPId;
+    }
+
+    public void setVariantPId(String variantPId) {
+        this.variantPId = variantPId;
+    }
+
+    public Integer getVariantIndex() {
+        return variantIndex;
+    }
+
+    public void setVariantIndex(Integer variantIndex) {
+        this.variantIndex = variantIndex;
+    }
+
+    public Integer getSizeIndex() {
+        return sizeIndex;
+    }
+
+    public void setSizeIndex(Integer sizeIndex) {
+        this.sizeIndex = sizeIndex;
     }
 }

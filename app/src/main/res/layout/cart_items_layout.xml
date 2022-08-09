@@ -38,45 +38,84 @@
                 android:layout_marginStart="10dp"
                 android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/txtStoreName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/TextAppearance.AppCompat.Small"
-                android:maxWidth="200dp"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textSize="12sp"
-                android:text="Store Name" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center">
 
-            <TextView
-                android:id="@+id/txtProdName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/gilroy_medium"
-                android:layout_marginTop="4dp"
-                android:textSize="15sp"
-                android:maxLines="1"
-                android:maxWidth="200dp"
-                android:ellipsize="end"
-                android:text="Product Name" />
+                    <ImageView
+                        android:layout_width="16sp"
+                        android:layout_height="16sp"
+                        android:src="@drawable/storefront_fill_24px"
+                        android:layout_marginEnd="6dp"
+                        app:tint="@color/hintColor" />
 
-                <!--                <TextView-->
-                <!--                    android:id="@+id/txtStock"-->
-                <!--                    android:layout_width="wrap_content"-->
-                <!--                    android:layout_height="wrap_content"-->
-                <!--                    android:layout_marginTop="4dp"-->
-                <!--                    android:textSize="12sp"-->
-                <!--                    android:textColor="@color/red"-->
-                <!--                    android:text="Stock: 50" />    -->
+                    <TextView
+                        android:id="@+id/txtStoreName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.AppCompat.Small"
+                        android:maxWidth="200dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textSize="12sp"
+                        android:text="Store Name" />
+
+                </LinearLayout>
+
                 <TextView
-                    android:id="@+id/txtSize"
+                    android:id="@+id/txtProdName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gilroy_medium"
+                    android:layout_marginTop="4dp"
+                    android:textSize="15sp"
+                    android:maxLines="1"
+                    android:maxWidth="200dp"
+                    android:ellipsize="end"
+                    android:text="Product Name" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="4dp">
+
+                    <TextView
+                        android:id="@+id/txtSize"
+                        style="@style/TextAppearance.AppCompat.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:text="Size: Small" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="|"
+                        android:textColor="@color/black"
+                        android:layout_marginEnd="10dp" />
+
+                    <TextView
+                        android:id="@+id/txtColor"
+                        style="@style/TextAppearance.AppCompat.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_marginEnd="20dp"
+                        android:text="Color: Red" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtStock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:textSize="12sp"
+                    android:textSize="11sp"
+                    android:visibility="gone"
                     android:textColor="@color/red"
-                    android:text="Size: Small" />
+                    android:text="only 5 item(s) in stock" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -125,7 +164,6 @@
                             android:id="@+id/imgPlus"
                             android:layout_width="30dp"
                             android:layout_height="wrap_content"
-
                             android:src="@drawable/ic_plus" />
                     </LinearLayout>
 

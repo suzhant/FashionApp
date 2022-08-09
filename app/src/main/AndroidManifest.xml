@@ -15,6 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
+            android:name=".Buyer.WishListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ImageActivity"
+            android:exported="false" />
+        <activity
             android:name=".seller.ActivityAddProduct"
             android:exported="false" />
         <activity
