@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.denzcoskun.imageslider.models.SlideModel;
@@ -34,8 +35,6 @@ import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
-import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,16 +50,16 @@ public class ActivityProductDetails extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseDatabase database;
     String pName, sName, pId, color, pDesc;
-    String sizeId, actualProductId, variantId;
+    String sizeId, actualProductId;
     ArrayList<Product> products = new ArrayList<>();
-    ArrayList<String> images = new ArrayList<>();
     VariantAdapter variantAdapter;
     List<SlideModel> list = new ArrayList<>();
     VariantClickListener variantClickListener;
     ValueEventListener variantListener, wishListListener;
     DatabaseReference variantRef, wishListRef;
     ArrayList<Product> sizes = new ArrayList<>();
-    List<CarouselItem> listCarousel = new ArrayList<>();
+    ArrayList<Product> wishList = new ArrayList<>();
+    boolean isLoved;
 
     int index;
 
@@ -100,10 +99,12 @@ public class ActivityProductDetails extends AppCompatActivity {
                 sizeId = null;
                 sizes.addAll(product.getSizes());
 
+                //hiding all the chips
                 for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
                     Chip chip = (Chip) binding.chipGroup.getChildAt(j);
                     chip.setVisibility(View.GONE);
                 }
+                //showing chips associated with the sizes of colors
                 for (int i = 0; i < sizes.size(); i++) {
                     for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
                         Chip chip = (Chip) binding.chipGroup.getChildAt(j);
@@ -121,19 +122,22 @@ public class ActivityProductDetails extends AppCompatActivity {
                     binding.imgSlider.setImageList(list);
                 }
 
+                //resetting wish icon to normal
+                binding.imgWish.setImageResource(R.drawable.ic_love);
+                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
             }
         };
 
 
         initVariantRecycler();
 
+        //fetching variants
         variantRef = database.getReference().child("Products").child(pId).child("variants");
         variantListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("variantListener", "called");
                 products.clear();
-                //  list.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     products.add(product);
@@ -157,12 +161,15 @@ public class ActivityProductDetails extends AppCompatActivity {
         };
         variantRef.addValueEventListener(variantListener);
 
+        //fetching wishlist items
+        wishListRef = database.getReference().child("WishList");
         wishListListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
-
+                    assert product != null;
+                    wishList.add(product);
                 }
             }
 
@@ -171,6 +178,8 @@ public class ActivityProductDetails extends AppCompatActivity {
 
             }
         };
+        wishListRef.addValueEventListener(wishListListener);
+
 
         //expandable description
         ReadMoreOption readMoreOption = new ReadMoreOption.Builder(this)
@@ -202,6 +211,19 @@ public class ActivityProductDetails extends AppCompatActivity {
                                 break;
                             }
                         }
+                        //finding if the selected item is in the wishlist
+                        for (Product p : wishList) {
+                            if (actualProductId.equals(p.getVariantPId())) {
+                                binding.imgWish.setImageResource(R.drawable.ic_love_fill);
+                                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
+                                isLoved = true;
+                                break;
+                            } else {
+                                binding.imgWish.setImageResource(R.drawable.ic_love);
+                                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
+                                isLoved = false;
+                            }
+                        }
                     }
                 }
             }
@@ -223,13 +245,27 @@ public class ActivityProductDetails extends AppCompatActivity {
         });
 
 
-
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(ActivityProductDetails.this, ActivityHomePage.class));
                 finishAfterTransition();
                 //  onBackPressed();
+            }
+        });
+
+        binding.imgWish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sizeId == null) {
+                    Snackbar.make(binding.parent, "Please select size", Snackbar.LENGTH_SHORT).setAnchorView(binding.btnAddCart).show();
+                    return;
+                }
+                if (isLoved) {
+                    deleteProductFromWishList();
+                } else {
+                    addToWishList();
+                }
             }
         });
 
@@ -317,16 +353,71 @@ public class ActivityProductDetails extends AppCompatActivity {
                 .updateChildren(quantity);
     }
 
+    private void addToWishList() {
+        binding.imgWish.setVisibility(View.GONE);
+        binding.progressCircular.setVisibility(View.VISIBLE);
+        Product product = new Product(pId, pName, pic, price, sName, stock);
+        product.setVariantPId(actualProductId);
+        product.setVariantIndex(variantPos);
+        product.setSizeIndex(sizeIndex);
+        product.setDesc(pDesc);
+        product.setSize(sizeId);
+        product.setMaxLimit(maxLimit);
+        product.setColor(color);
+        database.getReference().child("WishList").child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                binding.progressCircular.setVisibility(View.GONE);
+                binding.imgWish.setVisibility(View.VISIBLE);
+                binding.imgWish.setImageResource(R.drawable.ic_love_fill);
+                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
+                isLoved = true;
+                Snackbar.make(findViewById(R.id.parent), "Added to WishList", Snackbar.LENGTH_SHORT).setAction("Go to WishList", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(getApplicationContext(), WishListActivity.class));
+                    }
+                }).show();
+            }
+        });
+    }
+
+    private void deleteProductFromWishList() {
+        binding.imgWish.setVisibility(View.GONE);
+        binding.progressCircular.setVisibility(View.VISIBLE);
+        FirebaseDatabase.getInstance().getReference().child("WishList").child(actualProductId).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                isLoved = false;
+                binding.progressCircular.setVisibility(View.GONE);
+                binding.imgWish.setVisibility(View.VISIBLE);
+                binding.imgWish.setImageResource(R.drawable.ic_love);
+                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
+                Snackbar.make(findViewById(R.id.parent), "Removed from wishList", Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        variantRef.removeEventListener(variantListener);
+        if (variantRef != null) {
+            variantRef.removeEventListener(variantListener);
+        }
+        if (wishListRef != null) {
+            wishListRef.removeEventListener(wishListListener);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.d("ondestroy", "destroyed");
-        variantRef.removeEventListener(variantListener);
+        if (variantRef != null) {
+            variantRef.removeEventListener(variantListener);
+        }
+        if (wishListRef != null) {
+            wishListRef.removeEventListener(wishListListener);
+        }
     }
 }

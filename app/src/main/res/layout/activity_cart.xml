@@ -10,7 +10,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout3"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?actionBarSize"
         android:backgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,7 +19,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?actionBarSize">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -31,7 +31,6 @@
                     android:id="@+id/imgBack"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:tint="@color/skyBlue"
                     android:layout_marginStart="10dp"
                     android:src="@drawable/ic_arrow_back_24" />
 
@@ -39,11 +38,10 @@
                     android:id="@+id/toolbarTxt"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="30dp"
+                    android:layout_marginStart="20dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
                     android:layout_weight="@integer/material_motion_duration_long_1"
-                    android:fontFamily="@font/gilroy_medium"
-                    android:text="My Cart"
-                    android:textSize="24sp" />
+                    android:text="My Cart" />
 
                 <TextView
                     android:id="@+id/count"

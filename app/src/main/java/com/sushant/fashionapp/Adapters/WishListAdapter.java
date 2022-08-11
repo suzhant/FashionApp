@@ -155,7 +155,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                                         .setAnchorView(wishListActivity.findViewById(R.id.fabAddToCart)).show();
                             }
                         } else {
-                            if (stock > product.getQuantity()) {
+                            if (stock != 0) {
                                 Product item = new Product(product.getpId(), product.getpName(), product.getpPic(), product.getpPrice(), product.getStoreName(), product.getStock());
                                 item.setVariantPId(product.getVariantPId());
                                 item.setVariantIndex(product.getVariantIndex());
@@ -196,7 +196,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
 
             }
         });
-
     }
 
     @Override

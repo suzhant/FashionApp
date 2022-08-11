@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -43,6 +44,7 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
         Glide.with(context).load(product.getPhotos().get(0)).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
+        holder.txtColor.setText(product.getColor());
         if (holder.getAbsoluteAdapterPosition() == selectedItemPos) {
             holder.cardVariant.setStrokeColor(ContextCompat.getColorStateList(context, R.color.black));
             productClickListener.onClick(product, holder.getAbsoluteAdapterPosition());
@@ -67,11 +69,13 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
 
         private final ImageView imgVariant;
         private final MaterialCardView cardVariant;
+        private final TextView txtColor;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             imgVariant = itemView.findViewById(R.id.imgVariant);
             cardVariant = itemView.findViewById(R.id.cardVariant);
+            txtColor = itemView.findViewById(R.id.txtColor);
         }
     }
 }

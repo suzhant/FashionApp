@@ -1,6 +1,7 @@
 package com.sushant.fashionapp.fragments.Buyer;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -18,9 +19,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.CardAdapters;
 import com.sushant.fashionapp.Adapters.CategoryAdapter;
+import com.sushant.fashionapp.Buyer.ViewMoreActivity;
 import com.sushant.fashionapp.Models.Category;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
@@ -31,6 +34,7 @@ import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,15 +95,17 @@ public class HomeFragment extends Fragment {
         list.add(new CarouselItem(R.drawable.banner_3));
         binding.imgBanner.setData(list);
 
-        database.getReference().child("Products").addValueEventListener(new ValueEventListener() {
+        Query query = database.getReference().child("Products").limitToLast(5);
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     products.add(product);
-                    popularAdapters.notifyItemInserted(products.size());
                 }
+                Collections.reverse(products);
+                popularAdapters.notifyItemInserted(products.size());
             }
 
             @Override
@@ -120,6 +126,12 @@ public class HomeFragment extends Fragment {
 //                        appBarLayout.getTotalScrollRange()));
 //            }
 //        });
+        binding.txtPopularViewMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), ViewMoreActivity.class));
+            }
+        });
         return binding.getRoot();
     }
 
@@ -129,7 +141,6 @@ public class HomeFragment extends Fragment {
         popularAdapters = new CardAdapters(products, getActivity());
         popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         binding.popularRecycler.setAdapter(popularAdapters);
-        ;
 
     }
 
