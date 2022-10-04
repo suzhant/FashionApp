@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:enabled="true"
+        android:icon="@drawable/home_icon"
+        android:title="Home" />
+    <item
+        android:id="@+id/message"
+        android:enabled="true"
+        android:icon="@drawable/message_icon"
+        android:title="Chat" />
+    <item
+        android:id="@+id/store"
+        android:enabled="true"
+        android:icon="@drawable/store_icon"
+        android:title="Store" />
+    <item
+        android:id="@+id/account"
+        android:enabled="true"
+        android:icon="@drawable/account_icon"
+        android:title="Account" />
+</menu>

@@ -1,6 +1,7 @@
 package com.sushant.fashionapp.Models;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class Product {
@@ -244,4 +245,33 @@ public class Product {
     public void setSizeIndex(Integer sizeIndex) {
         this.sizeIndex = sizeIndex;
     }
+
+    public static Comparator<Product> ascending = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return product.getpName().compareTo(t1.getpName());
+        }
+    };
+
+
+    public static Comparator<Product> descending = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return t1.getpName().compareTo(product.getpName());
+        }
+    };
+
+    public static Comparator<Product> lowToHigh = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return product.getpPrice().compareTo(t1.getpPrice());
+        }
+    };
+
+    public static Comparator<Product> highToLow = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return t1.getpPrice().compareTo(product.getpPrice());
+        }
+    };
 }

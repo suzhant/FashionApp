@@ -104,4 +104,6 @@ dependencies {
     //For Zooming Image
     implementation 'com.github.MikeOrtiz:TouchImageView:1.4.1'
 
+    //chart
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

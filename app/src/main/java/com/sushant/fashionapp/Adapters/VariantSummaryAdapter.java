@@ -88,6 +88,13 @@ public class VariantSummaryAdapter extends RecyclerView.Adapter<VariantSummaryAd
             }
         });
 
+        holder.imgEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 
     @Override
@@ -102,7 +109,7 @@ public class VariantSummaryAdapter extends RecyclerView.Adapter<VariantSummaryAd
 //        private final TextView txtStock;
         private final RecyclerView recyclerView;
         private final RecyclerView recyclerViewSizes;
-        private final ImageView imgDelete;
+        private final ImageView imgDelete, imgEdit;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
@@ -112,6 +119,7 @@ public class VariantSummaryAdapter extends RecyclerView.Adapter<VariantSummaryAd
 //            txtStock=itemView.findViewById(R.id.txtStock);
             recyclerView = itemView.findViewById(R.id.recyclerImages);
             imgDelete = itemView.findViewById(R.id.imgDelete);
+            imgEdit = itemView.findViewById(R.id.imgEdit);
             recyclerViewSizes = itemView.findViewById(R.id.recyclerSizes);
         }
     }

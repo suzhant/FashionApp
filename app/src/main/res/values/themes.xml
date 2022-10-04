@@ -105,30 +105,6 @@
 
     //cardview
 
-    <style name="CustomCardViewStyle" parent="@style/Widget.MaterialComponents.CardView">
-        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay_card_custom_corners</item>
-    </style>
-
-
-    <style name="ShapeAppearanceOverlay_card_custom_corners" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">20dp</item>
-        <item name="cornerSizeTopLeft">20dp</item>
-        <item name="cornerSizeBottomRight">4dp</item>
-        <item name="cornerSizeBottomLeft">4dp</item>
-    </style>
-
-    <style name="Theme.FashionApp.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="TextAppearance" parent="">
-        <item name="android:textSize">24sp</item>
-        <item name="fontFamily">@font/gilroy_medium</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
 
     //bottom navigation bar
 

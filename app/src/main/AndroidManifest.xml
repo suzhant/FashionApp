@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
+            android:name=".ActivitySellerMain"
+            android:exported="false" />
+        <activity
             android:name=".Buyer.ViewMoreActivity"
             android:exported="false" />
         <activity

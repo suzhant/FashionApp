@@ -319,6 +319,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     private void showSizeDialog(ArrayList<Product> sizes) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddProduct.this);
         builder.setMessage("Enter size details");
+        builder.setCancelable(false);
 
         View viewInflated = LayoutInflater.from(ActivityAddProduct.this).inflate(R.layout.stock_editbox_dialog, findViewById(android.R.id.content), false);
 
@@ -334,30 +335,37 @@ public class ActivityAddProduct extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
                 size = adapterView.getItemAtPosition(pos).toString();
-                Toast.makeText(ActivityAddProduct.this, size, Toast.LENGTH_SHORT).show();
             }
         });
 
-        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String stock;
-                stock = input.getText().toString();
-                Product product = new Product();
-                product.setSize(size);
-                product.setStock(Integer.valueOf(stock));
-                sizes.add(product);
-                sizeSummaryAdapter.notifyItemInserted(sizes.size() - 1);
-                dialog.dismiss();
-            }
-        });
+        builder.setPositiveButton(android.R.string.ok, null);
         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
             }
         });
-        builder.show();
+
+        AlertDialog dialog = builder.show();
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        positiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String stock;
+                stock = input.getText().toString();
+                if (size == null || stock.isEmpty()) {
+                    Toast.makeText(ActivityAddProduct.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Product product = new Product();
+                product.setSize(size);
+                product.setStock(Integer.valueOf(stock));
+                sizes.add(product);
+                sizeSummaryAdapter.notifyItemInserted(sizes.size() - 1);
+                dialog.dismiss();
+                size = null;
+            }
+        });
 
     }
 
