@@ -155,7 +155,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                     FirebaseUser users = auth.getCurrentUser();
                                     Users user = new Users(name, email, PhoneNum);
                                     String id = task.getResult().getUser().getUid();
-                                    user.setBuyerId(id);
+                                    user.setUserId(id);
                                     database.getReference().child("Users").child(id).setValue(user);
                                     resetAllFields();
                                     assert users != null;

@@ -9,7 +9,7 @@ public class Users {
     private String userEmail;
     private String userDOB;
     private String userPhone;
-    private String buyerId;
+    private String userId;
     private String sellerId;
     private String userPic;
     private String panNo;
@@ -122,19 +122,19 @@ public class Users {
         this.citizenNo = citizenNo;
     }
 
-    public String getBuyerId() {
-        return buyerId;
-    }
-
-    public void setBuyerId(String buyerId) {
-        this.buyerId = buyerId;
-    }
-
     public String getSellerId() {
         return sellerId;
     }
 
     public void setSellerId(String sellerId) {
         this.sellerId = sellerId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
+import com.sushant.fashionapp.Buyer.BuyerSettingActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
@@ -101,6 +102,13 @@ public class AccountFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), WishListActivity.class));
+            }
+        });
+
+        binding.cardSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), BuyerSettingActivity.class));
             }
         });
         return binding.getRoot();

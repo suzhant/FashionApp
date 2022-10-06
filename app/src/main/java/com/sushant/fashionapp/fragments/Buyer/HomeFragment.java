@@ -54,6 +54,7 @@ public class HomeFragment extends Fragment {
     public GridLayoutManager layoutManager;
     ArrayList<Category> categories = new ArrayList<>();
     CategoryAdapter categoryAdapter;
+    String buyerPic;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -76,6 +77,12 @@ public class HomeFragment extends Fragment {
                 String name = snapshot.child("userName").getValue(String.class);
                 assert name != null;
                 binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">" + TextUtils.captializeAllFirstLetter(name) + "</font"));
+                if (snapshot.child("userPic").exists()) {
+                    buyerPic = snapshot.child("userPic").getValue(String.class);
+                    if (getActivity() != null) {
+                        Glide.with(getActivity()).load(buyerPic).placeholder(R.drawable.avatar).into(binding.circleImageView);
+                    }
+                }
             }
 
             @Override
@@ -84,7 +91,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        Glide.with(this).load(R.drawable.profile).placeholder(R.drawable.avatar).into(binding.circleImageView);
 
         //banner slider
         binding.imgBanner.registerLifecycle(getLifecycle());
