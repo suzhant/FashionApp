@@ -7,9 +7,16 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -24,9 +31,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -52,7 +62,10 @@ public class BuyerProfileActivity extends AppCompatActivity {
     FirebaseAuth auth;
     FirebaseDatabase database;
     ProgressDialog dialog;
-    String buyerPic, buyerId;
+    String buyerPic, buyerId, buyerName;
+    ActivityResultLauncher<Intent> imageLauncher;
+    DatabaseReference userRef;
+    ValueEventListener userListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,16 +80,21 @@ public class BuyerProfileActivity extends AppCompatActivity {
         dialog = new ProgressDialog(this);
         dialog.setCancelable(false);
 
-        database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addValueEventListener(new ValueEventListener() {
+        userRef = database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid()));
+        userListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Users buyer = snapshot.getValue(Users.class);
                 assert buyer != null;
                 buyerId = buyer.getUserId();
+                buyerName = buyer.getUserName();
+
+                binding.txtName.setText(buyerName);
+
                 if (snapshot.child("userPic").exists()) {
                     buyerPic = snapshot.child("userPic").getValue(String.class);
                     Glide.with(getApplicationContext()).load(buyerPic)
-                            .placeholder(com.denzcoskun.imageslider.R.drawable.placeholder)
+                            .placeholder(R.drawable.avatar)
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .into(binding.imgChangePhoto);
                 }
@@ -86,8 +104,16 @@ public class BuyerProfileActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        userRef.addValueEventListener(userListener);
 
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         binding.imgChangePhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,6 +129,68 @@ public class BuyerProfileActivity extends AppCompatActivity {
             }
         });
 
+        imageLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            // There are no request codes
+                            if (result.getData().getData() != null) {
+                                Uri selectedImage = result.getData().getData();
+                                createImageBitmap(selectedImage);
+                            }
+                        }
+                    }
+                });
+
+        binding.linearChangeName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showBottomSheetNameDialog();
+            }
+        });
+
+    }
+
+    private void showBottomSheetNameDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_name);
+        MaterialButton btnSave = bottomSheetDialog.findViewById(R.id.btnSave);
+        TextInputEditText edFirstName = bottomSheetDialog.findViewById(R.id.edFirstName);
+        TextInputEditText edLastName = bottomSheetDialog.findViewById(R.id.edLastName);
+        LinearLayout parent = bottomSheetDialog.findViewById(R.id.nameParent);
+        //putting bottomsheetdialog above keyboard
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        assert btnSave != null;
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.setTitle("Changing Name");
+                dialog.setMessage("Please wait...");
+                dialog.show();
+                String firstName = edFirstName.getText().toString();
+                String lastName = edLastName.getText().toString();
+                if (firstName.isEmpty() || lastName.isEmpty()) {
+                    Snackbar.make(parent, "Please fill both fields", Snackbar.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                    return;
+                }
+                HashMap<String, Object> name = new HashMap<>();
+                name.put("userName", firstName + " " + lastName);
+                database.getReference().child("Users").child(buyerId).updateChildren(name).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        bottomSheetDialog.dismiss();
+                        dialog.dismiss();
+                        Snackbar.make(binding.getRoot(), "Name Changed", Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+        });
+        bottomSheetDialog.show();
     }
 
     private void showBottomSheetPhotoDialog() {
@@ -122,12 +210,17 @@ public class BuyerProfileActivity extends AppCompatActivity {
             }
         });
         assert btnUploadFromGallery != null;
+
         btnUploadFromGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                bottomSheetDialog.dismiss();
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+                imageLauncher.launch(intent);
             }
         });
+
         bottomSheetDialog.show();
     }
 
@@ -168,7 +261,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
             dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         }
         dialog.setProgress(0);
-        dialog.setMessage("Uploading Image");
+        dialog.setMessage("Please wait");
         dialog.show();
         UploadTask uploadTask = reference.putBytes(uri);
         uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -208,4 +301,11 @@ public class BuyerProfileActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (userRef != null) {
+            userRef.removeEventListener(userListener);
+        }
+    }
 }

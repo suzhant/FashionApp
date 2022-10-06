@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -80,7 +81,8 @@ public class HomeFragment extends Fragment {
                 if (snapshot.child("userPic").exists()) {
                     buyerPic = snapshot.child("userPic").getValue(String.class);
                     if (getActivity() != null) {
-                        Glide.with(getActivity()).load(buyerPic).placeholder(R.drawable.avatar).into(binding.circleImageView);
+                        Glide.with(getActivity()).load(buyerPic).placeholder(R.drawable.avatar).diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(binding.circleImageView);
                     }
                 }
             }

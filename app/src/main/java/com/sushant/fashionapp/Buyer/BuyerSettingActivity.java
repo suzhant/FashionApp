@@ -25,5 +25,12 @@ public class BuyerSettingActivity extends AppCompatActivity {
                 startActivity(new Intent(BuyerSettingActivity.this, BuyerProfileActivity.class));
             }
         });
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 }
