@@ -46,10 +46,11 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <LinearLayout
+        android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginTop="20dp"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView4">
@@ -71,9 +72,9 @@
                 android:id="@+id/edMail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
                 android:importantForAutofill="no"
-                android:inputType="textEmailAddress|textWebEmailAddress" />
+                android:inputType="textEmailAddress|textWebEmailAddress"
+                android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -93,8 +94,8 @@
                 android:id="@+id/edPass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:inputType="textPassword|textWebPassword" />
+                android:inputType="textPassword|textWebPassword"
+                android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -102,16 +103,16 @@
             android:layout_width="match_parent"
             android:layout_height="61dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="40dp"
             android:layout_marginStart="20dp"
+            android:layout_marginTop="40dp"
             android:layout_marginEnd="20dp"
             android:fontFamily="sans-serif-medium"
             android:text="Login"
-            android:textStyle="bold"
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/white"
             android:textSize="14sp"
+            android:textStyle="bold"
             app:backgroundTint="@color/skyBlue"
             app:cornerRadius="8dp" />
 
@@ -120,38 +121,56 @@
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:padding="10dp"
             android:text="Tap to login with fingerprint"
             android:textAllCaps="false"
+            android:textSize="12sp"
+            android:visibility="gone"
             app:icon="@drawable/ic_fingerprint_24"
             app:iconGravity="textStart"
             app:iconPadding="20dp"
-            android:padding="10dp"
             app:strokeColor="@color/skyBlue"
-            app:strokeWidth="0.5dp"
-            android:textSize="12sp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp" />
+            app:strokeWidth="0.5dp" />
 
         <Button
             android:id="@+id/txtForgotPass"
+            style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:text="Forgot Password"
+            android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:fontFamily="sans-serif"
+            android:text="Forgot Password"
             android:textAllCaps="false"
-            android:layout_gravity="center"
             android:textColor="@color/hintColor" />
 
     </LinearLayout>
 
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSignInWithPhone"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Sign In With Phone"
+        android:textAllCaps="false"
+        android:textColor="@color/skyBlue"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <LinearLayout
+        android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:orientation="horizontal"
         android:gravity="center_horizontal"
+        android:orientation="horizontal"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -160,21 +179,21 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="15sp"
             android:layout_gravity="center"
-            android:text="Don't have an account?" />
+            android:fontFamily="sans-serif-medium"
+            android:text="Don't have an account?"
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/txtCreateAcc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/open_sans"
-            android:textSize="15sp"
-            android:textStyle="bold"
             android:layout_marginStart="5dp"
+            android:fontFamily="@font/open_sans"
+            android:text="Create"
             android:textColor="@color/skyBlue"
-            android:text="Create" />
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

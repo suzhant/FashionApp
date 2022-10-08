@@ -75,9 +75,14 @@ public class HomeFragment extends Fragment {
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                String name = snapshot.child("userName").getValue(String.class);
-                assert name != null;
-                binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">" + TextUtils.captializeAllFirstLetter(name) + "</font"));
+                if (snapshot.child("userName").exists()) {
+                    String name = snapshot.child("userName").getValue(String.class);
+                    binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">" + TextUtils.captializeAllFirstLetter(name) + "</font"));
+                } else {
+                    String phone = snapshot.child("userPhone").getValue(String.class);
+                    binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">" + phone + "</font"));
+                }
+
                 if (snapshot.child("userPic").exists()) {
                     buyerPic = snapshot.child("userPic").getValue(String.class);
                     if (getActivity() != null) {

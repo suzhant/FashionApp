@@ -37,6 +37,7 @@ public class ActivityHomePage extends AppCompatActivity {
     double cartNumber;
     ValueEventListener cartListener;
     DatabaseReference cartRef;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,18 @@ public class ActivityHomePage extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+        sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        String authId = sharedPreferences.getString("authId", "");
+        SharedPreferences.Editor authEditor = getSharedPreferences("data", MODE_PRIVATE).edit();
+        if (authId == null) {
+            authEditor.putBoolean("enableBiometric", false);
+        } else {
+            authEditor.putBoolean("enableBiometric", authId.equals(auth.getUid()));
+        }
+        authEditor.apply();
+
+
         BadgeDrawable badge = binding.bottomNavigation.getOrCreateBadge(R.id.page_3);
         SharedPreferences.Editor editor = getSharedPreferences("userData", MODE_PRIVATE).edit();
         editor.putBoolean("isSeller", false);

@@ -159,6 +159,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                     database.getReference().child("Users").child(id).setValue(user);
                                     resetAllFields();
                                     assert users != null;
+
                                     users.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {

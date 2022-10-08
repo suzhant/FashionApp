@@ -27,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
+import com.sushant.fashionapp.Buyer.BuyerMultiFactorActivity;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.ActivitySignInBinding;
 
@@ -55,6 +56,12 @@ public class ActivitySignIn extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         dialog = new ProgressDialog(this);
+
+        sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+        boolean enableBiometric = sharedPreferences.getBoolean("enableBiometric", true);
+        if (enableBiometric) {
+            binding.btnFingerprint.setVisibility(View.VISIBLE);
+        }
 
         //sign in using biometrics
         androidx.biometric.BiometricManager biometricManager = androidx.biometric.BiometricManager.from(this);
@@ -133,11 +140,7 @@ public class ActivitySignIn extends AppCompatActivity {
             biometricPrompt.authenticate(promptInfo);
         });
 
-        sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-        boolean isLogin = sharedPreferences.getBoolean("isLogin", false);
-        if (isLogin) {
-            binding.btnFingerprint.setVisibility(View.VISIBLE);
-        }
+
 
 
         binding.txtCreateAcc.setOnClickListener(new View.OnClickListener() {
@@ -177,6 +180,23 @@ public class ActivitySignIn extends AppCompatActivity {
                     return;
                 }
                 performAuth(email, pass);
+                sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+                boolean isLogin = sharedPreferences.getBoolean("isGoogle", flag);
+                String authId = sharedPreferences.getString("authId", "");
+                if (isLogin) {
+                    if (!authId.equals(auth.getUid())) {
+                        SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
+                        editor.putBoolean("enableBiometric", false);
+                        editor.apply();
+                    }
+                }
+            }
+        });
+
+        binding.btnSignInWithPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ActivitySignIn.this, BuyerMultiFactorActivity.class));
             }
         });
     }
@@ -220,7 +240,6 @@ public class ActivitySignIn extends AppCompatActivity {
                         }
                     }
                 });
-
     }
 
     public void hideSoftKeyboard() {

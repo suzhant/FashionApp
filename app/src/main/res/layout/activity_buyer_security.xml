@@ -19,16 +19,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navigationIcon="@drawable/ic_arrow_back_24"
-            app:title="Settings"
+            app:title="Security"
             app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
     </com.google.android.material.appbar.AppBarLayout>
 
 
     <LinearLayout
-        android:id="@+id/lytChangeProfile"
+        android:id="@+id/lytTwoFactor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:padding="15dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/rectangle_bg"
@@ -41,50 +40,22 @@
             app:tint="@color/black"
             android:background="@drawable/round_corners"
             android:backgroundTint="@color/anti_flash_white"
-            android:src="@drawable/change_profile" />
+            android:src="@drawable/ic_fingerprint_24" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:padding="8sp"
             android:layout_marginStart="5dp"
+            android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
-            android:text="Change Profile"
-            app:drawableEndCompat="@drawable/ic_arrow_forward_ios_24" />
-    </LinearLayout>
+            android:text="Enable fingerprint authentication" />
 
-    <LinearLayout
-        android:id="@+id/lytSecurity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="15dp"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="3dp"
-            app:tint="@color/black"
-            android:background="@drawable/round_corners"
-            android:backgroundTint="@color/anti_flash_white"
-            android:src="@drawable/security_48px" />
-
-        <TextView
-            android:layout_width="match_parent"
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchFingerPrint"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:padding="8sp"
-            android:layout_marginStart="5dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Security"
-            app:drawableEndCompat="@drawable/ic_arrow_forward_ios_24" />
+            app:thumbTint="@color/skyBlue" />
     </LinearLayout>
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:dividerColor="@color/medium_gray" />
-
 </LinearLayout>

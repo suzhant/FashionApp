@@ -32,5 +32,12 @@ public class BuyerSettingActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+        binding.lytSecurity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(BuyerSettingActivity.this, BuyerSecurityActivity.class));
+            }
+        });
     }
 }

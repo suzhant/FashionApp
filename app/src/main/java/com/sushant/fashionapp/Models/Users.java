@@ -14,6 +14,7 @@ public class Users {
     private String userPic;
     private String panNo;
     private String citizenNo;
+    private String userAddress;
     private String imgCitizenFront, imgCitizenBack, imgPanFront, imgPanBack;
     private ArrayList<Users> images;
 
@@ -136,5 +137,13 @@ public class Users {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserAddress() {
+        return userAddress;
+    }
+
+    public void setUserAddress(String userAddress) {
+        this.userAddress = userAddress;
     }
 }
