@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class Users {
     private String userName;
     private String userEmail;
+    private String userSecondaryEmail;
     private String userDOB;
     private String userPhone;
     private String userId;
@@ -145,5 +146,13 @@ public class Users {
 
     public void setUserAddress(String userAddress) {
         this.userAddress = userAddress;
+    }
+
+    public String getUserSecondaryEmail() {
+        return userSecondaryEmail;
+    }
+
+    public void setUserSecondaryEmail(String userSecondaryEmail) {
+        this.userSecondaryEmail = userSecondaryEmail;
     }
 }

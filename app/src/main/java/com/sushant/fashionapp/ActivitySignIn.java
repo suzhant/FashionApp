@@ -44,7 +44,6 @@ public class ActivitySignIn extends AppCompatActivity {
     private androidx.biometric.BiometricPrompt biometricPrompt;
     private androidx.biometric.BiometricPrompt.PromptInfo promptInfo;
     SharedPreferences sharedPreferences;
-    boolean flag;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -58,7 +57,7 @@ public class ActivitySignIn extends AppCompatActivity {
         dialog = new ProgressDialog(this);
 
         sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-        boolean enableBiometric = sharedPreferences.getBoolean("enableBiometric", true);
+        boolean enableBiometric = sharedPreferences.getBoolean("enableBiometric", false);
         if (enableBiometric) {
             binding.btnFingerprint.setVisibility(View.VISIBLE);
         }
@@ -108,8 +107,8 @@ public class ActivitySignIn extends AppCompatActivity {
                     @NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
                 sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                boolean isLogin = sharedPreferences.getBoolean("isGoogle", flag);
-                if (!isLogin) {
+                boolean isLogin = sharedPreferences.getBoolean("isLogin", false);
+                if (isLogin) {
                     String email = sharedPreferences.getString("email", "");
                     String pass = sharedPreferences.getString("password", "");
                     if (!email.isEmpty() || !pass.isEmpty()) {
@@ -181,7 +180,7 @@ public class ActivitySignIn extends AppCompatActivity {
                 }
                 performAuth(email, pass);
                 sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                boolean isLogin = sharedPreferences.getBoolean("isGoogle", flag);
+                boolean isLogin = sharedPreferences.getBoolean("isLogin", false);
                 String authId = sharedPreferences.getString("authId", "");
                 if (isLogin) {
                     if (!authId.equals(auth.getUid())) {
@@ -227,7 +226,6 @@ public class ActivitySignIn extends AppCompatActivity {
                             editor.putString("email", email);
                             editor.putString("password", password);
                             editor.putBoolean("isLogin", true);
-                            editor.putBoolean("isGoogle", flag);
                             editor.apply();
 
                             Intent intent = new Intent(getApplicationContext(), ActivityHomePage.class);

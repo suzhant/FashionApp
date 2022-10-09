@@ -20,10 +20,10 @@ import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.ActivityHomePage;
-import com.sushant.fashionapp.Models.Users;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityOtpactivityBinding;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class OTPActivity extends AppCompatActivity {
@@ -45,7 +45,7 @@ public class OTPActivity extends AppCompatActivity {
         verificationId = getIntent().getStringExtra("verificationId");
         phoneNumber = getIntent().getStringExtra("phoneNumber");
 
-        binding.txtOTP.setText("Enter the OTP sent to" + phoneNumber);
+        binding.txtOTP.setText("Enter the OTP sent to " + phoneNumber);
 
         binding.btnVerify.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,12 +67,11 @@ public class OTPActivity extends AppCompatActivity {
                                     binding.circularProgressIndicator.setVisibility(View.GONE);
                                     binding.btnVerify.setVisibility(View.VISIBLE);
                                     if (task.isSuccessful()) {
-                                        Users user = new Users();
                                         String id = task.getResult().getUser().getUid();
-                                        user.setUserId(id);
-                                        user.setUserPhone(phoneNumber);
-                                        database.getReference().child("Users").child(id).setValue(user);
-
+                                        HashMap<String, Object> userObj = new HashMap<>();
+                                        userObj.put("userPhone", phoneNumber);
+                                        userObj.put("userId", id);
+                                        database.getReference().child("Users").child(id).updateChildren(userObj);
 
                                         Intent intent = new Intent(getApplicationContext(), ActivityHomePage.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -104,6 +103,13 @@ public class OTPActivity extends AppCompatActivity {
                                 .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
                                 .build();
                 PhoneAuthProvider.verifyPhoneNumber(options);
+            }
+        });
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
 

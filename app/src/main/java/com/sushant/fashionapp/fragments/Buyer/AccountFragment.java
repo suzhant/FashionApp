@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -18,6 +20,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
 import com.sushant.fashionapp.Buyer.BuyerSettingActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
+import com.sushant.fashionapp.Models.Users;
+import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
 import com.sushant.fashionapp.seller.SellerHomePage;
@@ -60,6 +64,41 @@ public class AccountFragment extends Fragment {
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Users buyer = snapshot.getValue(Users.class);
+                assert buyer != null;
+                if (snapshot.child("userName").exists()) {
+                    String buyerName = buyer.getUserName();
+                    binding.txtName.setText(buyerName);
+                } else {
+                    binding.txtName.setText("Name not registered yet");
+                }
+
+                if (snapshot.child("userPhone").exists()) {
+                    String phone = buyer.getUserPhone();
+                    binding.txtPhone.setText(phone);
+                } else {
+                    binding.txtPhone.setText("Phone number not registered yet");
+                }
+
+                if (snapshot.child("userEmail").exists()) {
+                    String email = buyer.getUserEmail();
+                    binding.txtEmail.setText(email);
+                } else {
+                    binding.txtEmail.setText("Secondary Email not registered yet");
+                }
+
+
+                if (snapshot.child("userPic").exists()) {
+                    String buyerPic = snapshot.child("userPic").getValue(String.class);
+                    if (getActivity() != null) {
+                        Glide.with(getActivity()).load(buyerPic)
+                                .placeholder(R.drawable.avatar)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .into(binding.imgPic);
+                    }
+
+                }
+
                 if (snapshot.child("sellerId").exists()) {
                     sellerId = snapshot.child("sellerId").getValue(String.class);
                     database.getReference().child("Seller").child(sellerId)

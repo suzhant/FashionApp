@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -127,6 +128,13 @@ public class BuyerSecurityActivity extends AppCompatActivity {
                     editor.apply();
                     Snackbar.make(binding.getRoot(), "Fingerprint login disabled", Snackbar.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
     }

@@ -3,10 +3,10 @@ package com.sushant.fashionapp.Buyer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,6 +41,8 @@ public class BuyerMultiFactorActivity extends AppCompatActivity {
                 binding.btnVerify.setVisibility(View.GONE);
 
                 if (phoneNumber.isEmpty()) {
+                    binding.circularProgressIndicator.setVisibility(View.GONE);
+                    binding.btnVerify.setVisibility(View.VISIBLE);
                     binding.ipPhoneNumber.requestFocus();
                     binding.ipPhoneNumber.setError("Phone number cannot be empty!!");
                     return;
@@ -55,6 +57,13 @@ public class BuyerMultiFactorActivity extends AppCompatActivity {
                                 .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
                                 .build();
                 PhoneAuthProvider.verifyPhoneNumber(options);
+            }
+        });
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
 
@@ -75,12 +84,12 @@ public class BuyerMultiFactorActivity extends AppCompatActivity {
                         // Invalid request
                         binding.circularProgressIndicator.setVisibility(View.GONE);
                         binding.btnVerify.setVisibility(View.VISIBLE);
-                        Toast.makeText(BuyerMultiFactorActivity.this, "Invalid Request: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), "Invalid Request: " + e.getMessage(), Snackbar.LENGTH_LONG).setTextMaxLines(2).show();
                     } else if (e instanceof FirebaseTooManyRequestsException) {
                         // The SMS quota for the project has been exceeded
                         binding.circularProgressIndicator.setVisibility(View.GONE);
                         binding.btnVerify.setVisibility(View.VISIBLE);
-                        Toast.makeText(BuyerMultiFactorActivity.this, "The SMS quota for the project has been exceeded: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), "The SMS quota for the project has been exceeded: " + e.getMessage(), Snackbar.LENGTH_SHORT).setTextMaxLines(2).show();
                     }
                     // Show a message and update the UI
                     // ...
@@ -99,6 +108,7 @@ public class BuyerMultiFactorActivity extends AppCompatActivity {
                     intent.putExtra("phoneNumber", phoneNumber);
                     startActivity(intent);
                     overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
                 }
             };
 }

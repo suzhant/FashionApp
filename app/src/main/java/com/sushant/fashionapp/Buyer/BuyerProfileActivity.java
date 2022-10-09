@@ -11,12 +11,11 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,7 +29,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -39,6 +37,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
@@ -53,7 +54,13 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -76,11 +83,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class BuyerProfileActivity extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAPTURE = 100;
     private static final int REQUEST_CHECK_SETTINGS = 102;
+    private static final int LOCATION_PERMISSION_REQUEST = 104;
     ActivityBuyerProfileBinding binding;
     FirebaseStorage storage;
     FirebaseAuth auth;
@@ -95,6 +104,9 @@ public class BuyerProfileActivity extends AppCompatActivity {
     LocationManager mLocationManager;
     TextInputEditText edAddress;
     MaterialButton btnGetCurrentLocation;
+    FusedLocationProviderClient fusedLocationProviderClient;
+    PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
+    BottomSheetDialog bottomSheetOTPDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,9 +128,34 @@ public class BuyerProfileActivity extends AppCompatActivity {
                 Users buyer = snapshot.getValue(Users.class);
                 assert buyer != null;
                 buyerId = buyer.getUserId();
-                buyerName = buyer.getUserName();
 
-                binding.txtName.setText(buyerName);
+                if (snapshot.child("userName").exists()) {
+                    buyerName = buyer.getUserName();
+                    binding.txtName.setText(buyerName);
+                } else {
+                    binding.txtName.setText("Name not registered yet");
+                }
+
+                if (snapshot.child("userPhone").exists()) {
+                    String phone = buyer.getUserPhone();
+                    binding.txtPhone.setText(phone);
+                } else {
+                    binding.txtPhone.setText("Phone number not registered yet");
+                }
+
+                if (snapshot.child("userAddress").exists()) {
+                    String address = buyer.getUserAddress();
+                    binding.txtAddress.setText(address);
+                } else {
+                    binding.txtAddress.setText("Address not registered yet");
+                }
+
+                if (snapshot.child("userSecondaryEmail").exists()) {
+                    String email = buyer.getUserSecondaryEmail();
+                    binding.txtEmail.setText(email);
+                } else {
+                    binding.txtEmail.setText("Secondary Email not registered yet");
+                }
 
                 if (snapshot.child("userPic").exists()) {
                     buyerPic = snapshot.child("userPic").getValue(String.class);
@@ -194,7 +231,68 @@ public class BuyerProfileActivity extends AppCompatActivity {
             }
         });
 
+        binding.linearChangeEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showBottomSheetEmailDialog();
+            }
+        });
 
+
+    }
+
+    private void showBottomSheetEmailDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_email_secondary);
+        MaterialButton btnVerify = bottomSheetDialog.findViewById(R.id.btnVerify);
+        TextInputEditText edEmail = bottomSheetDialog.findViewById(R.id.edEmail);
+        TextInputLayout ipEmail = bottomSheetDialog.findViewById(R.id.ipEmail);
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        bottomSheetDialog.show();
+
+        assert btnVerify != null;
+        btnVerify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String email = edEmail.getText().toString();
+                boolean isValid = validateEmail(email, ipEmail);
+                if (isValid) {
+                    dialog.setTitle("Setting email");
+                    dialog.setMessage("Please wait..");
+                    dialog.show();
+
+                    HashMap<String, Object> emailObj = new HashMap<>();
+                    emailObj.put("userSecondaryEmail", email);
+                    database.getReference().child("Users").child(buyerId).updateChildren(emailObj).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            bottomSheetDialog.dismiss();
+                            dialog.dismiss();
+                            Snackbar.make(binding.getRoot(), "Secondary Email Changed successfully", Snackbar.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+
+            }
+        });
+
+    }
+
+    private boolean validateEmail(String email, TextInputLayout ipEmail) {
+        if (email.isEmpty()) {
+            ipEmail.requestFocus();
+            ipEmail.setError("Email cannot be empty");
+            return false;
+        }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            ipEmail.requestFocus();
+            ipEmail.setError("Invalid Email Address!");
+            return false;
+        }
+        ipEmail.setErrorEnabled(false);
+        return true;
     }
 
     private void showBottomSheetAddressDialog() {
@@ -206,16 +304,9 @@ public class BuyerProfileActivity extends AppCompatActivity {
         TextInputLayout ipAddress = bottomSheetDialog.findViewById(R.id.ipAddress);
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        if (ActivityCompat.checkSelfPermission(BuyerProfileActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(BuyerProfileActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(BuyerProfileActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                    100);
-            return;
-        }
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!getLocation()) {
-            //  buildAlertMessageNoGps();
             btnGetCurrentLocation.setText("Turn on Location");
         }
 
@@ -229,10 +320,13 @@ public class BuyerProfileActivity extends AppCompatActivity {
                     ipAddress.setError("Address cannot be empty");
                     return;
                 }
-                dialog.setMessage("Please wait..");
-                dialog.show();
                 assert ipAddress != null;
                 ipAddress.setErrorEnabled(false);
+
+                dialog.setTitle("Saving location");
+                dialog.setMessage("Please wait..");
+                dialog.show();
+
                 HashMap<String, Object> addressObj = new HashMap<>();
                 addressObj.put("userAddress", address);
                 database.getReference().child("Users").child(buyerId).updateChildren(addressObj).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -240,7 +334,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         bottomSheetDialog.dismiss();
                         dialog.dismiss();
-                        Snackbar.make(binding.getRoot(), "Address Changed", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(binding.getRoot(), "Address Changed successfully", Snackbar.LENGTH_SHORT).show();
                     }
                 });
 
@@ -251,21 +345,14 @@ public class BuyerProfileActivity extends AppCompatActivity {
         btnGetCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(BuyerProfileActivity.this);
                 if (ActivityCompat.checkSelfPermission(BuyerProfileActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(BuyerProfileActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(BuyerProfileActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
-                            100);
-                    return;
-                }
-                if (!getLocation()) {
-                    buildAlertMessageNoGps();
-                }
-                //   displayLocationSettingsRequest();
-                try {
-                    mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
-                            LOCATION_REFRESH_DISTANCE, mLocationListener);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                            LOCATION_PERMISSION_REQUEST);
+
+                } else {
+                    displayLocationSettingsRequest();
                 }
 
             }
@@ -273,13 +360,21 @@ public class BuyerProfileActivity extends AppCompatActivity {
 
         bottomSheetDialog.show();
 
+        bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                stopLocationUpdates();
+            }
+        });
+
     }
 
     private void displayLocationSettingsRequest() {
+        dialog.setTitle("Fetching location");
         dialog.setMessage("Please wait...");
         dialog.show();
         com.google.android.gms.location.LocationRequest locationRequest = com.google.android.gms.location.LocationRequest.create();
-        locationRequest.setPriority(Priority.PRIORITY_LOW_POWER);
+        locationRequest.setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(10000);
         locationRequest.setFastestInterval(10000 / 2);
 
@@ -294,13 +389,10 @@ public class BuyerProfileActivity extends AppCompatActivity {
                 try {
                     LocationSettingsResponse response = task.getResult(ApiException.class);
                     // All location settings are satisfied. The client can initialize location
-                    // requests here.
-                    try {
-                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME,
-                                LOCATION_REFRESH_DISTANCE, mLocationListener);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    // requests here.
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+                            locationCallback,
+                            Looper.getMainLooper());
 
                 } catch (ApiException exception) {
                     switch (exception.getStatusCode()) {
@@ -332,6 +424,32 @@ public class BuyerProfileActivity extends AppCompatActivity {
         });
     }
 
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            dialog.dismiss();
+            try {
+                Geocoder geocoder = new Geocoder(BuyerProfileActivity.this, Locale.getDefault());
+                List<Address> addresses = geocoder.getFromLocation(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude(), 1);
+                String adminArea = addresses.get(0).getAdminArea();
+                String subAdminArea = addresses.get(0).getSubAdminArea();
+                String countryName = addresses.get(0).getCountryName();
+                String postalCode = addresses.get(0).getPostalCode();
+                String subLocality = addresses.get(0).getSubLocality();
+                String address = adminArea + "," + subAdminArea + "," + subLocality + "," + countryName + "," + postalCode;
+                edAddress.setText(address);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private void stopLocationUpdates() {
+        if (fusedLocationProviderClient != null) {
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        }
+    }
+
     public boolean getLocation() {
         boolean gpsEnabled = false;
         boolean networkEnabled = false;
@@ -352,47 +470,8 @@ public class BuyerProfileActivity extends AppCompatActivity {
         return gpsEnabled && networkEnabled;
     }
 
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    private final LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(final Location location) {
-            //your code here
-            dialog.dismiss();
-            try {
-                Geocoder geocoder = new Geocoder(BuyerProfileActivity.this, Locale.getDefault());
-                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                String adminArea = addresses.get(0).getAdminArea();
-                String subAdminArea = addresses.get(0).getSubAdminArea();
-                String countryName = addresses.get(0).getCountryName();
-                String postalCode = addresses.get(0).getPostalCode();
-                String subLocality = addresses.get(0).getSubLocality();
-                String address = adminArea + "," + subAdminArea + " " + subLocality + "," + countryName + "," + postalCode;
-                edAddress.setText(address);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
 
-        }
-    };
 
     private void showBottomSheetPhoneDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
@@ -420,19 +499,97 @@ public class BuyerProfileActivity extends AppCompatActivity {
                 String phone = edphone.getText().toString();
                 boolean isValid = validatePhoneNumber(phone, ipPhone, cpp);
                 if (isValid) {
-                    dialog.setTitle("Changing phone number");
+                    dialog.setTitle("Sending SMS code");
                     dialog.setMessage("Please wait...");
                     dialog.show();
-                    HashMap<String, Object> phoneObj = new HashMap<>();
-                    phoneObj.put("userPhone", phone);
-                    database.getReference().child("Users").child(buyerId).updateChildren(phoneObj).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                    callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                         @Override
-                        public void onSuccess(Void unused) {
-                            bottomSheetDialog.dismiss();
-                            dialog.dismiss();
-                            Snackbar.make(binding.getRoot(), "Phone number Changed successfully", Snackbar.LENGTH_SHORT).show();
+                        public void onVerificationCompleted(PhoneAuthCredential credential) {
+
                         }
-                    });
+
+                        @Override
+                        public void onVerificationFailed(FirebaseException e) {
+                            // This callback is invoked in response to invalid requests for
+                            // verification, like an incorrect phone number.
+                            dialog.dismiss();
+                            if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                // Invalid request
+                                Snackbar.make(binding.getRoot(), "Invalid Request: " + e.getMessage(), Snackbar.LENGTH_LONG).setTextMaxLines(2).show();
+                            } else if (e instanceof FirebaseTooManyRequestsException) {
+                                // The SMS quota for the project has been exceeded
+                                Snackbar.make(binding.getRoot(), "The SMS quota for the project has been exceeded: " + e.getMessage(), Snackbar.LENGTH_SHORT).setTextMaxLines(2).show();
+                            }
+                            // Show a message and update the UI
+                            // ...
+                        }
+
+                        @Override
+                        public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token) {
+                            // The SMS verification code has been sent to the provided phone number.
+                            // We now need to ask the user to enter the code and then construct a
+                            // credential by combining the code with a verification ID.
+                            // Save the verification ID and resending token for later use.
+                            dialog.dismiss();
+                            bottomSheetDialog.dismiss();
+                            bottomSheetOTPDialog = new BottomSheetDialog(BuyerProfileActivity.this);
+                            bottomSheetOTPDialog.setContentView(R.layout.bottomsheet_verify_otp);
+                            MaterialButton btnVerify = bottomSheetOTPDialog.findViewById(R.id.btnVerify);
+                            TextInputEditText edOTP = bottomSheetOTPDialog.findViewById(R.id.edOTP);
+                            TextInputLayout ipOTP = bottomSheetOTPDialog.findViewById(R.id.ipOTP);
+                            Objects.requireNonNull(bottomSheetOTPDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+                            bottomSheetOTPDialog.show();
+
+
+                            assert btnVerify != null;
+                            btnVerify.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    String code = edOTP.getText().toString();
+                                    if (code.isEmpty()) {
+                                        ipOTP.setError("Empty Field!!");
+                                        ipOTP.requestFocus();
+                                        return;
+                                    }
+                                    ipOTP.setErrorEnabled(false);
+
+                                    dialog.setTitle("Changing Phone Number");
+                                    dialog.setMessage("Please wait");
+                                    dialog.show();
+
+                                    PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+
+                                    if (credential.getSmsCode().equals(code)) {
+                                        HashMap<String, Object> phoneObj = new HashMap<>();
+                                        phoneObj.put("userPhone", phone);
+                                        database.getReference().child("Users").child(buyerId).updateChildren(phoneObj).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                bottomSheetOTPDialog.dismiss();
+                                                dialog.dismiss();
+                                                Snackbar.make(binding.getRoot(), "Phone number Changed successfully", Snackbar.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    } else {
+                                        bottomSheetOTPDialog.dismiss();
+                                        dialog.dismiss();
+                                        Snackbar.make(binding.getRoot(), "Phone number cannot be verified", Snackbar.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+
+                        }
+                    };
+
+                    PhoneAuthOptions options =
+                            PhoneAuthOptions.newBuilder(auth)
+                                    .setPhoneNumber("+977" + phone)       // Phone number to verify
+                                    .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                                    .setActivity(BuyerProfileActivity.this)   // Activity (for callback binding)
+                                    .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
+                                    .build();
+                    PhoneAuthProvider.verifyPhoneNumber(options);
                 }
             }
         });
@@ -528,37 +685,6 @@ public class BuyerProfileActivity extends AppCompatActivity {
         bottomSheetDialog.show();
     }
 
-    @SuppressLint("MissingPermission")
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                if (data != null) {
-                    if (data.getData() != null) {
-                        Uri selectedImage = data.getData();
-                        createImageBitmap(selectedImage);
-                    }
-                }
-            }
-        }
-
-        switch (requestCode) {
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
-                        // All required changes were successfully made
-                        btnGetCurrentLocation.setText("Get Current Location");
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        // The user was asked to change settings, but chose not to
-
-                        break;
-                }
-                dialog.dismiss();
-                break;
-        }
-    }
 
     private void createImageBitmap(Uri imageUrl) {
         Bitmap bitmap = null;
@@ -620,6 +746,50 @@ public class BuyerProfileActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case LOCATION_PERMISSION_REQUEST:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    displayLocationSettingsRequest();
+                } else {
+                    Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null) {
+                    if (data.getData() != null) {
+                        Uri selectedImage = data.getData();
+                        createImageBitmap(selectedImage);
+                    }
+                }
+            }
+        }
+
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+                        btnGetCurrentLocation.setText("Get Current Location");
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+
+                        break;
+                }
+                dialog.dismiss();
+                break;
+        }
     }
 
     @Override

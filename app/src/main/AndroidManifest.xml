@@ -27,7 +27,7 @@
             android:exported="false" />
         <activity
             android:name=".Buyer.BuyerProfileActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".Buyer.BuyerSettingActivity"
             android:exported="false" />

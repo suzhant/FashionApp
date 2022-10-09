@@ -72,7 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                android:text="Sushant Shrestha" />
+                android:text="You have not registered your name yet" />
         </LinearLayout>
 
         <ImageView
@@ -104,9 +104,10 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:fontFamily="sans-serif-medium"
-                android:text="Email" />
+                android:text="Email (Secondary)" />
 
             <TextView
+                android:id="@+id/txtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -149,6 +150,7 @@
                 android:text="Phone" />
 
             <TextView
+                android:id="@+id/txtPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -191,6 +193,7 @@
                 android:text="Address" />
 
             <TextView
+                android:id="@+id/txtAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
