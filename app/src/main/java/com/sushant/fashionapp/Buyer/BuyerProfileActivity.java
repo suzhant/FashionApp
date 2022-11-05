@@ -285,6 +285,26 @@ public class BuyerProfileActivity extends AppCompatActivity {
             }
         });
 
+        edEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() > 0) {
+                    ipEmail.setErrorEnabled(false);
+                }
+
+            }
+        });
+
     }
 
     private boolean validateEmail(String email, TextInputLayout ipEmail) {
@@ -631,6 +651,25 @@ public class BuyerProfileActivity extends AppCompatActivity {
                                     .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
                                     .build();
                     PhoneAuthProvider.verifyPhoneNumber(options);
+                }
+            }
+        });
+
+        edphone.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() > 0) {
+                    ipPhone.setErrorEnabled(false);
                 }
             }
         });
