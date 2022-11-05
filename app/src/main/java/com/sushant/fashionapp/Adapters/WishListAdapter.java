@@ -56,7 +56,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
-        Glide.with(context).load(product.getpPic()).placeholder(R.drawable.avatar).into(holder.imgProduct);
+        Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgProduct);
         holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(product.getStoreName()));
         holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getpPrice())));
         holder.txtProductName.setText(TextUtils.captializeAllFirstLetter(product.getpName()));

@@ -28,10 +28,10 @@
             android:id="@+id/txtdesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            android:textColor="@color/hintColor"
             android:layout_gravity="center"
-            android:text="All" />
+            android:text="All"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/hintColor" />
 
         <ImageView
             android:layout_width="wrap_content"

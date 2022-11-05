@@ -30,7 +30,7 @@ import com.sushant.fashionapp.databinding.ActivityViewMoreBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -75,7 +75,12 @@ public class ViewMoreActivity extends AppCompatActivity {
                 }
 
                 txtClear.setVisibility(View.VISIBLE);
-                isSorted = true;
+                isSorted = !sortBy.equals("All") || !category.equals("All") || !colour.equals("All");
+                if (!isSorted) {
+                    txtClear.setVisibility(View.GONE);
+
+                }
+
             }
         };
 
@@ -162,19 +167,22 @@ public class ViewMoreActivity extends AppCompatActivity {
                 }
 
 
+                if (category.equals("All") || sortBy.equals("All") || colour.equals("All")) {
+                    products.clear();
+                    products.addAll(unmodifiedList);
+                }
                 if (!category.equals("All")) {
                     filterGender(category);
-                }
-                if (!colour.equals("All")) {
-                    filterColor(colour);
                 }
                 if (!sortBy.equals("All")) {
                     performSort(sortBy);
                 }
+                if (!colour.equals("All")) {
+                    filterColor(colour);
+                }
 
 
                 bottomSheetDialog.dismiss();
-
             }
         });
 
@@ -198,6 +206,7 @@ public class ViewMoreActivity extends AppCompatActivity {
         list.clear();
         sortBy = "All";
         category = "All";
+        colour = "All";
         isSorted = false;
         list.add(new SortModel("Sort by", sortBy));
         list.add(new SortModel("Category", category));
@@ -213,8 +222,8 @@ public class ViewMoreActivity extends AppCompatActivity {
         Predicate<Product> byFemale = product -> product.getCategory().equals(gender);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            List<Product> result = unmodifiedList.stream().filter(byFemale)
-                    .collect(Collectors.toList());
+            Set<Product> result = unmodifiedList.stream().filter(byFemale)
+                    .collect(Collectors.toSet());
             products.addAll(result);
         }
         adapters.notifyDataSetChanged();
@@ -223,19 +232,31 @@ public class ViewMoreActivity extends AppCompatActivity {
 
     private void filterColor(String color) {
         colour = color;
-        products.clear();
-        Predicate<Product> byColor = product -> product.getVariants().get(0).getColor().equals(color);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            List<Product> result = unmodifiedList.stream().filter(byColor)
-                    .collect(Collectors.toList());
-            products.addAll(result);
+        ArrayList<Product> list = new ArrayList<>(products);
+        products.clear();
+        for (Product p : list) {
+            for (int i = 0; i < p.getTotalVariant(); i++) {
+                if (p.getVariants().get(i).getColor().equals(color)) {
+                    products.add(p);
+                }
+            }
+
         }
+
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//            List<Product> result = unmodifiedList.stream().filter(byColor)
+//                    .collect(Collectors.toList());
+//            products.addAll(result);
+//        }
         adapters.notifyDataSetChanged();
     }
 
     private void performSort(String sort) {
         sortBy = sort;
+        if (products.isEmpty()) {
+            products.addAll(unmodifiedList);
+        }
         switch (sortBy) {
             case "Ascending":
                 Collections.sort(products, Product.ascending);

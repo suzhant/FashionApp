@@ -31,10 +31,12 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
     ArrayList<SortModel> list;
     Context context;
     HashSet<String> colors;
+    HashSet<String> gender;
     ItemClickListener itemClickListener;
     BottomSheetDialog bottomSheetDialog;
     ViewMoreActivity viewMoreActivity;
     ArrayList<String> subItems;
+    TextView txtClear;
 
     public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener) {
         this.list = list;
@@ -68,10 +70,12 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 colors = new HashSet<>();
+                gender = new HashSet<>();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     for (int i = 0; i < product.getVariants().size(); i++) {
                         colors.add(product.getVariants().get(i).getColor());
+                        gender.add(product.getCategory());
                     }
                 }
             }
@@ -89,9 +93,25 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
         bottomSheetDialog.setContentView(R.layout.item_sort_dialog);
         ListView listView = bottomSheetDialog.findViewById(R.id.dialogListView);
         TextView title = bottomSheetDialog.findViewById(R.id.txtTitle);
+        txtClear = bottomSheetDialog.findViewById(R.id.txtClear);
         initListView(listView, item, holder);
         title.setText(item.getName());
         bottomSheetDialog.show();
+
+        if (!holder.txtDesc.getText().equals("All")) {
+            txtClear.setVisibility(View.VISIBLE);
+        }
+
+        assert txtClear != null;
+        txtClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                itemClickListener.onClick("All", item.getName());
+                holder.txtDesc.setText("All");
+                bottomSheetDialog.dismiss();
+            }
+        });
+
     }
 
     private void initListView(ListView listView, SortModel item, viewHolder holder) {
@@ -104,10 +124,7 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
                 subItems.add("Price: high to low");
                 break;
             case "Category":
-                subItems.add("Male");
-                subItems.add("Female");
-                subItems.add("Kids");
-                subItems.add("Toddler");
+                subItems.addAll(gender);
                 break;
             case "Colour":
                 subItems.addAll(colors);

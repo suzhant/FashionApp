@@ -274,4 +274,8 @@ public class Product {
             return t1.getpPrice().compareTo(product.getpPrice());
         }
     };
+
+    public int getTotalVariant() {
+        return variants.size();
+    }
 }
