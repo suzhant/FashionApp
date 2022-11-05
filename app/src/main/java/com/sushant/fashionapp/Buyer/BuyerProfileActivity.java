@@ -18,6 +18,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -363,6 +365,26 @@ public class BuyerProfileActivity extends AppCompatActivity {
             }
         });
 
+        edAddress.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() > 1) {
+                    ipAddress.setErrorEnabled(false);
+                }
+
+            }
+        });
+
         bottomSheetDialog.show();
 
         bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -446,6 +468,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            stopLocationUpdates();
         }
     };
 
