@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.FragmentSellerHomeBinding;
 
@@ -65,7 +66,7 @@ public class SellerHomeFragment extends Fragment {
                                         sellerName = snapshot.child("userName").getValue(String.class);
                                         if (snapshot.child("userPic").exists()) {
                                             sellerPic = snapshot.child("userPic").getValue(String.class);
-                                            Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(com.denzcoskun.imageslider.R.drawable.placeholder)
+                                            Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(R.drawable.avatar)
                                                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                                                     .into(binding.circleImageView);
                                         }
