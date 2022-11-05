@@ -378,7 +378,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editable.length() > 1) {
+                if (editable.length() > 0) {
                     ipAddress.setErrorEnabled(false);
                 }
 
