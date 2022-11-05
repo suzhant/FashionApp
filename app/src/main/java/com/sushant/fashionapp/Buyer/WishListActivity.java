@@ -38,7 +38,7 @@ public class WishListActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         initWishListRecycler();
-        database.getReference().child("WishList").addValueEventListener(new ValueEventListener() {
+        database.getReference().child("WishList").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();

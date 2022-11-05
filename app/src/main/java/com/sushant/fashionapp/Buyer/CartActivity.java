@@ -194,7 +194,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void addToWishList(Product product, int pos) {
         deleteProductFromDB(product);
-        database.getReference().child("WishList").child(product.getVariantPId()).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
+        database.getReference().child("WishList").child(Objects.requireNonNull(auth.getUid())).child(product.getVariantPId()).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Snackbar.make(findViewById(R.id.cartLayout), "Added to WishList", Snackbar.LENGTH_SHORT).setAction("Go to WishList", new View.OnClickListener() {

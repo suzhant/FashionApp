@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg"
+    android:paddingTop="0dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
@@ -12,13 +13,20 @@
         android:layout_height="wrap_content"
         android:scaleX="2"
         android:scaleY="2"
-        android:paddingVertical="2dp"
+        android:paddingBottom="2dp"
         android:src="@drawable/horizontal_rule"
         android:layout_gravity="center" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:src="@drawable/ic_arrow_back_24" />
 
         <TextView
             android:id="@+id/txt"

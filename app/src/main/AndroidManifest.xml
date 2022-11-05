@@ -17,13 +17,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
+            android:name=".seller.DisplayProductActivity"
+            android:exported="false" />
+        <activity
             android:name=".Buyer.OTPActivity"
             android:exported="false" />
         <activity
             android:name=".Buyer.BuyerSecurityActivity"
             android:exported="false" />
         <activity
-            android:name=".Buyer.BuyerMultiFactorActivity"
+            android:name=".Buyer.BuyerPhoneSignIn"
             android:exported="false" />
         <activity
             android:name=".Buyer.BuyerProfileActivity"

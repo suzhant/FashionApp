@@ -49,57 +49,12 @@
                 android:textSize="14sp" />
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
-    <!--    <ImageView-->
-    <!--        android:id="@+id/btnBack"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginStart="16dp"-->
-    <!--        android:layout_marginTop="12dp"-->
-    <!--        android:src="@drawable/ic_arrow_back_24"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/guideline4"-->
-    <!--        app:tint="@color/skyBlue" />-->
-
-    <!--    <Button-->
-    <!--        android:id="@+id/button"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="16dp"-->
-    <!--        android:layout_marginEnd="16dp"-->
-    <!--        android:backgroundTint="@color/skyBlue"-->
-    <!--        android:drawableEnd="@drawable/ic_message_outlined"-->
-    <!--        android:text="Bargain"-->
-    <!--        android:textAllCaps="false"-->
-    <!--        android:textAppearance="@style/TextAppearance.AppCompat.Small"-->
-    <!--        android:textColor="@color/white"-->
-    <!--        android:drawableTint="@color/white"-->
-    <!--        android:paddingStart="10dp"-->
-    <!--        android:paddingEnd="10dp"-->
-    <!--        android:textSize="14sp"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-    <!--    <androidx.constraintlayout.widget.Guideline-->
-    <!--        android:id="@+id/guideline4"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:orientation="horizontal"-->
-    <!--        app:layout_constraintGuide_begin="16dp" />-->
-
-    <!--    <androidx.constraintlayout.widget.Guideline-->
-    <!--        android:id="@+id/guideline5"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:orientation="horizontal"-->
-    <!--        app:layout_constraintGuide_begin="64dp" />-->
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="4dp"
-        android:fillViewport="true"
-        android:overScrollMode="never"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toTopOf="@+id/cardView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -112,7 +67,6 @@
             android:layout_marginTop="16dp"
             android:orientation="vertical">
 
-
             <com.denzcoskun.imageslider.ImageSlider
                 android:id="@+id/imgSlider"
                 android:layout_width="wrap_content"
@@ -122,38 +76,12 @@
                 app:iss_selected_dot="@drawable/selected_dots"
                 app:iss_unselected_dot="@drawable/unselected_dots" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.divider.MaterialDivider
-                    android:id="@+id/materialDivider"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    app:dividerColor="#F0F0F0"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/bell_bg"
-                    android:padding="10dp"
-                    android:visibility="gone"
-                    android:src="@drawable/ic_clarity_store_line"
-                    app:layout_constraintBottom_toBottomOf="@+id/materialDivider"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/materialDivider"
-                    app:layout_constraintVertical_bias="0.465"
-                    app:tint="@color/black" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.divider.MaterialDivider
+                android:id="@+id/materialDivider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:dividerColor="#F0F0F0" />
 
             <LinearLayout
                 android:layout_width="match_parent"

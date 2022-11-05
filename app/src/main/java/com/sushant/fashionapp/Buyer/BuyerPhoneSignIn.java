@@ -19,7 +19,7 @@ import com.sushant.fashionapp.databinding.ActivityBuyerMutiFactorBinding;
 
 import java.util.concurrent.TimeUnit;
 
-public class BuyerMultiFactorActivity extends AppCompatActivity {
+public class BuyerPhoneSignIn extends AppCompatActivity {
 
     ActivityBuyerMutiFactorBinding binding;
     FirebaseAuth auth;
@@ -53,7 +53,7 @@ public class BuyerMultiFactorActivity extends AppCompatActivity {
                         PhoneAuthOptions.newBuilder(auth)
                                 .setPhoneNumber("+977" + phoneNumber)       // Phone number to verify
                                 .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-                                .setActivity(BuyerMultiFactorActivity.this)   // Activity (for callback binding)
+                                .setActivity(BuyerPhoneSignIn.this)   // Activity (for callback binding)
                                 .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
                                 .build();
                 PhoneAuthProvider.verifyPhoneNumber(options);
@@ -103,7 +103,7 @@ public class BuyerMultiFactorActivity extends AppCompatActivity {
                     // Save the verification ID and resending token for later use.
                     binding.circularProgressIndicator.setVisibility(View.GONE);
                     binding.btnVerify.setVisibility(View.VISIBLE);
-                    Intent intent = new Intent(BuyerMultiFactorActivity.this, OTPActivity.class);
+                    Intent intent = new Intent(BuyerPhoneSignIn.this, OTPActivity.class);
                     intent.putExtra("verificationId", verificationId);
                     intent.putExtra("phoneNumber", phoneNumber);
                     startActivity(intent);

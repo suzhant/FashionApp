@@ -51,9 +51,7 @@ public class ActivityHomePage extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         String authId = sharedPreferences.getString("authId", "");
         SharedPreferences.Editor authEditor = getSharedPreferences("data", MODE_PRIVATE).edit();
-        if (authId == null) {
-            authEditor.putBoolean("enableBiometric", false);
-        } else {
+        if (authId != null) {
             authEditor.putBoolean("enableBiometric", authId.equals(auth.getUid()));
         }
         authEditor.apply();

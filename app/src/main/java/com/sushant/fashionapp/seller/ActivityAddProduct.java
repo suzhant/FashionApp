@@ -86,6 +86,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     FirebaseStorage storage;
     String size;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +118,6 @@ public class ActivityAddProduct extends AppCompatActivity {
         String[] subCatList = getResources().getStringArray(R.array.subCategory);
         binding.autoSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subCatList));
 
-
         imgLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -127,13 +127,16 @@ public class ActivityAddProduct extends AppCompatActivity {
                             // There are no request codes
                             if (result.getData().getClipData() != null) {
                                 ClipData clipData = result.getData().getClipData();
+
                                 int count = clipData.getItemCount();
                                 if (count > 5) {
                                     Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
+
                                 for (int i = 0; i < count; i++) {
                                     Uri imageUrl = clipData.getItemAt(i).getUri();
+
                                     if (tempImages.size() > 4) {
                                         Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
                                         return;
@@ -195,6 +198,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
     }
 
+
     private void addProductToDB() {
         confirmDialog();
     }
@@ -250,16 +254,16 @@ public class ActivityAddProduct extends AppCompatActivity {
     private void showDialog() {
         tempImages.clear();
         ArrayList<Product> sizes = new ArrayList<>();
+
         Dialog variantDialog = new Dialog(this);
         variantDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         variantDialog.setContentView(R.layout.add_variant_layout);
-
+        TextInputEditText colorName = variantDialog.findViewById(R.id.edColorName);
         RecyclerView recyclerImage = variantDialog.findViewById(R.id.recyclerPhoto);
         RecyclerView recyclerSize = variantDialog.findViewById(R.id.recyclerSize);
         MaterialCardView cardUpload = variantDialog.findViewById(R.id.cardUpload);
         Button addVariant = variantDialog.findViewById(R.id.btnAddVariant);
         Button addSize = variantDialog.findViewById(R.id.btnAddSize);
-        TextInputEditText colorName = variantDialog.findViewById(R.id.edColorName);
         LinearLayout variantDialogLayout = variantDialog.findViewById(R.id.variantLayout);
 
 

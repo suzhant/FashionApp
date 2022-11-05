@@ -3,6 +3,7 @@ package com.sushant.fashionapp.Buyer;
 import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.denzcoskun.imageslider.models.SlideModel;
@@ -162,7 +164,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         variantRef.addValueEventListener(variantListener);
 
         //fetching wishlist items
-        wishListRef = database.getReference().child("WishList");
+        wishListRef = database.getReference().child("WishList").child(auth.getUid());
         wishListListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -272,6 +274,30 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     }
 
+
+    // Generate palette synchronously and return it
+    public Palette createPaletteSync(Bitmap bitmap) {
+        Palette p = Palette.from(bitmap).generate();
+        return p;
+    }
+
+    // Generate palette asynchronously and use it on a different
+// thread using onGenerated()
+    public void createPaletteAsync(Bitmap bitmap) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                // Use generated instance
+                Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
+                if (vibrantSwatch != null) {
+                    int backgroundColor = vibrantSwatch.getRgb();
+                    int textColor = vibrantSwatch.getTitleTextColor();
+                    int dominantColor = p.getDominantColor(backgroundColor);
+                    binding.imgSlider.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue));
+                }
+            }
+        });
+    }
+
     private void initVariantRecycler() {
         Log.d("variantAdapter", "created");
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -364,7 +390,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         product.setSize(sizeId);
         product.setMaxLimit(maxLimit);
         product.setColor(color);
-        database.getReference().child("WishList").child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
+        database.getReference().child("WishList").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 binding.progressCircular.setVisibility(View.GONE);
@@ -385,7 +411,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     private void deleteProductFromWishList() {
         binding.imgWish.setVisibility(View.GONE);
         binding.progressCircular.setVisibility(View.VISIBLE);
-        FirebaseDatabase.getInstance().getReference().child("WishList").child(actualProductId).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+        FirebaseDatabase.getInstance().getReference().child("WishList").child(auth.getUid()).child(actualProductId).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 isLoved = false;

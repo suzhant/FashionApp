@@ -83,8 +83,11 @@ public class AccountFragment extends Fragment {
                 if (snapshot.child("userEmail").exists()) {
                     String email = buyer.getUserEmail();
                     binding.txtEmail.setText(email);
+                } else if (snapshot.child("userSecondaryEmail").exists()) {
+                    String email = buyer.getUserSecondaryEmail();
+                    binding.txtEmail.setText(email);
                 } else {
-                    binding.txtEmail.setText("Secondary Email not registered yet");
+                    binding.txtEmail.setVisibility(View.GONE);
                 }
 
 

@@ -159,6 +159,7 @@
         android:fontFamily="sans-serif-medium"
         android:text="Sign In With Phone"
         android:textAllCaps="false"
+        android:visibility="gone"
         android:textColor="@color/skyBlue"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"

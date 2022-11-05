@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import com.sushant.fashionapp.databinding.FragmentSellerStoreBinding;
 import com.sushant.fashionapp.seller.ActivityAddProduct;
+import com.sushant.fashionapp.seller.DisplayProductActivity;
 
 public class SellerStoreFragment extends Fragment {
 
@@ -26,6 +27,13 @@ public class SellerStoreFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), ActivityAddProduct.class));
+            }
+        });
+
+        binding.btnDisplayProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), DisplayProductActivity.class));
             }
         });
 

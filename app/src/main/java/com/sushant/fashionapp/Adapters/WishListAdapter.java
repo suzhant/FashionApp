@@ -189,7 +189,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
     }
 
     private void deleteProductFromWishList(Product product) {
-        FirebaseDatabase.getInstance().getReference().child("WishList").child(product.getVariantPId()).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+        FirebaseDatabase.getInstance().getReference().child("WishList").child(FirebaseAuth.getInstance().getUid()).child(product.getVariantPId()).setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
                 Snackbar.make(wishListActivity.findViewById(R.id.wishListLyt), "Deleted Successfully", Snackbar.LENGTH_SHORT).show();

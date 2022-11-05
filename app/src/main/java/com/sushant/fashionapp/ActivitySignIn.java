@@ -27,7 +27,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
-import com.sushant.fashionapp.Buyer.BuyerMultiFactorActivity;
+import com.sushant.fashionapp.Buyer.BuyerPhoneSignIn;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.ActivitySignInBinding;
 
@@ -106,9 +106,6 @@ public class ActivitySignIn extends AppCompatActivity {
             public void onAuthenticationSucceeded(
                     @NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
-                sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                boolean isLogin = sharedPreferences.getBoolean("isLogin", false);
-                if (isLogin) {
                     String email = sharedPreferences.getString("email", "");
                     String pass = sharedPreferences.getString("password", "");
                     if (!email.isEmpty() || !pass.isEmpty()) {
@@ -116,7 +113,6 @@ public class ActivitySignIn extends AppCompatActivity {
                     } else {
                         Toast.makeText(getApplicationContext(), "This is the first time you're using Biometric!! Please sign in manually", Toast.LENGTH_SHORT).show();
                     }
-                }
             }
 
             @Override
@@ -179,23 +175,13 @@ public class ActivitySignIn extends AppCompatActivity {
                     return;
                 }
                 performAuth(email, pass);
-                sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
-                boolean isLogin = sharedPreferences.getBoolean("isLogin", false);
-                String authId = sharedPreferences.getString("authId", "");
-                if (isLogin) {
-                    if (!authId.equals(auth.getUid())) {
-                        SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
-                        editor.putBoolean("enableBiometric", false);
-                        editor.apply();
-                    }
-                }
             }
         });
 
         binding.btnSignInWithPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ActivitySignIn.this, BuyerMultiFactorActivity.class));
+                startActivity(new Intent(ActivitySignIn.this, BuyerPhoneSignIn.class));
             }
         });
     }
@@ -225,7 +211,6 @@ public class ActivitySignIn extends AppCompatActivity {
                             SharedPreferences.Editor editor = getSharedPreferences("data", MODE_PRIVATE).edit();
                             editor.putString("email", email);
                             editor.putString("password", password);
-                            editor.putBoolean("isLogin", true);
                             editor.apply();
 
                             Intent intent = new Intent(getApplicationContext(), ActivityHomePage.class);

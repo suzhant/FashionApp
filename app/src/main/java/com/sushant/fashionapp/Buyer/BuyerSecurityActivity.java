@@ -14,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
@@ -33,6 +34,8 @@ public class BuyerSecurityActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     Executor executor;
 
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

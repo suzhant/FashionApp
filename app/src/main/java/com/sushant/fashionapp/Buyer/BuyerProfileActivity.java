@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -20,6 +21,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -56,6 +58,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -107,7 +110,9 @@ public class BuyerProfileActivity extends AppCompatActivity {
     FusedLocationProviderClient fusedLocationProviderClient;
     PhoneAuthProvider.OnVerificationStateChangedCallbacks callbacks;
     BottomSheetDialog bottomSheetOTPDialog;
+    SharedPreferences sharedPreferences;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,7 +159,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
                     String email = buyer.getUserSecondaryEmail();
                     binding.txtEmail.setText(email);
                 } else {
-                    binding.txtEmail.setText("Secondary Email not registered yet");
+                    binding.txtEmail.setText("Secondary email not registered yet");
                 }
 
                 if (snapshot.child("userPic").exists()) {
@@ -506,7 +511,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
                     callbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                         @Override
                         public void onVerificationCompleted(PhoneAuthCredential credential) {
-
+                            Toast.makeText(BuyerProfileActivity.this, credential.getSmsCode(), Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -538,10 +543,19 @@ public class BuyerProfileActivity extends AppCompatActivity {
                             MaterialButton btnVerify = bottomSheetOTPDialog.findViewById(R.id.btnVerify);
                             TextInputEditText edOTP = bottomSheetOTPDialog.findViewById(R.id.edOTP);
                             TextInputLayout ipOTP = bottomSheetOTPDialog.findViewById(R.id.ipOTP);
+                            LinearLayout linearLayout = bottomSheetOTPDialog.findViewById(R.id.otpParent);
+                            TextView txtBack = bottomSheetOTPDialog.findViewById(R.id.txt);
                             Objects.requireNonNull(bottomSheetOTPDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                             bottomSheetOTPDialog.show();
 
 
+                            txtBack.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    bottomSheetOTPDialog.dismiss();
+                                    bottomSheetDialog.show();
+                                }
+                            });
                             assert btnVerify != null;
                             btnVerify.setOnClickListener(new View.OnClickListener() {
                                 @Override
@@ -560,22 +574,26 @@ public class BuyerProfileActivity extends AppCompatActivity {
 
                                     PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
 
-                                    if (credential.getSmsCode().equals(code)) {
-                                        HashMap<String, Object> phoneObj = new HashMap<>();
-                                        phoneObj.put("userPhone", phone);
-                                        database.getReference().child("Users").child(buyerId).updateChildren(phoneObj).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                bottomSheetOTPDialog.dismiss();
+                                    auth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                            if (task.isSuccessful()) {
+                                                auth.signOut();
+                                                sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
+                                                String email = sharedPreferences.getString("email", "");
+                                                String pass = sharedPreferences.getString("password", "");
+                                                if (!email.isEmpty() || !pass.isEmpty()) {
+                                                    performAuth(email, pass, phone);
+                                                }
+                                            } else {
                                                 dialog.dismiss();
-                                                Snackbar.make(binding.getRoot(), "Phone number Changed successfully", Snackbar.LENGTH_SHORT).show();
+                                                Snackbar.make(linearLayout, "Phone number cannot be verified", Snackbar.LENGTH_SHORT).show();
                                             }
-                                        });
-                                    } else {
-                                        bottomSheetOTPDialog.dismiss();
-                                        dialog.dismiss();
-                                        Snackbar.make(binding.getRoot(), "Phone number cannot be verified", Snackbar.LENGTH_SHORT).show();
-                                    }
+
+                                        }
+                                    });
+
+
                                 }
                             });
 
@@ -596,6 +614,33 @@ public class BuyerProfileActivity extends AppCompatActivity {
 
         bottomSheetDialog.show();
 
+    }
+
+    //Firebase Email Authentication
+    public void performAuth(String email, String password, String phone) {
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        dialog.dismiss();
+                        if (task.isSuccessful()) {
+                            HashMap<String, Object> phoneObj = new HashMap<>();
+                            phoneObj.put("userPhone", phone);
+                            database.getReference().child("Users").child(buyerId).updateChildren(phoneObj).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    bottomSheetOTPDialog.dismiss();
+                                    dialog.dismiss();
+                                    Snackbar.make(binding.getRoot(), "Phone number Changed successfully", Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            bottomSheetOTPDialog.dismiss();
+                            dialog.dismiss();
+                            Snackbar.make(binding.getRoot(), "Something went wrong! Please try again", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private boolean validatePhoneNumber(String phone, TextInputLayout ipPhone, CountryCodePicker cpp) {
