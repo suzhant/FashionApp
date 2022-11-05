@@ -59,6 +59,13 @@ public class ViewMoreActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
 
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         itemClickListener = new ItemClickListener() {
             @Override
             public void onClick(String item, String type) {
@@ -236,7 +243,7 @@ public class ViewMoreActivity extends AppCompatActivity {
         ArrayList<Product> list = new ArrayList<>(products);
         products.clear();
         for (Product p : list) {
-            for (int i = 0; i < p.getTotalVariant(); i++) {
+            for (int i = 0; i < p.getVariants().size(); i++) {
                 if (p.getVariants().get(i).getColor().equals(color)) {
                     products.add(p);
                 }
