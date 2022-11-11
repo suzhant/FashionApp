@@ -245,6 +245,8 @@ public class ViewMoreActivity extends AppCompatActivity {
         for (Product p : list) {
             for (int i = 0; i < p.getVariants().size(); i++) {
                 if (p.getVariants().get(i).getColor().equals(color)) {
+                    p.setPreviewPic(p.getVariants().get(i).getPhotos().get(0));
+                    p.setVariantIndex(i);
                     products.add(p);
                 }
             }
