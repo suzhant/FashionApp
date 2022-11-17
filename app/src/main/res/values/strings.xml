@@ -16,22 +16,111 @@
     </string-array>
 
     <string-array name="category">
-        <item>Male</item>
-        <item>Female</item>
-        <item>Kid</item>
-        <item>Toddler</item>
+        <item>Women"'"s Fashion</item>
+        <item>Men"'"s Fashion</item>
+        <item>Babies &amp; Toys</item>
+        <item>Sports Outdoor</item>
     </string-array>
 
-    <string-array name="subCategory">
-        <item>Shirt</item>
-        <item>T-Shirt</item>
-        <item>InnerWear</item>
-        <item>Paint</item>
-        <item>Bag</item>
-        <item>Eye-Glass</item>
-        <item>Jacket</item>
+    <string-array name="seasons">
+        <item>Summer</item>
+        <item>Winter</item>
+    </string-array>
+
+    <string-array name="male_subcategory">
         <item>Sweater</item>
+        <item>Shirt</item>
+        <item>Jeans</item>
+        <item>Gloves</item>
+        <item>Cap</item>
+        <item>Suit</item>
+        <item>Hawaiian shirt</item>
+        <item>Singlet</item>
+        <item>Business shoes</item>
+        <item>Flip flops</item>
+        <item>Shorts</item>
+        <item>Cardigan</item>
+        <item>Jacket</item>
+        <item>Sport shoes</item>
+        <item>Bow tie</item>
+        <item>Sleeveless shirt</item>
+        <item>Vest</item>
+        <item>Long-sleeve top</item>
+        <item>Polo shirt</item>
+        <item>Jumper</item>
+        <item>Trench coat</item>
+        <item>Bathrobe</item>
+        <item>Cargo pants</item>
+        <item>Swimsuit</item>
+        <item>Blazer</item>
+        <item>T-shirt</item>
+        <item>Belt</item>
+        <item>Underpants</item>
+        <item>Waistcoat</item>
+        <item>Socks</item>
+        <item>Tie</item>
+        <item>Pullover</item>
+        <item>Umbrella</item>
+        <item>Scarf</item>
+        <item>Sunglasses</item>
+        <item>Glasses</item>
+        <item>Boots</item>
+        <item>Wallet</item>
+        <item>Handbag</item>
+        <item>Watch</item>
+    </string-array>
+
+    <string-array name="female_subcategory">
+        <item>Wedding dress</item>
+        <item>Sweater</item>
+        <item>T-shirt</item>
+        <item>Sheath dress</item>
+        <item>Dress</item>
+        <item>Gym clothes</item>
+        <item>Bra</item>
+        <item>Tank top</item>
+        <item>Shorts</item>
+        <item>Hoodie</item>
+        <item>Jeans</item>
+        <item>Long coat</item>
+        <item>Uniform</item>
+        <item>Coat</item>
+        <item>Dress pants</item>
+        <item>Swimsuit</item>
+        <item>Long-sleeve top</item>
+        <item>Skirt</item>
+        <item>Thong</item>
+        <item>Hat</item>
+        <item>Necklace</item>
+        <item>Ring</item>
+        <item>Earrings</item>
+        <item>Perfume</item>
+        <item>Mittens</item>
+        <item>Sunglasses</item>
+        <item>Handbag</item>
+        <item>Bracelet</item>
+        <item>Purse</item>
+        <item>Watch</item>
+        <item>Umbrella</item>
+        <item>Scarf</item>
+        <item>Slip</item>
+        <item>High-heeled shoes</item>
+        <item>Flip-flops</item>
+        <item>Boots</item>
+        <item>Stockings</item>
+        <item>Jacket</item>
+    </string-array>
+
+    <string-array name="toddler_subcategory">
+        <item>Overalls</item>
+        <item>Mittens</item>
+        <item>Beanie</item>
+        <item>Baby apron</item>
+        <item>Socks</item>
+        <item>Diaper</item>
+        <item>Singlet</item>
         <item>Shoes</item>
+        <item>Safety pin</item>
     </string-array>
 
     <string name="Policy">I agree to the <font color="#09AEA3"><u> Terms and Conditions</u></font> and  <font color="#09AEA3"><u>Privacy Policy</u></font></string>

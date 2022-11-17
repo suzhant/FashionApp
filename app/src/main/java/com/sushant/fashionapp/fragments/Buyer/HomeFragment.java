@@ -24,6 +24,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.CardAdapters;
 import com.sushant.fashionapp.Adapters.CategoryAdapter;
+import com.sushant.fashionapp.Buyer.SearchActivity;
 import com.sushant.fashionapp.Buyer.ViewMoreActivity;
 import com.sushant.fashionapp.Models.Category;
 import com.sushant.fashionapp.Models.Product;
@@ -143,6 +144,13 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), ViewMoreActivity.class));
+            }
+        });
+
+        binding.imgSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), SearchActivity.class));
             }
         });
         return binding.getRoot();

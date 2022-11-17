@@ -77,6 +77,9 @@ public class ActivityAddProduct extends AppCompatActivity {
     ArrayList<String> tempImages = new ArrayList<>();
     ActivityResultLauncher<Intent> imgLauncher;
     ArrayList<Product> variants = new ArrayList<>();
+    ArrayList<String> catList = new ArrayList<>();
+    ArrayList<String> subCatList = new ArrayList<>();
+    ArrayList<String> subSubCatList = new ArrayList<>();
 
     VariantSummaryAdapter variantSummaryAdapter;
     SizeSummaryAdapter sizeSummaryAdapter;
@@ -85,6 +88,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     String pName, cat, subCat, pDes, storeId, price, sellerId, storeName;
     FirebaseStorage storage;
     String size;
+    String category, subcategory;
 
 
     @Override
@@ -111,12 +115,24 @@ public class ActivityAddProduct extends AppCompatActivity {
         binding.recyclerVariantSummary.setAdapter(variantSummaryAdapter);
 
         //category List
-        String[] catList = getResources().getStringArray(R.array.category);
-        binding.autoCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, catList));
+        // String[] catList = getResources().getStringArray(R.array.category);
+        database.getReference().child("category").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                catList.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    String cat = snapshot1.getKey();
+                    catList.add(cat);
+                }
+                binding.autoCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, catList));
+            }
 
-        //subcategory List
-        String[] subCatList = getResources().getStringArray(R.array.subCategory);
-        binding.autoSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subCatList));
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
         imgLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -158,6 +174,27 @@ public class ActivityAddProduct extends AppCompatActivity {
                     }
                 });
 
+        binding.autoCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                category = adapterView.getItemAtPosition(i).toString();
+                addSubCategory(category);
+                binding.autoSubCategory.getText().clear();
+                binding.autoSubSubCategory.getText().clear();
+                binding.ipSubCategory.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.autoSubCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                subcategory = adapterView.getItemAtPosition(i).toString();
+                addSubSubCat();
+                binding.autoSubSubCategory.getText().clear();
+                binding.ipSubSubCategory.setVisibility(View.VISIBLE);
+            }
+        });
+
         binding.btnAddProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,6 +232,46 @@ public class ActivityAddProduct extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    private void addSubSubCat() {
+        database.getReference().child("category").child(category).child(subcategory).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                subSubCatList.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    String subCat = snapshot1.getValue(String.class);
+                    subSubCatList.add(subCat);
+                }
+                binding.autoSubSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subSubCatList));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void addSubCategory(String category) {
+        database.getReference().child("category").child(category).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                subCatList.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    String subCat = snapshot1.getKey();
+                    subCatList.add(subCat);
+                }
+                binding.autoSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subCatList));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+//        String[] subCatList = getResources().getStringArray(subcategory);
 
     }
 
