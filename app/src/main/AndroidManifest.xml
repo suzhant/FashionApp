@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
+            android:name=".Buyer.SearchResultActivity"
+            android:exported="false" />
+        <activity
             android:name=".Buyer.SearchActivity"
             android:exported="false" />
         <activity

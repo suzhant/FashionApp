@@ -29,7 +29,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Product;
@@ -250,9 +249,9 @@ public class ActivityProductDetails extends AppCompatActivity {
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ActivityProductDetails.this, ActivityHomePage.class));
-                finishAfterTransition();
-                //  onBackPressed();
+//                startActivity(new Intent(ActivityProductDetails.this, ActivityHomePage.class));
+//                finishAfterTransition();
+                onBackPressed();
             }
         });
 

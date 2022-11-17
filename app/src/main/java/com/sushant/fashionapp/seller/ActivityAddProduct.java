@@ -85,10 +85,9 @@ public class ActivityAddProduct extends AppCompatActivity {
     SizeSummaryAdapter sizeSummaryAdapter;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, cat, subCat, pDes, storeId, price, sellerId, storeName;
+    String pName, cat, subCat, subSubCat, pDes, storeId, price, sellerId, storeName;
     FirebaseStorage storage;
     String size;
-    String category, subcategory;
 
 
     @Override
@@ -177,21 +176,29 @@ public class ActivityAddProduct extends AppCompatActivity {
         binding.autoCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                category = adapterView.getItemAtPosition(i).toString();
-                addSubCategory(category);
+                cat = adapterView.getItemAtPosition(i).toString();
+                addSubCategory(cat);
                 binding.autoSubCategory.getText().clear();
                 binding.autoSubSubCategory.getText().clear();
                 binding.ipSubCategory.setVisibility(View.VISIBLE);
+                binding.ipSubSubCategory.setVisibility(View.GONE);
             }
         });
 
         binding.autoSubCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                subcategory = adapterView.getItemAtPosition(i).toString();
+                subCat = adapterView.getItemAtPosition(i).toString();
                 addSubSubCat();
                 binding.autoSubSubCategory.getText().clear();
                 binding.ipSubSubCategory.setVisibility(View.VISIBLE);
+            }
+        });
+
+        binding.autoSubSubCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                subSubCat = adapterView.getItemAtPosition(i).toString();
             }
         });
 
@@ -201,9 +208,10 @@ public class ActivityAddProduct extends AppCompatActivity {
                 pName = binding.edProductName.getText().toString();
                 cat = binding.autoCategory.getText().toString();
                 subCat = binding.autoSubCategory.getText().toString();
+                subSubCat = binding.autoSubSubCategory.getText().toString();
                 pDes = binding.edDescription.getText().toString();
                 price = binding.edPrice.getText().toString();
-                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | pDes.isEmpty() | variants.isEmpty()) {
+                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty()) {
                     Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -236,7 +244,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     }
 
     private void addSubSubCat() {
-        database.getReference().child("category").child(category).child(subcategory).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child(cat).child(subCat).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subSubCatList.clear();
