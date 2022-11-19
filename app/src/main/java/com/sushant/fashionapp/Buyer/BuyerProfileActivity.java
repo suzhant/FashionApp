@@ -76,7 +76,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.hbb20.CountryCodePicker;
-import com.sushant.fashionapp.Models.Users;
+import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.ImageUtils;
 import com.sushant.fashionapp.databinding.ActivityBuyerProfileBinding;
@@ -132,7 +132,7 @@ public class BuyerProfileActivity extends AppCompatActivity {
         userListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Users buyer = snapshot.getValue(Users.class);
+                Buyer buyer = snapshot.getValue(Buyer.class);
                 assert buyer != null;
                 buyerId = buyer.getUserId();
 

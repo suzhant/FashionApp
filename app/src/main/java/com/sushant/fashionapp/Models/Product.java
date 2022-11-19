@@ -10,8 +10,12 @@ public class Product {
     private ArrayList<Product> variants;
     private ArrayList<Product> sizes;
     private ArrayList<String> photos;
+    private ArrayList<String> tags;
+    private Long timeStamp;
     private String previewPic;
-    private String category, subCategory;
+    private String category, subCategory, subSubCategory;
+    private String season;
+    private String storeId;
 
     public Product() {
     }
@@ -274,4 +278,59 @@ public class Product {
             return t1.getpPrice().compareTo(product.getpPrice());
         }
     };
+
+    public static Comparator<Product> oldToNew = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return product.getTimeStamp().compareTo(t1.getTimeStamp());
+        }
+    };
+
+    public static Comparator<Product> newToOld = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return t1.getTimeStamp().compareTo(product.getTimeStamp());
+        }
+    };
+
+
+    public ArrayList<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(ArrayList<String> tags) {
+        this.tags = tags;
+    }
+
+    public Long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getSubSubCategory() {
+        return subSubCategory;
+    }
+
+    public void setSubSubCategory(String subSubCategory) {
+        this.subSubCategory = subSubCategory;
+    }
+
+    public String getSeason() {
+        return season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
 }

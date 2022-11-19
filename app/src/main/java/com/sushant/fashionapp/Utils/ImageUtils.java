@@ -163,8 +163,7 @@ public class ImageUtils {
 //            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 //        }
 //        dialog.setProgress(0);
-        dialog.setTitle("Images");
-        dialog.setMessage("Uploading Image");
+        dialog.setMessage("Please wait..");
         dialog.setCancelable(false);
         dialog.show();
         for (int i = 0; i < uri.size(); i++) {

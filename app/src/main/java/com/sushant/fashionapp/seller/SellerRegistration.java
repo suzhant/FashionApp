@@ -39,8 +39,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.hbb20.CountryCodePicker;
+import com.sushant.fashionapp.Models.Seller;
 import com.sushant.fashionapp.Models.Store;
-import com.sushant.fashionapp.Models.Users;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.ImageUtils;
 import com.sushant.fashionapp.Utils.TextFieldValidation;
@@ -292,7 +292,6 @@ public class SellerRegistration extends AppCompatActivity {
                     return;
                 }
                 createStoreAccount();
-                createSellerAccount();
             }
         });
 
@@ -381,15 +380,16 @@ public class SellerRegistration extends AppCompatActivity {
         ImageUtils.createImageBitmap(image, sellerId, SellerRegistration.this);
     }
 
-    private void createSellerAccount() {
+    private void createSellerAccount(String storeId) {
 //        UUID uuid = UUID.randomUUID();
 //        String sellerId = uuid.toString();
         String sellerId = database.getReference().child("Seller").push().getKey();
-        Users users = new Users(sellerName, sellerEmail, sellerPhoneNum);
+        Seller users = new Seller(sellerName, sellerEmail, sellerPhoneNum);
         users.setUserDOB(dob);
         users.setPanNo(panNo);
         users.setCitizenNo(citizenNo);
         users.setSellerId(sellerId);
+        users.setStoreId(storeId);
         database.getReference().child("Seller").child(sellerId).setValue(users).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
@@ -414,7 +414,12 @@ public class SellerRegistration extends AppCompatActivity {
         Store store = new Store.StoreBuilder(storeName, storePhoneNum, storeEmail)
                 .storeAddress(storeAddress).storeVAT(vatNo).storeDesc(storeDesc)
                 .ownerId(auth.getUid()).storeId(String.valueOf(storeId)).build();
-        database.getReference().child("Store").child(String.valueOf(storeId)).setValue(store);
+        database.getReference().child("Store").child(String.valueOf(storeId)).setValue(store).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                createSellerAccount(storeId.toString());
+            }
+        });
     }
 
     private boolean isFieldEmpty() {

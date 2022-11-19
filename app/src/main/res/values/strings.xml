@@ -25,6 +25,8 @@
     <string-array name="seasons">
         <item>Summer</item>
         <item>Winter</item>
+        <item>Fall</item>
+        <item>Spring</item>
     </string-array>
 
     <string-array name="male_subcategory">

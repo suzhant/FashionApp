@@ -2,22 +2,14 @@ package com.sushant.fashionapp.Models;
 
 import com.sushant.fashionapp.Utils.TextUtils;
 
-import java.util.ArrayList;
-
 public class Users {
     private String userName;
     private String userEmail;
     private String userSecondaryEmail;
     private String userDOB;
     private String userPhone;
-    private String userId;
-    private String sellerId;
     private String userPic;
-    private String panNo;
-    private String citizenNo;
     private String userAddress;
-    private String imgCitizenFront, imgCitizenBack, imgPanFront, imgPanBack;
-    private ArrayList<Users> images;
 
     public Users() {
     }
@@ -64,81 +56,10 @@ public class Users {
         this.userPic = userPic;
     }
 
-    public String getPanNo() {
-        return panNo;
-    }
-
-    public String getCitizenNo() {
-        return citizenNo;
-    }
-
-    public String getImgCitizenFront() {
-        return imgCitizenFront;
-    }
-
-    public void setImgCitizenFront(String imgCitizenFront) {
-        this.imgCitizenFront = imgCitizenFront;
-    }
-
-    public String getImgCitizenBack() {
-        return imgCitizenBack;
-    }
-
-    public void setImgCitizenBack(String imgCitizenBack) {
-        this.imgCitizenBack = imgCitizenBack;
-    }
-
-    public String getImgPanFront() {
-        return imgPanFront;
-    }
-
-    public void setImgPanFront(String imgPanFront) {
-        this.imgPanFront = imgPanFront;
-    }
-
-    public String getImgPanBack() {
-        return imgPanBack;
-    }
-
-    public void setImgPanBack(String imgPanBack) {
-        this.imgPanBack = imgPanBack;
-    }
-
-    public ArrayList<Users> getImages() {
-        return images;
-    }
-
-    public void setImages(ArrayList<Users> images) {
-        this.images = images;
-    }
-
     public void setUserDOB(String userDOB) {
         this.userDOB = userDOB;
     }
 
-    public void setPanNo(String panNo) {
-        this.panNo = panNo;
-    }
-
-    public void setCitizenNo(String citizenNo) {
-        this.citizenNo = citizenNo;
-    }
-
-    public String getSellerId() {
-        return sellerId;
-    }
-
-    public void setSellerId(String sellerId) {
-        this.sellerId = sellerId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
     public String getUserAddress() {
         return userAddress;

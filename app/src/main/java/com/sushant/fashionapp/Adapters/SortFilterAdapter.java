@@ -32,6 +32,8 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
     Context context;
     HashSet<String> colors;
     HashSet<String> gender;
+    HashSet<String> brand;
+    HashSet<String> season;
     ItemClickListener itemClickListener;
     BottomSheetDialog bottomSheetDialog;
     ViewMoreActivity viewMoreActivity;
@@ -71,12 +73,16 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 colors = new HashSet<>();
                 gender = new HashSet<>();
+                brand = new HashSet<>();
+                season = new HashSet<>();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     for (int i = 0; i < product.getVariants().size(); i++) {
                         colors.add(product.getVariants().get(i).getColor());
                         gender.add(product.getCategory());
                     }
+                    brand.add(product.getBrandName());
+                    season.add(product.getSeason());
                 }
             }
 
@@ -118,8 +124,10 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
         subItems = new ArrayList<>();
         switch (item.getName()) {
             case "Sort by":
-                subItems.add("Ascending");
-                subItems.add("Descending");
+//                subItems.add("Ascending");
+//                subItems.add("Descending");
+                subItems.add("Time: new to old");
+                subItems.add("Time: old to new");
                 subItems.add("Price: low to high");
                 subItems.add("Price: high to low");
                 break;
@@ -128,6 +136,12 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
                 break;
             case "Colour":
                 subItems.addAll(colors);
+                break;
+            case "Brand":
+                subItems.addAll(brand);
+                break;
+            case "Season":
+                subItems.addAll(season);
                 break;
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, subItems);

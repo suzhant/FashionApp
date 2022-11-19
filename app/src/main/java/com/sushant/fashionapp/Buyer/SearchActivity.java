@@ -41,6 +41,7 @@ public class SearchActivity extends AppCompatActivity {
     ArrayList<Product> searchList = new ArrayList<>();
     ArrayList<String> searchQuery = new ArrayList<>();
     ArrayList<Product> products = new ArrayList<>();
+    ArrayList<Product> filterList = new ArrayList<>();
     SearchAdapter searchAdapter;
     CardAdapters adapters;
     ItemClickListener itemClickListener;
@@ -80,10 +81,15 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
+                filterList.clear();
                 products.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     list.add(product.getpName());
+//                    product.setSubCategory(product.getSubCategory()+" for "+product.getCategory());
+//                    if (product.getSubSubCategory()!=null){
+//                        product.setSubSubCategory(product.getSubSubCategory()+" for "+product.getCategory());
+//                    }
                     products.add(product);
                 }
             }
@@ -126,7 +132,7 @@ public class SearchActivity extends AppCompatActivity {
                         String processedQuery = removeSpecialChar(query);
                         searchHistory.add(processedQuery);
                         saveHistory(processedQuery);
-                        //       search(processedQuery);
+                        // search(processedQuery);
                         hideSoftKeyboard();
                         Intent intent = new Intent(SearchActivity.this, SearchResultActivity.class);
                         intent.putExtra("pName", query);
@@ -155,8 +161,12 @@ public class SearchActivity extends AppCompatActivity {
                 binding.recyclerSearchView.setVisibility(View.VISIBLE);
                 searchQuery.clear();
                 for (Product p : products) {
-                    if (p.getpName().toLowerCase().contains(charSequence.toString().toLowerCase()) || p.getDesc().toLowerCase().contains(charSequence.toString().toLowerCase())) {
+                    if (p.getpName().toLowerCase().contains(charSequence.toString().toLowerCase()) || p.getDesc().toLowerCase().contains(charSequence.toString().toLowerCase())
+                            || p.getSubCategory().toLowerCase().contains(charSequence.toString().toLowerCase()) ||
+                            p.getSubSubCategory().toLowerCase().contains(charSequence.toString().toLowerCase())) {
                         searchQuery.add(p.getpName());
+//                        searchQuery.add(p.getSubCategory());
+//                        searchQuery.add(p.getSubSubCategory());
                     }
                 }
                 searchAdapter.notifyDataSetChanged();
@@ -242,7 +252,10 @@ public class SearchActivity extends AppCompatActivity {
     private void search(String toString) {
         searchList.clear();
         for (Product p : products) {
-            if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())) {
+            String subsubcat = removeSpecialChar(p.getSubSubCategory());
+            if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())
+                    || p.getCategory().toLowerCase().contains(toString) || p.getSubCategory().toLowerCase().contains(toString)
+                    || subsubcat.toLowerCase().contains(toString) || toString.contains(p.getSeason().toLowerCase())) {
                 searchList.add(p);
             }
         }

@@ -30,7 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.hbb20.CountryCodePicker;
-import com.sushant.fashionapp.Models.Users;
+import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.ActivityRegisterBinding;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
@@ -153,7 +153,7 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                                 if (task.isSuccessful()) {
                                     showCreatingDialog();
                                     FirebaseUser users = auth.getCurrentUser();
-                                    Users user = new Users(name, email, PhoneNum);
+                                    Buyer user = new Buyer(name, email, PhoneNum);
                                     String id = task.getResult().getUser().getUid();
                                     user.setUserId(id);
                                     database.getReference().child("Users").child(id).setValue(user);

@@ -67,7 +67,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.Objects;
 
 public class ActivityAddProduct extends AppCompatActivity {
@@ -85,9 +85,9 @@ public class ActivityAddProduct extends AppCompatActivity {
     SizeSummaryAdapter sizeSummaryAdapter;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, cat, subCat, subSubCat, pDes, storeId, price, sellerId, storeName;
+    String pName, cat, subCat, subSubCat, pDes, storeId, price, storeName;
     FirebaseStorage storage;
-    String size;
+    String size, brandName, season;
 
 
     @Override
@@ -115,6 +115,11 @@ public class ActivityAddProduct extends AppCompatActivity {
 
         //category List
         // String[] catList = getResources().getStringArray(R.array.category);
+
+        //season list
+        String[] seasonList = getResources().getStringArray(R.array.seasons);
+        binding.autoSeason.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, seasonList));
+
         database.getReference().child("category").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -206,12 +211,15 @@ public class ActivityAddProduct extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 pName = binding.edProductName.getText().toString();
+                pDes = binding.edDescription.getText().toString();
+                price = binding.edPrice.getText().toString();
+                brandName = binding.edBrandName.getText().toString();
+                season = binding.autoSeason.getText().toString();
                 cat = binding.autoCategory.getText().toString();
                 subCat = binding.autoSubCategory.getText().toString();
                 subSubCat = binding.autoSubSubCategory.getText().toString();
-                pDes = binding.edDescription.getText().toString();
-                price = binding.edPrice.getText().toString();
-                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty()) {
+
+                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty()) {
                     Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
@@ -227,7 +235,6 @@ public class ActivityAddProduct extends AppCompatActivity {
                     assert store != null;
                     if (store.getOwnerId().equals(auth.getUid())) {
                         storeId = store.getStoreId();
-                        sellerId = store.getOwnerId();
                         storeName = store.getStoreName();
                         break;
                     }
@@ -308,18 +315,20 @@ public class ActivityAddProduct extends AppCompatActivity {
                             product1.setpPrice(Integer.valueOf(price));
                             product1.setCategory(cat);
                             product1.setSubCategory(subCat);
+                            product1.setSubSubCategory(subSubCat);
                             product1.setDesc(pDes);
                             product1.setBrandName("Gucci");
                             product1.setProductCode(123);
+                            product1.setTimeStamp(new Date().getTime());
                             product1.setVariants(variants);
-                            HashMap<String, Object> store = new HashMap<>();
-                            store.put("storeId", storeId);
+                            product1.setBrandName(brandName);
+                            product1.setSeason(season);
+                            product1.setStoreId(storeId);
 
                             dialog.show();
                             database.getReference().child("Products").child(product1.getpId()).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
-                                    database.getReference().child("Products").child(product1.getpId()).updateChildren(store);
                                     resetAllFields();
                                     dialog.dismiss();
                                 }
@@ -483,7 +492,6 @@ public class ActivityAddProduct extends AppCompatActivity {
         ArrayList<String> finalImageList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setTitle("Images");
         dialog.setMessage("Please wait...");
         dialog.setCancelable(false);
         dialog.show();
@@ -530,6 +538,11 @@ public class ActivityAddProduct extends AppCompatActivity {
         binding.edDescription.getText().clear();
         binding.autoSubCategory.getText().clear();
         binding.autoCategory.getText().clear();
+        binding.autoSubSubCategory.getText().clear();
+        binding.edBrandName.getText().clear();
+        binding.autoSeason.getText().clear();
+        binding.ipSubCategory.setVisibility(View.GONE);
+        binding.ipSubSubCategory.setVisibility(View.GONE);
         variants.clear();
         variantSummaryAdapter.notifyDataSetChanged();
     }

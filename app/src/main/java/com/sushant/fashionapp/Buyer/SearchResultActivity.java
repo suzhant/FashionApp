@@ -90,13 +90,34 @@ public class SearchResultActivity extends AppCompatActivity {
     private void search(String toString) {
         searchList.clear();
         for (Product p : products) {
-            if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())) {
+            String subsubcat = removeSpecialChar(p.getSubSubCategory());
+            if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())
+                    || p.getCategory().toLowerCase().contains(toString) || p.getSubCategory().toLowerCase().contains(toString)
+                    || subsubcat.toLowerCase().contains(toString)
+                    || toString.contains(p.getSeason().toLowerCase())) {
                 searchList.add(p);
             }
         }
         binding.edSearch.dismissDropDown();
         adapters.notifyDataSetChanged();
     }
+
+    private String removeSpecialChar(String query) {
+        StringBuilder resultStr = new StringBuilder();
+        for (int i = 0; i < query.length(); i++) {
+            if (Character.isWhitespace(query.charAt(i))) {
+                resultStr.append(" ");
+            }
+            //comparing alphabets with their corresponding ASCII value
+            if (query.charAt(i) > 64 && query.charAt(i) <= 122) //returns true if both conditions returns true
+            {
+                //adding characters into empty string
+                resultStr.append(query.charAt(i));
+            }
+        }
+        return resultStr.toString();
+    }
+
 
 //    public void setHistoryChips(ArrayList<String> histories) {
 //        binding.chipGroup.removeAllViews();

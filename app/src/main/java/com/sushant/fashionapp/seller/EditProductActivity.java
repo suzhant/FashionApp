@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -12,18 +12,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sushant.fashionapp.Adapters.CardAdapters;
+import com.sushant.fashionapp.Adapters.EditProductAdapter;
 import com.sushant.fashionapp.Models.Product;
-import com.sushant.fashionapp.databinding.ActivityDisplayProductBinding;
+import com.sushant.fashionapp.databinding.ActivityEditProductBinding;
 
 import java.util.ArrayList;
 
-public class DisplayProductActivity extends AppCompatActivity {
+public class EditProductActivity extends AppCompatActivity {
 
-    ActivityDisplayProductBinding binding;
+    ActivityEditProductBinding binding;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    CardAdapters adapters;
+    EditProductAdapter adapters;
     ArrayList<Product> products = new ArrayList<>();
     String sellerId, storeId;
     DatabaseReference reference;
@@ -31,7 +31,7 @@ public class DisplayProductActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityDisplayProductBinding.inflate(getLayoutInflater());
+        binding = ActivityEditProductBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         auth = FirebaseAuth.getInstance();
@@ -82,13 +82,12 @@ public class DisplayProductActivity extends AppCompatActivity {
 
         initRecyclerView();
 
-
     }
 
     private void initRecyclerView() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         binding.viewMoreRecycler.setLayoutManager(layoutManager);
-        adapters = new CardAdapters(products, this);
+        adapters = new EditProductAdapter(products, this);
         binding.viewMoreRecycler.setAdapter(adapters);
     }
 }
