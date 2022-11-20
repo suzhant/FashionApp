@@ -5,7 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".seller.ActivityAddProduct">
+    tools:context=".seller.EditProductDetailsActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout3"
@@ -26,19 +26,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:navigationIcon="@drawable/ic_arrow_back_24"
-                app:title="Add Product"
+                app:title="Edit Product"
                 app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
         </com.google.android.material.appbar.AppBarLayout>
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="10dp"
-            android:textSize="16sp"
-            android:text="Please enter the details of your product." />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/ipProductName"
@@ -147,7 +137,6 @@
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
-            android:visibility="gone"
             app:boxCornerRadiusTopStart="10dp"
             app:boxStrokeColor="@color/skyBlue">
 
@@ -169,7 +158,6 @@
             android:layout_marginRight="20dp"
             android:layout_gravity="start"
             android:hint="Sub Category"
-            android:visibility="gone"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -276,10 +264,10 @@
             android:layout_marginEnd="10dp" />
 
         <Button
-            android:id="@+id/btnAddProduct"
+            android:id="@+id/btnEditProduct"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="Add Product"
+            android:text="Edit Product"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp" />

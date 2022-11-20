@@ -1,16 +1,16 @@
 package com.sushant.fashionapp.Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class Product {
+public class Product implements Serializable {
     private String pId, pName, storeName, size, maxLimit, color, desc, pPic, brandName, variantPId;
     private Integer pPrice, stock, love, quantity, productCode, variantIndex, sizeIndex;
     private ArrayList<Product> variants;
     private ArrayList<Product> sizes;
     private ArrayList<String> photos;
-    private ArrayList<String> tags;
     private Long timeStamp;
     private String previewPic;
     private String category, subCategory, subSubCategory;
@@ -293,14 +293,6 @@ public class Product {
         }
     };
 
-
-    public ArrayList<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(ArrayList<String> tags) {
-        this.tags = tags;
-    }
 
     public Long getTimeStamp() {
         return timeStamp;

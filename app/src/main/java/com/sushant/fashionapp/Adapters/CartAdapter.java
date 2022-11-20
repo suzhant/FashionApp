@@ -43,6 +43,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     ProductClickListener productClickListener;
     private final CartActivity cartActivity;
     int stock;
+    boolean isAvailable;
 
     public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
@@ -75,18 +76,24 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                 .child(String.valueOf(product.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                stock = snapshot.child("stock").getValue(Integer.class);
-                if (stock < 5) {
-                    holder.txtStock.setVisibility(View.VISIBLE);
-                    holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+                if (snapshot.exists()) {
+                    isAvailable = true;
+                    stock = snapshot.child("stock").getValue(Integer.class);
+                    if (stock < 5) {
+                        holder.txtStock.setVisibility(View.VISIBLE);
+                        holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+                    } else {
+                        holder.txtStock.setVisibility(View.GONE);
+                    }
+                    if (stock == 0) {
+                        holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+                    }
+                    if (product.getQuantity() < stock) {
+                        holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
+                    }
                 } else {
-                    holder.txtStock.setVisibility(View.GONE);
-                }
-                if (stock == 0) {
-                    holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
-                }
-                if (product.getQuantity() < stock) {
-                    holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
+                    holder.txtUnavailabe.setVisibility(View.VISIBLE);
+                    isAvailable = false;
                 }
             }
 
@@ -116,13 +123,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    if (stock != 0) {
-                        if (product.getQuantity() < 5) {
-                            product.setQuantity(product.getQuantity() + 1);
-                            updateCartQuantity(product);
-                            updateStock(product, stock - 1);
-                        } else {
-                            Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "Max limit is 5", Snackbar.LENGTH_SHORT).show();
+                    if (isAvailable) {
+                        if (stock != 0) {
+                            if (product.getQuantity() < 5) {
+                                product.setQuantity(product.getQuantity() + 1);
+                                updateCartQuantity(product);
+                                updateStock(product, stock - 1);
+                            } else {
+                                Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "Max limit is 5", Snackbar.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 }
@@ -133,10 +142,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    if (product.getQuantity() > 1) {
-                        product.setQuantity(product.getQuantity() - 1);
-                        updateCartQuantity(product);
-                        updateStock(product, stock + 1);
+                    if (isAvailable) {
+                        if (product.getQuantity() > 1) {
+                            product.setQuantity(product.getQuantity() - 1);
+                            updateCartQuantity(product);
+                            updateStock(product, stock + 1);
+                        }
                     }
                 }
             }
@@ -146,15 +157,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    Intent intent = new Intent(context, ActivityProductDetails.class);
-                    intent.putExtra("pPic", product.getPreviewPic());
-                    intent.putExtra("pName", product.getpName());
-                    intent.putExtra("pPrice", product.getpPrice());
-                    intent.putExtra("pId", product.getpId());
-                    intent.putExtra("sName", product.getStoreName());
-                    intent.putExtra("pDesc", product.getDesc());
-                    intent.putExtra("index", product.getVariantIndex());
-                    context.startActivity(intent);
+                    if (isAvailable) {
+                        Intent intent = new Intent(context, ActivityProductDetails.class);
+                        intent.putExtra("pPic", product.getPreviewPic());
+                        intent.putExtra("pName", product.getpName());
+                        intent.putExtra("pPrice", product.getpPrice());
+                        intent.putExtra("pId", product.getpId());
+                        intent.putExtra("sName", product.getStoreName());
+                        intent.putExtra("pDesc", product.getDesc());
+                        intent.putExtra("index", product.getVariantIndex());
+                        context.startActivity(intent);
+                    }
                 }
 
             }
@@ -226,6 +239,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         private final TextView txtSize;
         private final TextView txtColor;
         private final TextView txtStock;
+        private final TextView txtUnavailabe;
         private final MaterialCardView cardView;
         private final LinearLayout quantityLayout;
 
@@ -243,6 +257,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             quantityLayout = itemView.findViewById(R.id.quantityLyt);
             txtColor = itemView.findViewById(R.id.txtColor);
             txtStock = itemView.findViewById(R.id.txtStock);
+            txtUnavailabe = itemView.findViewById(R.id.txtUnavailable);
         }
     }
 

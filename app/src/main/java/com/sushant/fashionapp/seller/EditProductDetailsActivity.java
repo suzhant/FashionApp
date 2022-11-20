@@ -53,52 +53,54 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sushant.fashionapp.Adapters.EditVariantAdapter;
 import com.sushant.fashionapp.Adapters.SizeSummaryAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
-import com.sushant.fashionapp.Adapters.VariantSummaryAdapter;
 import com.sushant.fashionapp.Models.Product;
-import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.Utils.ImageUtils;
-import com.sushant.fashionapp.databinding.ActivityAddProductBinding;
+import com.sushant.fashionapp.databinding.ActivityEditProductDetailsBinding;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 
-public class ActivityAddProduct extends AppCompatActivity {
+public class EditProductDetailsActivity extends AppCompatActivity {
 
-    ActivityAddProductBinding binding;
-    VariantPhotoAdapter adapter;
-    ArrayList<String> tempImages = new ArrayList<>();
-    ActivityResultLauncher<Intent> imgLauncher;
-    ArrayList<Product> variants = new ArrayList<>();
-    ArrayList<String> catList = new ArrayList<>();
-    ArrayList<String> subCatList = new ArrayList<>();
-    ArrayList<String> subSubCatList = new ArrayList<>();
-
-    VariantSummaryAdapter variantSummaryAdapter;
-    SizeSummaryAdapter sizeSummaryAdapter;
+    ActivityEditProductDetailsBinding binding;
+    EditVariantAdapter adapter;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, cat, subCat, subSubCat, pDes, storeId, price, storeName;
+    String pid, pName, brandName, season, masterCategory, category, subcategory, pDesc;
+    Integer price;
+    ArrayList<String> tempImages = new ArrayList<>();
+    ActivityResultLauncher<Intent> imgLauncher;
+    SizeSummaryAdapter sizeSummaryAdapter;
+    VariantPhotoAdapter photoAdapter;
+    ArrayList<Product> variants = new ArrayList<>();
+    ArrayList<Product> newVariant = new ArrayList<>();
+    String size;
     FirebaseStorage storage;
-    String size, brandName, season;
-
+    ArrayList<String> subCatList = new ArrayList<>();
+    ArrayList<String> subSubCatList = new ArrayList<>();
+    ArrayList<String> catList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityAddProductBinding.inflate(getLayoutInflater());
+        binding = ActivityEditProductDetailsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
+
+        pid = getIntent().getStringExtra("pId");
+        newVariant = (ArrayList<Product>) getIntent().getSerializableExtra("variant");
 
 
         binding.btnAddVariant.setOnClickListener(new View.OnClickListener() {
@@ -108,27 +110,56 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
-        variantSummaryAdapter = new VariantSummaryAdapter(variants, this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
-        binding.recyclerVariantSummary.setLayoutManager(layoutManager);
-        binding.recyclerVariantSummary.setAdapter(variantSummaryAdapter);
 
-        //category List
-        // String[] catList = getResources().getStringArray(R.array.category);
-
-        //season list
-        String[] seasonList = getResources().getStringArray(R.array.seasons);
-        binding.autoSeason.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, seasonList));
-
-        database.getReference().child("category").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("Products").child(pid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                catList.clear();
+                Product product = snapshot.getValue(Product.class);
+                pName = product.getpName();
+                brandName = product.getBrandName();
+                season = product.getSeason();
+                masterCategory = product.getCategory();
+                category = product.getSubCategory();
+                subcategory = product.getSubSubCategory();
+                pDesc = product.getDesc();
+                price = product.getpPrice();
+                binding.edProductName.setText(pName);
+                binding.edBrandName.setText(brandName);
+                binding.autoSeason.setText(season);
+                binding.autoCategory.setText(masterCategory);
+                binding.autoSubCategory.setText(category);
+                binding.autoSubSubCategory.setText(subcategory);
+                binding.edPrice.setText(price.toString());
+                binding.edDescription.setText(pDesc);
+                //season list
+                String[] seasonList = getResources().getStringArray(R.array.seasons);
+                binding.autoSeason.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, seasonList));
+
+                addSubCategory();
+                addSubSubCat();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        database.getReference().child("Products").child(pid).child("variants").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                variants.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String cat = snapshot1.getKey();
-                    catList.add(cat);
+                    Product product1 = snapshot1.getValue(Product.class);
+                    variants.add(product1);
                 }
-                binding.autoCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, catList));
+                if (newVariant != null) {
+                    variants.clear();
+                    variants.addAll(newVariant);
+                }
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -150,7 +181,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
                                 int count = clipData.getItemCount();
                                 if (count > 5) {
-                                    Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EditProductDetailsActivity.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
 
@@ -158,31 +189,69 @@ public class ActivityAddProduct extends AppCompatActivity {
                                     Uri imageUrl = clipData.getItemAt(i).getUri();
 
                                     if (tempImages.size() > 4) {
-                                        Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(EditProductDetailsActivity.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
                                         return;
                                     }
                                     tempImages.add(String.valueOf(imageUrl));
-                                    adapter.notifyItemInserted(tempImages.size());
+                                    photoAdapter.notifyItemInserted(tempImages.size());
                                 }
 
                             } else if (result.getData().getData() != null) {
                                 Uri selectedImage = result.getData().getData();
                                 if (tempImages.size() > 4) {
-                                    Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EditProductDetailsActivity.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
                                     return;
                                 }
                                 tempImages.add(String.valueOf(selectedImage));
-                                adapter.notifyItemInserted(tempImages.size());
+                                photoAdapter.notifyItemInserted(tempImages.size());
                             }
                         }
                     }
                 });
 
+        binding.btnEditProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                pName = binding.edProductName.getText().toString();
+                pDesc = binding.edDescription.getText().toString();
+                price = Integer.valueOf(binding.edPrice.getText().toString());
+                brandName = binding.edBrandName.getText().toString();
+                season = binding.autoSeason.getText().toString();
+                masterCategory = binding.autoCategory.getText().toString();
+                category = binding.autoSubCategory.getText().toString();
+                subcategory = binding.autoSubSubCategory.getText().toString();
+
+                if (pName.isEmpty() | masterCategory.isEmpty() | category.isEmpty() | subcategory.isEmpty() | pDesc.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty()) {
+                    Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                addProductToDB();
+            }
+        });
+
+        database.getReference().child("category").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                catList.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    String cat = snapshot1.getKey();
+                    catList.add(cat);
+                }
+                binding.autoCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, catList));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         binding.autoCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                cat = adapterView.getItemAtPosition(i).toString();
-                addSubCategory(cat);
+                masterCategory = adapterView.getItemAtPosition(i).toString();
+                addSubCategory();
                 binding.autoSubCategory.getText().clear();
                 binding.autoSubSubCategory.getText().clear();
                 binding.ipSubCategory.setVisibility(View.VISIBLE);
@@ -190,10 +259,11 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
+
         binding.autoSubCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                subCat = adapterView.getItemAtPosition(i).toString();
+                category = adapterView.getItemAtPosition(i).toString();
                 addSubSubCat();
                 binding.autoSubSubCategory.getText().clear();
                 binding.ipSubSubCategory.setVisibility(View.VISIBLE);
@@ -203,55 +273,16 @@ public class ActivityAddProduct extends AppCompatActivity {
         binding.autoSubSubCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                subSubCat = adapterView.getItemAtPosition(i).toString();
+                subcategory = adapterView.getItemAtPosition(i).toString();
             }
         });
 
-        binding.btnAddProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pName = binding.edProductName.getText().toString();
-                pDes = binding.edDescription.getText().toString();
-                price = binding.edPrice.getText().toString();
-                brandName = binding.edBrandName.getText().toString();
-                season = binding.autoSeason.getText().toString();
-                cat = binding.autoCategory.getText().toString();
-                subCat = binding.autoSubCategory.getText().toString();
-                subSubCat = binding.autoSubSubCategory.getText().toString();
-
-                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty()) {
-                    Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
-                addProductToDB();
-            }
-        });
-
-        database.getReference().child("Store").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Store store = snapshot1.getValue(Store.class);
-                    assert store != null;
-                    if (store.getOwnerId().equals(auth.getUid())) {
-                        storeId = store.getStoreId();
-                        storeName = store.getStoreName();
-                        break;
-                    }
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+        initRecyclerView();
     }
 
+
     private void addSubSubCat() {
-        database.getReference().child("category").child(cat).child(subCat).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child(masterCategory).child(category).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subSubCatList.clear();
@@ -269,8 +300,8 @@ public class ActivityAddProduct extends AppCompatActivity {
         });
     }
 
-    private void addSubCategory(String category) {
-        database.getReference().child("category").child(category).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void addSubCategory() {
+        database.getReference().child("category").child(masterCategory).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subCatList.clear();
@@ -288,7 +319,6 @@ public class ActivityAddProduct extends AppCompatActivity {
         });
     }
 
-
     private void addProductToDB() {
         confirmDialog();
     }
@@ -302,29 +332,23 @@ public class ActivityAddProduct extends AppCompatActivity {
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            String key = database.getReference().child("Products").push().getKey();
-                            ProgressDialog dialog = new ProgressDialog(ActivityAddProduct.this);
+                            ProgressDialog dialog = new ProgressDialog(EditProductDetailsActivity.this);
                             dialog.setTitle("Uploading..");
                             dialog.setMessage("Please wait while we are adding your product");
                             dialog.setCancelable(false);
 
-                            Product product1 = new Product(key, pName, storeName, variants.get(0).getPhotos().get(0));
-                            product1.setLove(0);
-                            product1.setpPrice(Integer.valueOf(price));
-                            product1.setCategory(cat);
-                            product1.setSubCategory(subCat);
-                            product1.setSubSubCategory(subSubCat);
-                            product1.setDesc(pDes);
-                            product1.setBrandName("Gucci");
-                            product1.setProductCode(123);
-                            product1.setTimeStamp(new Date().getTime());
-                            product1.setVariants(variants);
-                            product1.setBrandName(brandName);
-                            product1.setSeason(season);
-                            product1.setStoreId(storeId);
+                            HashMap<String, Object> obj = new HashMap<>();
+                            obj.put("pName", pName);
+                            obj.put("brandName", brandName);
+                            obj.put("season", season);
+                            obj.put("category", masterCategory);
+                            obj.put("subCategory", category);
+                            obj.put("pPrice", price);
+                            obj.put("desc", pDesc);
+                            obj.put("variants", variants);
 
                             dialog.show();
-                            database.getReference().child("Products").child(product1.getpId()).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            database.getReference().child("Products").child(pid).updateChildren(obj).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     resetAllFields();
@@ -341,6 +365,29 @@ public class ActivityAddProduct extends AppCompatActivity {
         } else {
             CheckConnection.showCustomDialog(this);
         }
+    }
+
+    private void resetAllFields() {
+        binding.edProductName.getText().clear();
+        binding.edPrice.getText().clear();
+        binding.edDescription.getText().clear();
+        binding.autoSubCategory.getText().clear();
+        binding.autoCategory.getText().clear();
+        binding.autoSubSubCategory.getText().clear();
+        binding.edBrandName.getText().clear();
+        binding.autoSeason.getText().clear();
+        binding.ipSubCategory.setVisibility(View.GONE);
+        binding.ipSubSubCategory.setVisibility(View.GONE);
+        variants.clear();
+        adapter.notifyDataSetChanged();
+    }
+
+
+    private void initRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        binding.recyclerVariantSummary.setLayoutManager(layoutManager);
+        adapter = new EditVariantAdapter(variants, this, pid);
+        binding.recyclerVariantSummary.setAdapter(adapter);
     }
 
     private void showDialog() {
@@ -367,10 +414,10 @@ public class ActivityAddProduct extends AppCompatActivity {
 
 
         // showing images in horizontal
-        adapter = new VariantPhotoAdapter(tempImages, this, 1);
+        photoAdapter = new VariantPhotoAdapter(tempImages, this, 1);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerImage.setLayoutManager(layoutManager);
-        recyclerImage.setAdapter(adapter);
+        recyclerImage.setAdapter(photoAdapter);
 
         //showing size summary
         sizeSummaryAdapter = new SizeSummaryAdapter(sizes, this, 1);
@@ -408,16 +455,14 @@ public class ActivityAddProduct extends AppCompatActivity {
                 variantDialog.dismiss();
             }
         });
-
-
     }
 
     private void showSizeDialog(ArrayList<Product> sizes) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddProduct.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditProductDetailsActivity.this);
         builder.setMessage("Enter size details");
         builder.setCancelable(false);
 
-        View viewInflated = LayoutInflater.from(ActivityAddProduct.this).inflate(R.layout.stock_editbox_dialog, findViewById(android.R.id.content), false);
+        View viewInflated = LayoutInflater.from(EditProductDetailsActivity.this).inflate(R.layout.stock_editbox_dialog, findViewById(android.R.id.content), false);
 
         EditText input = viewInflated.findViewById(R.id.input);
         AutoCompleteTextView dropMenu = viewInflated.findViewById(R.id.autoSize);
@@ -450,7 +495,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                 String stock;
                 stock = input.getText().toString();
                 if (size == null || stock.isEmpty()) {
-                    Toast.makeText(ActivityAddProduct.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EditProductDetailsActivity.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 Product product = new Product();
@@ -462,7 +507,6 @@ public class ActivityAddProduct extends AppCompatActivity {
                 size = null;
             }
         });
-
     }
 
     private void createImageBitmap(TextInputEditText colorName, ArrayList<Product> sizes) {
@@ -513,7 +557,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                                     product.setSizes(sizes);
                                     product.setPhotos(finalImageList);
                                     variants.add(product);
-                                    variantSummaryAdapter.notifyItemInserted(variants.size());
+                                    adapter.notifyItemInserted(variants.size());
                                     dialog.dismiss();
                                 }
                             }
@@ -528,21 +572,6 @@ public class ActivityAddProduct extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private void resetAllFields() {
-        binding.edProductName.getText().clear();
-        binding.edPrice.getText().clear();
-        binding.edDescription.getText().clear();
-        binding.autoSubCategory.getText().clear();
-        binding.autoCategory.getText().clear();
-        binding.autoSubSubCategory.getText().clear();
-        binding.edBrandName.getText().clear();
-        binding.autoSeason.getText().clear();
-        binding.ipSubCategory.setVisibility(View.GONE);
-        binding.ipSubSubCategory.setVisibility(View.GONE);
-        variants.clear();
-        variantSummaryAdapter.notifyDataSetChanged();
     }
 
 }
