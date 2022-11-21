@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -41,6 +42,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -53,9 +56,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sushant.fashionapp.Adapters.EditSizeAdapter;
+import com.sushant.fashionapp.Adapters.EditVariantAdapter;
 import com.sushant.fashionapp.Adapters.SizeSummaryAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
-import com.sushant.fashionapp.Adapters.VariantSummaryAdapter;
+import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
@@ -76,19 +81,28 @@ public class ActivityAddProduct extends AppCompatActivity {
     VariantPhotoAdapter adapter;
     ArrayList<String> tempImages = new ArrayList<>();
     ActivityResultLauncher<Intent> imgLauncher;
+    ActivityResultLauncher<Intent> photoLauncher;
     ArrayList<Product> variants = new ArrayList<>();
     ArrayList<String> catList = new ArrayList<>();
     ArrayList<String> subCatList = new ArrayList<>();
     ArrayList<String> subSubCatList = new ArrayList<>();
 
-    VariantSummaryAdapter variantSummaryAdapter;
+    EditVariantAdapter variantSummaryAdapter;
     SizeSummaryAdapter sizeSummaryAdapter;
     FirebaseAuth auth;
     FirebaseDatabase database;
     String pName, cat, subCat, subSubCat, pDes, storeId, price, storeName;
     FirebaseStorage storage;
     String size, brandName, season;
+    VariantClickListener productClickListener;
 
+    ArrayList<Product> sizes;
+    ArrayList<String> photos;
+    EditSizeAdapter editSizeAdapter;
+    String color;
+    VariantPhotoAdapter photoAdapter;
+    ArrayList<String> upLoadPic;
+    int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +115,14 @@ public class ActivityAddProduct extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
 
 
+        productClickListener = new VariantClickListener() {
+            @Override
+            public void onClick(Product product, int pos) {
+                openDialog(product);
+                position = pos;
+            }
+        };
+
         binding.btnAddVariant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -108,8 +130,8 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
-        variantSummaryAdapter = new VariantSummaryAdapter(variants, this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        variantSummaryAdapter = new EditVariantAdapter(variants, this, null, productClickListener);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.recyclerVariantSummary.setLayoutManager(layoutManager);
         binding.recyclerVariantSummary.setAdapter(variantSummaryAdapter);
 
@@ -178,6 +200,49 @@ public class ActivityAddProduct extends AppCompatActivity {
                     }
                 });
 
+        photoLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            // There are no request codes
+                            if (result.getData().getClipData() != null) {
+                                ClipData clipData = result.getData().getClipData();
+
+                                int count = clipData.getItemCount();
+                                if (count > 5) {
+                                    Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                for (int i = 0; i < count; i++) {
+                                    Uri imageUrl = clipData.getItemAt(i).getUri();
+
+                                    if (upLoadPic.size() > 4) {
+                                        Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    upLoadPic.add(String.valueOf(imageUrl));
+                                    photos.add(String.valueOf(imageUrl));
+                                    photoAdapter.notifyItemInserted(photos.size());
+                                }
+
+                            } else if (result.getData().getData() != null) {
+                                Uri selectedImage = result.getData().getData();
+                                if (upLoadPic.size() > 4) {
+                                    Toast.makeText(ActivityAddProduct.this, "You can add upto 5 images only", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                upLoadPic.add(String.valueOf(selectedImage));
+                                photos.add(String.valueOf(selectedImage));
+                                photoAdapter.notifyItemInserted(photos.size());
+                            }
+                        }
+                    }
+                });
+
+
         binding.autoCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -245,6 +310,139 @@ public class ActivityAddProduct extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+    }
+
+    private void openDialog(Product product) {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_edit_variant_dialog);
+        Button btnSave = bottomSheetDialog.findViewById(R.id.btnDone);
+        TextInputEditText edColor = bottomSheetDialog.findViewById(R.id.edColorName);
+        RecyclerView recyclerSize = bottomSheetDialog.findViewById(R.id.recycler_size);
+        RecyclerView recyclerPhoto = bottomSheetDialog.findViewById(R.id.recycler_photo);
+        MaterialCardView cardAddSize = bottomSheetDialog.findViewById(R.id.cardAddSize);
+        MaterialCardView cardUpload = bottomSheetDialog.findViewById(R.id.cardUploadPhoto);
+
+        edColor.setText(product.getColor());
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        bottomSheetDialog.show();
+
+        //size recycler
+        sizes = new ArrayList<>();
+        sizes.addAll(product.getSizes());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        assert recyclerSize != null;
+        recyclerSize.setLayoutManager(layoutManager);
+        editSizeAdapter = new EditSizeAdapter(sizes, this);
+        recyclerSize.setAdapter(editSizeAdapter);
+
+        //photo recycler
+        photos = new ArrayList<>();
+        upLoadPic = new ArrayList<>();
+        photos.addAll(product.getPhotos());
+        assert recyclerPhoto != null;
+        LinearLayoutManager layoutManager1 = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerPhoto.setLayoutManager(layoutManager1);
+        photoAdapter = new VariantPhotoAdapter(photos, this, 1);
+        recyclerPhoto.setAdapter(photoAdapter);
+
+        cardAddSize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openSizeDialog();
+            }
+        });
+
+        cardUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                photoLauncher.launch(intent);
+            }
+        });
+
+
+        assert btnSave != null;
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                color = edColor.getText().toString();
+                updateVariant();
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+    }
+
+    private void updateVariant() {
+        if (color.isEmpty() | sizes.isEmpty() | photos.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Please complete the form", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        confirmVariantDialog();
+    }
+
+    private void confirmVariantDialog() {
+        if (CheckConnection.isOnline(this)) {
+            new MaterialAlertDialogBuilder(this, R.style.RoundShapeTheme)
+                    .setMessage("Are you sure?")
+                    .setTitle("Confirmation")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (!upLoadPic.isEmpty()) {
+                                createPhotoBitmap(sizes);
+                            } else {
+                                Product product = new Product();
+                                product.setColor(color);
+                                product.setSizes(sizes);
+                                product.setPhotos(photos);
+                                variants.remove(position);
+                                variants.add(position, product);
+                                variantSummaryAdapter.notifyItemChanged(position, 1);
+                            }
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                }
+            }).show();
+        } else {
+            CheckConnection.showCustomDialog(this);
+        }
+    }
+
+    private void openSizeDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_size);
+        MaterialButton btnSave = bottomSheetDialog.findViewById(R.id.btnSave);
+        AutoCompleteTextView autoSize = bottomSheetDialog.findViewById(R.id.autoSize);
+        TextInputEditText edStock = bottomSheetDialog.findViewById(R.id.edStock);
+
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        bottomSheetDialog.show();
+
+        String[] sizeList = getResources().getStringArray(R.array.size);
+        autoSize.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, sizeList));
+
+
+        assert btnSave != null;
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Product product = new Product();
+                String size = autoSize.getText().toString();
+                String stock = edStock.getText().toString();
+                product.setSize(size);
+                product.setStock(Integer.valueOf(stock));
+                sizes.add(product);
+                editSizeAdapter.notifyItemInserted(sizes.size());
+                bottomSheetDialog.dismiss();
             }
         });
 
@@ -400,11 +598,12 @@ public class ActivityAddProduct extends AppCompatActivity {
         addVariant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (colorName.getText().toString().isEmpty() | sizes.isEmpty() | tempImages.isEmpty()) {
+                color = colorName.getText().toString();
+                if (color.isEmpty() | sizes.isEmpty() | tempImages.isEmpty()) {
                     Snackbar.make(variantDialogLayout, "Please fill all the fields", Snackbar.LENGTH_SHORT).setAnchorView(addVariant).show();
                     return;
                 }
-                createImageBitmap(colorName, sizes);
+                createImageBitmap(sizes);
                 variantDialog.dismiss();
             }
         });
@@ -465,7 +664,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
     }
 
-    private void createImageBitmap(TextInputEditText colorName, ArrayList<Product> sizes) {
+    private void createImageBitmap(ArrayList<Product> sizes) {
         ArrayList<byte[]> images = new ArrayList<>();
         for (String image : tempImages) {
             Bitmap bitmap = null;
@@ -481,12 +680,12 @@ public class ActivityAddProduct extends AppCompatActivity {
             images.add(bytes);
         }
         if (images.size() == tempImages.size()) {
-            uploadMultipleImageToFirebase(images, colorName, sizes);
+            uploadMultipleImageToFirebase(images, sizes);
         }
     }
 
 
-    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, TextInputEditText colorName, ArrayList<Product> sizes) {
+    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, ArrayList<Product> sizes) {
         ArrayList<String> finalImageList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(this);
@@ -509,7 +708,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                                 finalImageList.add(filePath);
                                 if (finalImageList.size() == imgList.size()) {
                                     Product product = new Product();
-                                    product.setColor(colorName.getText().toString());
+                                    product.setColor(color);
                                     product.setSizes(sizes);
                                     product.setPhotos(finalImageList);
                                     variants.add(product);
@@ -544,5 +743,78 @@ public class ActivityAddProduct extends AppCompatActivity {
         variants.clear();
         variantSummaryAdapter.notifyDataSetChanged();
     }
+
+    private void createPhotoBitmap(ArrayList<Product> sizes) {
+        ArrayList<byte[]> images = new ArrayList<>();
+        int count = photos.size();
+        for (String image : photos) {
+            count--;
+            if (!image.contains("https://firebasestorage.googleapis.com")) {
+                Bitmap bitmap = null;
+                try {
+                    bitmap = ImageUtils.handleSamplingAndRotationBitmap(this, Uri.parse(image));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                assert bitmap != null;
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                byte[] bytes = baos.toByteArray();
+                images.add(bytes);
+            }
+        }
+        if (count == 0) {
+            uploadMultiplePhotoToFirebase(images, sizes);
+        }
+    }
+
+
+    private void uploadMultiplePhotoToFirebase(ArrayList<byte[]> imgList, ArrayList<Product> sizes) {
+        ArrayList<String> finalImageList = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
+        dialog.show();
+        for (int i = 0; i < imgList.size(); i++) {
+            final StorageReference reference = storage.getReference().child("Seller").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child(calendar.getTimeInMillis() + i + "");
+            UploadTask uploadTask = reference.putBytes(imgList.get(i));
+            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @RequiresApi(api = Build.VERSION_CODES.P)
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @RequiresApi(api = Build.VERSION_CODES.P)
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                String filePath = uri.toString();
+                                finalImageList.add(filePath);
+                                if (finalImageList.size() == imgList.size()) {
+                                    dialog.dismiss();
+                                    photos.removeAll(upLoadPic);
+                                    photos.addAll(finalImageList);
+                                    Product product = new Product();
+                                    product.setColor(color);
+                                    product.setSizes(sizes);
+                                    product.setPhotos(photos);
+                                    variants.remove(position);
+                                    variants.add(position, product);
+                                    variantSummaryAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        });
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+        }
+    }
+
 
 }

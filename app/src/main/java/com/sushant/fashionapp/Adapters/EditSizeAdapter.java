@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
@@ -46,10 +49,18 @@ public class EditSizeAdapter extends RecyclerView.Adapter<EditSizeAdapter.viewHo
         holder.txtStock.setText(String.format("Stock: %s", stock));
         holder.txtSize.setText(String.format("Size: %s", size));
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openDialog(size, stock, holder);
+            }
+        });
+
+        holder.imgDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sizes.remove(holder.getAbsoluteAdapterPosition());
+                notifyItemRemoved(holder.getAbsoluteAdapterPosition());
             }
         });
 
@@ -101,11 +112,17 @@ public class EditSizeAdapter extends RecyclerView.Adapter<EditSizeAdapter.viewHo
 
         private final TextView txtSize;
         private final TextView txtStock;
+        private final MaterialCardView cardSize;
+        private final Button btnEdit;
+        private final ImageView imgDelete;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             txtSize = itemView.findViewById(R.id.txtSize);
             txtStock = itemView.findViewById(R.id.txtStock);
+            cardSize = itemView.findViewById(R.id.cardSize);
+            btnEdit = itemView.findViewById(R.id.btnEditSize);
+            imgDelete = itemView.findViewById(R.id.imgDelete);
         }
     }
 }

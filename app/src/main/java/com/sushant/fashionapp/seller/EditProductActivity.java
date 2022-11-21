@@ -1,6 +1,7 @@
 package com.sushant.fashionapp.seller;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,7 @@ public class EditProductActivity extends AppCompatActivity {
     ArrayList<Product> products = new ArrayList<>();
     String sellerId, storeId;
     DatabaseReference reference;
+    ValueEventListener valueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,7 @@ public class EditProductActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
 
         reference = database.getReference().child("Users").child(auth.getUid());
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 sellerId = snapshot.child("sellerId").getValue(String.class);
@@ -46,9 +48,10 @@ public class EditProductActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         storeId = snapshot.child("storeId").getValue(String.class);
-                        database.getReference().child("Products").addListenerForSingleValueEvent(new ValueEventListener() {
+                        database.getReference().child("Products").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                products.clear();
                                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                                     Product product = snapshot1.getValue(Product.class);
                                     assert product != null;
@@ -76,6 +79,14 @@ public class EditProductActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        };
+        reference.addListenerForSingleValueEvent(valueEventListener);
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
 

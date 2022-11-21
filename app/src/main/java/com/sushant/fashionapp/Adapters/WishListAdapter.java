@@ -69,16 +69,18 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                 .child(String.valueOf(product.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                stock = snapshot.child("stock").getValue(Integer.class);
-                if (stock < 5) {
-                    holder.txtStock.setVisibility(View.VISIBLE);
-                    if (stock == 0) {
-                        holder.txtStock.setText("out of stock!");
+                if (snapshot.child("stock").exists()) {
+                    stock = snapshot.child("stock").getValue(Integer.class);
+                    if (stock < 5) {
+                        holder.txtStock.setVisibility(View.VISIBLE);
+                        if (stock == 0) {
+                            holder.txtStock.setText("out of stock!");
+                        } else {
+                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+                        }
                     } else {
-                        holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+                        holder.txtStock.setVisibility(View.GONE);
                     }
-                } else {
-                    holder.txtStock.setVisibility(View.GONE);
                 }
             }
 
@@ -155,25 +157,25 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                                         .setAnchorView(wishListActivity.findViewById(R.id.fabAddToCart)).show();
                             }
                         } else {
+                            Product item = new Product(product.getpId(), product.getpName(), product.getpPic(), product.getpPrice(), product.getStoreName(), product.getStock());
+                            item.setVariantPId(product.getVariantPId());
+                            item.setVariantIndex(product.getVariantIndex());
+                            item.setSizeIndex(product.getSizeIndex());
+                            item.setDesc(product.getDesc());
+                            item.setSize(product.getSize());
+                            item.setMaxLimit(product.getMaxLimit());
+                            item.setColor(product.getColor());
+                            item.setQuantity(1);
                             if (stock != 0) {
-                                Product item = new Product(product.getpId(), product.getpName(), product.getpPic(), product.getpPrice(), product.getStoreName(), product.getStock());
-                                item.setVariantPId(product.getVariantPId());
-                                item.setVariantIndex(product.getVariantIndex());
-                                item.setSizeIndex(product.getSizeIndex());
-                                item.setDesc(product.getDesc());
-                                item.setSize(product.getSize());
-                                item.setMaxLimit(product.getMaxLimit());
-                                item.setColor(product.getColor());
-                                item.setQuantity(1);
                                 updateStock(product);
-                                FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details")
-                                        .child(item.getVariantPId()).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        snackbar.show();
-                                    }
-                                });
                             }
+                            FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details")
+                                    .child(item.getVariantPId()).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    snackbar.show();
+                                }
+                            });
                         }
 
                     }

@@ -54,6 +54,7 @@ public class CartActivity extends AppCompatActivity {
     public boolean isActionMode = false;
     int stock;
     SwipeHelper helper;
+    int productPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -276,8 +277,10 @@ public class CartActivity extends AppCompatActivity {
                 .child(String.valueOf(p.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                stock = snapshot.child("stock").getValue(Integer.class);
-                updateStock(p, stock - p.getQuantity());
+                if (snapshot.child("stock").exists()) {
+                    stock = snapshot.child("stock").getValue(Integer.class);
+                    updateStock(p, stock - p.getQuantity());
+                }
                 database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getVariantPId()).setValue(p);
             }
 
@@ -306,8 +309,10 @@ public class CartActivity extends AppCompatActivity {
                 .child(String.valueOf(p.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                stock = snapshot.child("stock").getValue(Integer.class);
-                updateStock(p, stock + p.getQuantity());
+                if (snapshot.child("stock").exists()) {
+                    stock = snapshot.child("stock").getValue(Integer.class);
+                    updateStock(p, stock + p.getQuantity());
+                }
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(p.getVariantPId(), null);
                 database.getReference().child("Cart").child(auth.getUid()).child("Product Details").updateChildren(map);

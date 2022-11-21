@@ -58,6 +58,7 @@ public class EditProductAdapter extends RecyclerView.Adapter<EditProductAdapter.
             public void onClick(View view) {
                 Intent intent = new Intent(context, EditProductDetailsActivity.class);
                 intent.putExtra("pId", product.getpId());
+                intent.putExtra("origVariant", product.getVariants());
                 context.startActivity(intent);
             }
         });

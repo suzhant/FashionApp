@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
+import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.seller.EditVariantActivity;
@@ -24,11 +25,13 @@ public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.
     ArrayList<Product> list;
     Context context;
     String pId;
+    VariantClickListener productClickListener;
 
-    public EditVariantAdapter(ArrayList<Product> list, Context context, String pId) {
+    public EditVariantAdapter(ArrayList<Product> list, Context context, String pId, VariantClickListener productClickListener) {
         this.list = list;
         this.context = context;
         this.pId = pId;
+        this.productClickListener = productClickListener;
     }
 
     @NonNull
@@ -47,13 +50,21 @@ public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.
         holder.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, EditVariantActivity.class);
-                intent.putExtra("pId", pId);
-                intent.putExtra("variantIndex", String.valueOf(holder.getAbsoluteAdapterPosition()));
-                intent.putExtra("color", product.getColor());
-                intent.putExtra("photos", product.getPhotos());
-                intent.putExtra("sizes", product.getSizes());
-                context.startActivity(intent);
+                if (pId != null) {
+                    Intent intent = new Intent(context, EditVariantActivity.class);
+                    intent.putExtra("pId", pId);
+                    intent.putExtra("variantIndex", holder.getAbsoluteAdapterPosition());
+                    intent.putExtra("color", product.getColor());
+                    intent.putExtra("photos", product.getPhotos());
+                    intent.putExtra("sizes", product.getSizes());
+                    intent.putExtra("origVariant", list);
+                    context.startActivity(intent);
+                } else {
+                    if (productClickListener != null) {
+                        productClickListener.onClick(product, holder.getAbsoluteAdapterPosition());
+                    }
+                }
+
             }
         });
 

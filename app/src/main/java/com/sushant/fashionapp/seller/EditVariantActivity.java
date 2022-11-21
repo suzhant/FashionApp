@@ -11,6 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -26,7 +29,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -49,7 +55,8 @@ import java.util.Objects;
 public class EditVariantActivity extends AppCompatActivity {
 
     ActivityEditVariantBinding binding;
-    String pId, variantIndex;
+    String pId;
+    int variantIndex;
     FirebaseAuth auth;
     FirebaseDatabase database;
     ArrayList<Product> sizes = new ArrayList<>();
@@ -74,64 +81,16 @@ public class EditVariantActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
 
         pId = getIntent().getStringExtra("pId");
-        variantIndex = getIntent().getStringExtra("variantIndex");
+        variantIndex = getIntent().getIntExtra("variantIndex", 0);
         photos = getIntent().getStringArrayListExtra("photos");
         color = getIntent().getStringExtra("color");
         sizes = (ArrayList<Product>) getIntent().getSerializableExtra("sizes");
+        variant = (ArrayList<Product>) getIntent().getSerializableExtra("origVariant");
 
         binding.edColorName.setText(color);
         tempPic.addAll(photos);
-//        database.getReference().child("Products").child(pId).child("variants").child(variantIndex).child("sizes").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    products.clear();
-//                    if (snapshot.exists()){
-//                        for (DataSnapshot snapshot1:snapshot.getChildren()){
-//                            Product product=snapshot1.getValue(Product.class);
-//                            products.add(product);
-//                        }
-//                        adapter.notifyDataSetChanged();
-//                    }
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//
-//        database.getReference().child("Products").child(pId).child("variants").child(variantIndex).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                String color=snapshot.child("color").getValue(String.class);
-//                binding.edColorName.setText(color);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//
-//        database.getReference().child("Products").child(pId).child("variants").child(variantIndex).child("photos").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                photos.clear();
-//                for (DataSnapshot snapshot1:snapshot.getChildren()){
-//                    String photo=snapshot1.getValue(String.class);
-//                    photos.add(photo);
-//                }
-//                photoAdapter.notifyItemInserted(photos.size());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
 
-        binding.btnAddPhoto.setOnClickListener(new View.OnClickListener() {
+        binding.cardUploadPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -191,6 +150,51 @@ public class EditVariantActivity extends AppCompatActivity {
                     }
                 });
 
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+        binding.cardAddSize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openDialog();
+            }
+        });
+
+    }
+
+    private void openDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_size);
+        MaterialButton btnSave = bottomSheetDialog.findViewById(R.id.btnSave);
+        AutoCompleteTextView autoSize = bottomSheetDialog.findViewById(R.id.autoSize);
+        TextInputEditText edStock = bottomSheetDialog.findViewById(R.id.edStock);
+
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        bottomSheetDialog.show();
+
+        String[] sizeList = getResources().getStringArray(R.array.size);
+        autoSize.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, sizeList));
+
+
+        assert btnSave != null;
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Product product = new Product();
+                String size = autoSize.getText().toString();
+                String stock = edStock.getText().toString();
+                product.setSize(size);
+                product.setStock(Integer.valueOf(stock));
+                sizes.add(product);
+                adapter.notifyItemInserted(sizes.size());
+                bottomSheetDialog.dismiss();
+            }
+        });
+
     }
 
     private void updateVariant() {
@@ -228,14 +232,16 @@ public class EditVariantActivity extends AppCompatActivity {
                             if (!upLoadPic.isEmpty()) {
                                 createImageBitmap(sizes);
                             } else {
+                                String color = binding.edColorName.getText().toString();
                                 Product product = new Product();
                                 product.setColor(color);
                                 product.setSizes(sizes);
                                 product.setPhotos(photos);
-                                variant.add(product);
+                                variant.set(variantIndex, product);
                                 Intent intent = new Intent(EditVariantActivity.this, EditProductDetailsActivity.class);
                                 intent.putExtra("pId", pId);
-                                intent.putExtra("variant", variant);
+                                intent.putExtra("origVariant", variant);
+                                intent.putExtra("variantIndex", variantIndex);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                             }
@@ -298,14 +304,16 @@ public class EditVariantActivity extends AppCompatActivity {
                                     photos.clear();
                                     photos.addAll(tempPic);
                                     photos.addAll(finalImageList);
+                                    String color = binding.edColorName.getText().toString();
                                     Product product = new Product();
                                     product.setColor(color);
                                     product.setSizes(sizes);
                                     product.setPhotos(photos);
-                                    variant.add(product);
+                                    variant.set(variantIndex, product);
                                     Intent intent = new Intent(EditVariantActivity.this, EditProductDetailsActivity.class);
                                     intent.putExtra("pId", pId);
-                                    intent.putExtra("variant", variant);
+                                    intent.putExtra("origVariant", variant);
+                                    intent.putExtra("variantIndex", variantIndex);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                     startActivity(intent);
 
@@ -323,6 +331,5 @@ public class EditVariantActivity extends AppCompatActivity {
             });
         }
     }
-
 
 }

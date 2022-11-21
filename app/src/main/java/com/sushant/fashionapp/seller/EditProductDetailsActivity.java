@@ -82,12 +82,12 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     SizeSummaryAdapter sizeSummaryAdapter;
     VariantPhotoAdapter photoAdapter;
     ArrayList<Product> variants = new ArrayList<>();
-    ArrayList<Product> newVariant = new ArrayList<>();
     String size;
     FirebaseStorage storage;
     ArrayList<String> subCatList = new ArrayList<>();
     ArrayList<String> subSubCatList = new ArrayList<>();
     ArrayList<String> catList = new ArrayList<>();
+    int variantIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +100,8 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
 
         pid = getIntent().getStringExtra("pId");
-        newVariant = (ArrayList<Product>) getIntent().getSerializableExtra("variant");
-
+        variants = (ArrayList<Product>) getIntent().getSerializableExtra("origVariant");
+        variantIndex = getIntent().getIntExtra("variantIndex", 0);
 
         binding.btnAddVariant.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,27 +147,23 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         });
 
 
-        database.getReference().child("Products").child(pid).child("variants").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                variants.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product1 = snapshot1.getValue(Product.class);
-                    variants.add(product1);
-                }
-                if (newVariant != null) {
-                    variants.clear();
-                    variants.addAll(newVariant);
-                }
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+//        database.getReference().child("Products").child(pid).child("variants").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                variants.clear();
+//                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+//                    Product product1 = snapshot1.getValue(Product.class);
+//                    variants.add(product1);
+//                }
+//                adapter.notifyDataSetChanged();
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
         imgLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -277,9 +273,17 @@ public class EditProductDetailsActivity extends AppCompatActivity {
             }
         });
 
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(EditProductDetailsActivity.this, EditProductActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
         initRecyclerView();
     }
-
 
     private void addSubSubCat() {
         database.getReference().child("category").child(masterCategory).child(category).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -386,7 +390,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         binding.recyclerVariantSummary.setLayoutManager(layoutManager);
-        adapter = new EditVariantAdapter(variants, this, pid);
+        adapter = new EditVariantAdapter(variants, this, pid, null);
         binding.recyclerVariantSummary.setAdapter(adapter);
     }
 
@@ -574,4 +578,12 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(EditProductDetailsActivity.this, EditProductActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+    }
 }

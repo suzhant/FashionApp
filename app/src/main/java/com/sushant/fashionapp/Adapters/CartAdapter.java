@@ -43,7 +43,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     ProductClickListener productClickListener;
     private final CartActivity cartActivity;
     int stock;
-    boolean isAvailable;
 
     public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
@@ -77,7 +76,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    isAvailable = true;
+                    holder.txtUnavailabe.setVisibility(View.GONE);
                     stock = snapshot.child("stock").getValue(Integer.class);
                     if (stock < 5) {
                         holder.txtStock.setVisibility(View.VISIBLE);
@@ -93,7 +92,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                     }
                 } else {
                     holder.txtUnavailabe.setVisibility(View.VISIBLE);
-                    isAvailable = false;
                 }
             }
 
@@ -123,7 +121,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    if (isAvailable) {
+                    if (holder.txtUnavailabe.getVisibility() == View.GONE) {
                         if (stock != 0) {
                             if (product.getQuantity() < 5) {
                                 product.setQuantity(product.getQuantity() + 1);
@@ -142,7 +140,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    if (isAvailable) {
+                    if (holder.txtUnavailabe.getVisibility() == View.GONE) {
                         if (product.getQuantity() > 1) {
                             product.setQuantity(product.getQuantity() - 1);
                             updateCartQuantity(product);
@@ -157,7 +155,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
-                    if (isAvailable) {
+                    if (holder.txtUnavailabe.getVisibility() == View.GONE) {
                         Intent intent = new Intent(context, ActivityProductDetails.class);
                         intent.putExtra("pPic", product.getPreviewPic());
                         intent.putExtra("pName", product.getpName());
@@ -177,15 +175,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             @Override
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
+                    if (holder.txtUnavailabe.getVisibility() == View.GONE) {
                         Intent intent = new Intent(context, ActivityProductDetails.class);
                         intent.putExtra("pPic", product.getpPic());
                         intent.putExtra("pName", product.getpName());
                         intent.putExtra("pPrice", product.getpPrice());
                         intent.putExtra("pId", product.getpId());
                         intent.putExtra("stock", product.getStock());
-                    intent.putExtra("sName", product.getStoreName());
-                    intent.putExtra("index", product.getVariantIndex());
-                    context.startActivity(intent);
+                        intent.putExtra("sName", product.getStoreName());
+                        intent.putExtra("index", product.getVariantIndex());
+                        context.startActivity(intent);
+                    }
                 }
 
             }

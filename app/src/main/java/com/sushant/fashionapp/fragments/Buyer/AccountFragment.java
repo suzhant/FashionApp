@@ -20,7 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
 import com.sushant.fashionapp.Buyer.BuyerSettingActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
-import com.sushant.fashionapp.Models.Users;
+import com.sushant.fashionapp.Models.Seller;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
@@ -34,7 +34,6 @@ public class AccountFragment extends Fragment {
     FragmentAccountBinding binding;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String sellerId;
     boolean isSeller = false;
 
     @Override
@@ -64,8 +63,12 @@ public class AccountFragment extends Fragment {
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Users buyer = snapshot.getValue(Users.class);
+                Seller buyer = snapshot.getValue(Seller.class);
                 assert buyer != null;
+                if (snapshot.child("sellerId").exists()) {
+                    isSeller = true;
+                }
+
                 if (snapshot.child("userName").exists()) {
                     String buyerName = buyer.getUserName();
                     binding.txtName.setText(buyerName);
@@ -92,7 +95,7 @@ public class AccountFragment extends Fragment {
 
 
                 if (snapshot.child("userPic").exists()) {
-                    String buyerPic = snapshot.child("userPic").getValue(String.class);
+                    String buyerPic = buyer.getUserPic();
                     if (getActivity() != null) {
                         Glide.with(getActivity()).load(buyerPic)
                                 .placeholder(R.drawable.avatar)
@@ -100,24 +103,6 @@ public class AccountFragment extends Fragment {
                                 .into(binding.imgPic);
                     }
 
-                }
-
-                if (snapshot.child("sellerId").exists()) {
-                    sellerId = snapshot.child("sellerId").getValue(String.class);
-                    database.getReference().child("Seller").child(sellerId)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        isSeller = true;
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
                 }
             }
 
