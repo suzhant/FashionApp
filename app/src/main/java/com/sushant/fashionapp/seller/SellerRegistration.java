@@ -380,10 +380,9 @@ public class SellerRegistration extends AppCompatActivity {
         ImageUtils.createImageBitmap(image, sellerId, SellerRegistration.this);
     }
 
-    private void createSellerAccount(String storeId) {
+    private void createSellerAccount(String storeId, String sellerId) {
 //        UUID uuid = UUID.randomUUID();
 //        String sellerId = uuid.toString();
-        String sellerId = database.getReference().child("Seller").push().getKey();
         Seller users = new Seller(sellerName, sellerEmail, sellerPhoneNum);
         users.setUserDOB(dob);
         users.setPanNo(panNo);
@@ -411,13 +410,14 @@ public class SellerRegistration extends AppCompatActivity {
 
     private void createStoreAccount() {
         storeId = UUID.randomUUID();
+        String sellerId = database.getReference().child("Seller").push().getKey();
         Store store = new Store.StoreBuilder(storeName, storePhoneNum, storeEmail)
                 .storeAddress(storeAddress).storeVAT(vatNo).storeDesc(storeDesc)
-                .ownerId(auth.getUid()).storeId(String.valueOf(storeId)).build();
+                .ownerId(sellerId).storeId(String.valueOf(storeId)).build();
         database.getReference().child("Store").child(String.valueOf(storeId)).setValue(store).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                createSellerAccount(storeId.toString());
+                createSellerAccount(storeId.toString(), sellerId);
             }
         });
     }

@@ -9,7 +9,7 @@ public class Store {
     private String storeAddress;
     private String storeVAT;
     private String storeDesc;
-    private String ownerId;
+    private String sellerId;
 
 
     public Store() {
@@ -24,7 +24,7 @@ public class Store {
         this.storeAddress = builder.storeAddress;
         this.storeVAT = builder.storeVAT;
         this.storeDesc = builder.storeDesc;
-        this.ownerId = builder.ownerId;
+        this.sellerId = builder.sellerId;
     }
 
     public String getStoreName() {
@@ -59,8 +59,12 @@ public class Store {
         return storeDesc;
     }
 
-    public String getOwnerId() {
-        return ownerId;
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 
     public static class StoreBuilder {
@@ -74,7 +78,7 @@ public class Store {
         private String storeAddress;
         private String storeVAT;
         private String storeDesc;
-        private String ownerId;
+        private String sellerId;
 
         //required fields
         public StoreBuilder(String storeName, String storePhone, String storeEmail) {
@@ -109,7 +113,7 @@ public class Store {
         }
 
         public Store.StoreBuilder ownerId(String ownerId) {
-            this.ownerId = ownerId;
+            this.sellerId = ownerId;
             return this;
         }
 

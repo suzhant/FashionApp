@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,10 +21,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.devs.readmoreoption.ReadMoreOption;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,13 +38,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
+import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +60,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     String maxLimit;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, sName, pId, color, pDesc;
+    String pName, sName, pId, color, pDesc, storeId;
     String sizeId, actualProductId;
     ArrayList<Product> products = new ArrayList<>();
     VariantAdapter variantAdapter;
@@ -60,7 +70,8 @@ public class ActivityProductDetails extends AppCompatActivity {
     DatabaseReference variantRef, wishListRef;
     ArrayList<Product> sizes = new ArrayList<>();
     ArrayList<Product> wishList = new ArrayList<>();
-    boolean isLoved;
+    boolean isLoved, isAccepted, isExist = false;
+    String bargainId;
 
     int index;
 
@@ -77,6 +88,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         price = getIntent().getIntExtra("pPrice", 0);
         pic = getIntent().getStringExtra("pPic");
         sName = getIntent().getStringExtra("sName");
+        storeId = getIntent().getStringExtra("storeId");
         pId = getIntent().getStringExtra("pId");
         pDesc = getIntent().getStringExtra("pDesc");
         pName = getIntent().getStringExtra("pName");
@@ -269,7 +281,154 @@ public class ActivityProductDetails extends AppCompatActivity {
                 }
             }
         });
+        database.getReference().child("Bargain").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Bargain bargain = snapshot1.getValue(Bargain.class);
+                        if (bargain.getProductId().equals(pId) && bargain.getBuyerId().equals(auth.getUid())) {
+                            bargainId = bargain.getBargainId();
+                            isExist = true;
+                        }
+                        break;
+                    }
 
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        binding.btnBargain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isExist) {
+                    openBargainDialog();
+                } else {
+                    openCancelBargainDialog();
+                }
+            }
+        });
+
+
+    }
+
+    private void openCancelBargainDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain_cancel);
+        MaterialButton btnCancelRequest = bottomSheetDialog.findViewById(R.id.btnCancelRequest);
+        TextView txtOriginalPrice = bottomSheetDialog.findViewById(R.id.txtOrigPrice);
+        TextView txtBargainPrice = bottomSheetDialog.findViewById(R.id.txtBargainPrice);
+        TextView txtPriceDiff = bottomSheetDialog.findViewById(R.id.txtPriceDiff);
+        TextView txtBargainDate = bottomSheetDialog.findViewById(R.id.txtBargainDate);
+        TextView txtBargainTime = bottomSheetDialog.findViewById(R.id.txtBargainTime);
+        ImageView imgClose = bottomSheetDialog.findViewById(R.id.imgClose);
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        database.getReference().child("Bargain").child(bargainId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Bargain bargain = snapshot.getValue(Bargain.class);
+                Integer origPrice = bargain.getOriginalPrice();
+                Integer bargainPrice = bargain.getBargainPrice();
+                Integer priceDiff = origPrice - bargainPrice;
+                Long timestamp = bargain.getTimestamp();
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
+                txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
+                txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time:  <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
+                txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Original Price:  Rs.<big>{0}</big>", origPrice)));
+                txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price:  Rs.<big>{0}</big>", bargainPrice)));
+                txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference:  Rs.<big>{0}</big>", priceDiff)));
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+        btnCancelRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                database.getReference().child("Bargain").child(bargainId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        isExist = false;
+                        Snackbar.make(findViewById(R.id.parent), "Bargain Request cancelled successfully", Snackbar.LENGTH_SHORT).show();
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+            }
+        });
+
+
+        bottomSheetDialog.show();
+    }
+
+    private void openBargainDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain);
+        MaterialButton btnRequest = bottomSheetDialog.findViewById(R.id.btnRequest);
+        MaterialButton btnGetCurrentPrice = bottomSheetDialog.findViewById(R.id.btnGetCurrentPrice);
+        TextInputEditText edPrice = bottomSheetDialog.findViewById(R.id.edPrices);
+        TextInputLayout ipPrice = bottomSheetDialog.findViewById(R.id.ipPrice);
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+        assert btnGetCurrentPrice != null;
+        btnGetCurrentPrice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                assert edPrice != null;
+                edPrice.setText(String.valueOf(price));
+            }
+        });
+
+        assert btnRequest != null;
+        btnRequest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String bargainPrice = edPrice.getText().toString();
+                if (!bargainPrice.isEmpty()) {
+                    String key = database.getReference().child("Bargain").push().getKey();
+                    Bargain bargain = new Bargain(price, Integer.valueOf(bargainPrice), key);
+                    bargain.setTimestamp(new Date().getTime());
+                    bargain.setProductId(pId);
+                    bargain.setBuyerId(auth.getUid());
+                    bargain.setStoreId(storeId);
+                    bargain.setAccepted(false);
+                    assert key != null;
+                    database.getReference().child("Bargain").child(key).setValue(bargain).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Snackbar.make(findViewById(R.id.parent), "Bargain Request sent successfully", Snackbar.LENGTH_SHORT).show();
+                            bottomSheetDialog.dismiss();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Snackbar.make(findViewById(R.id.parent), "Bargain Request couldn't be sent. Try again!!", Snackbar.LENGTH_SHORT).show();
+                            bottomSheetDialog.dismiss();
+                        }
+                    });
+                }
+            }
+        });
+
+        bottomSheetDialog.show();
 
     }
 

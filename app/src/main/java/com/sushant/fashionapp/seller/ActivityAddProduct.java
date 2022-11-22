@@ -62,6 +62,7 @@ import com.sushant.fashionapp.Adapters.SizeSummaryAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Seller;
 import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
@@ -292,19 +293,31 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
-        database.getReference().child("Store").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Store store = snapshot1.getValue(Store.class);
-                    assert store != null;
-                    if (store.getOwnerId().equals(auth.getUid())) {
-                        storeId = store.getStoreId();
-                        storeName = store.getStoreName();
-                        break;
-                    }
-                }
+                if (snapshot.child("sellerId").exists()) {
+                    Seller user = snapshot.getValue(Seller.class);
+                    String sellerId = user.getSellerId();
+                    database.getReference().child("Store").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                Store store = snapshot1.getValue(Store.class);
+                                if (sellerId.equals(store.getSellerId())) {
+                                    storeId = store.getStoreId();
+                                    storeName = store.getStoreName();
+                                }
+                                break;
+                            }
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
             }
 
             @Override
@@ -312,6 +325,26 @@ public class ActivityAddProduct extends AppCompatActivity {
 
             }
         });
+//        database.getReference().child("Store").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+//                    Store store = snapshot1.getValue(Store.class);
+//                    assert store != null;
+//                    if (store.getSellerId().equals(auth.getUid())) {
+//                        storeId = store.getStoreId();
+//                        storeName = store.getStoreName();
+//                        break;
+//                    }
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
 
     }
 
@@ -513,8 +546,6 @@ public class ActivityAddProduct extends AppCompatActivity {
                             product1.setSubCategory(subCat);
                             product1.setSubSubCategory(subSubCat);
                             product1.setDesc(pDes);
-                            product1.setBrandName("Gucci");
-                            product1.setProductCode(123);
                             product1.setTimeStamp(new Date().getTime());
                             product1.setVariants(variants);
                             product1.setBrandName(brandName);
