@@ -72,6 +72,8 @@ public class ActivityProductDetails extends AppCompatActivity {
     ArrayList<Product> wishList = new ArrayList<>();
     boolean isLoved, isAccepted, isExist = false;
     String bargainId;
+    DatabaseReference reference;
+    ValueEventListener valueEventListener;
 
     int index;
 
@@ -281,7 +283,10 @@ public class ActivityProductDetails extends AppCompatActivity {
                 }
             }
         });
-        database.getReference().child("Bargain").addValueEventListener(new ValueEventListener() {
+
+
+        reference = database.getReference().child("Bargain");
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -290,8 +295,9 @@ public class ActivityProductDetails extends AppCompatActivity {
                         if (bargain.getProductId().equals(pId) && bargain.getBuyerId().equals(auth.getUid())) {
                             bargainId = bargain.getBargainId();
                             isExist = true;
+                            break;
                         }
-                        break;
+
                     }
 
                 }
@@ -301,7 +307,8 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        reference.addValueEventListener(valueEventListener);
 
         binding.btnBargain.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -340,11 +347,11 @@ public class ActivityProductDetails extends AppCompatActivity {
 
                 SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
                 SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-                txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
-                txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time:  <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
-                txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Original Price:  Rs.<big>{0}</big>", origPrice)));
-                txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price:  Rs.<big>{0}</big>", bargainPrice)));
-                txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference:  Rs.<big>{0}</big>", priceDiff)));
+                txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
+                txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time: &nbsp; <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
+                txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Original Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
+                txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
+                txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference: &nbsp; <big>Rs.{0}</big>", priceDiff)));
 
             }
 
@@ -368,6 +375,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         isExist = false;
+
                         Snackbar.make(findViewById(R.id.parent), "Bargain Request cancelled successfully", Snackbar.LENGTH_SHORT).show();
                         bottomSheetDialog.dismiss();
                     }
@@ -591,6 +599,9 @@ public class ActivityProductDetails extends AppCompatActivity {
         if (wishListRef != null) {
             wishListRef.removeEventListener(wishListListener);
         }
+        if (reference != null) {
+            reference.removeEventListener(valueEventListener);
+        }
     }
 
     @Override
@@ -603,5 +614,25 @@ public class ActivityProductDetails extends AppCompatActivity {
         if (wishListRef != null) {
             wishListRef.removeEventListener(wishListListener);
         }
+        if (reference != null) {
+            reference.removeEventListener(valueEventListener);
+        }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (reference != null) {
+            reference.addValueEventListener(valueEventListener);
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (reference != null) {
+            reference.addValueEventListener(valueEventListener);
+        }
+    }
+
 }
