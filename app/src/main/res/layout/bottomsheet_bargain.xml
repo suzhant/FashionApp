@@ -63,6 +63,7 @@
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
         android:hint="Enter your Price"
+        app:prefixText="Rs."
         android:textColorHint="@color/hintColor"
         app:boxStrokeColor="@color/skyBlue"
         app:endIconMode="clear_text">

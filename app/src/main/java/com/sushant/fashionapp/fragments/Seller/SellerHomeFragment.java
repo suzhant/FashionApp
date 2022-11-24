@@ -66,9 +66,11 @@ public class SellerHomeFragment extends Fragment {
                                         sellerName = snapshot.child("userName").getValue(String.class);
                                         if (snapshot.child("userPic").exists()) {
                                             sellerPic = snapshot.child("userPic").getValue(String.class);
-                                            Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(R.drawable.avatar)
-                                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                                    .into(binding.circleImageView);
+                                            if (getActivity() != null) {
+                                                Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(R.drawable.avatar)
+                                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                                        .into(binding.circleImageView);
+                                            }
                                         }
                                         assert sellerName != null;
                                         binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">"

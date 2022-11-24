@@ -10,7 +10,9 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -328,12 +330,15 @@ public class ActivityProductDetails extends AppCompatActivity {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain_cancel);
         MaterialButton btnCancelRequest = bottomSheetDialog.findViewById(R.id.btnCancelRequest);
+        MaterialButton btnChangePrice = bottomSheetDialog.findViewById(R.id.btnChangePrice);
         TextView txtOriginalPrice = bottomSheetDialog.findViewById(R.id.txtOrigPrice);
         TextView txtBargainPrice = bottomSheetDialog.findViewById(R.id.txtBargainPrice);
-        TextView txtPriceDiff = bottomSheetDialog.findViewById(R.id.txtPriceDiff);
+        //  TextView txtPriceDiff = bottomSheetDialog.findViewById(R.id.txtPriceDiff);
         TextView txtBargainDate = bottomSheetDialog.findViewById(R.id.txtBargainDate);
-        TextView txtBargainTime = bottomSheetDialog.findViewById(R.id.txtBargainTime);
+        //    TextView txtBargainTime = bottomSheetDialog.findViewById(R.id.txtBargainTime);
         ImageView imgClose = bottomSheetDialog.findViewById(R.id.imgClose);
+        EditText edPrice = bottomSheetDialog.findViewById(R.id.edPrice);
+        LinearLayout parent = bottomSheetDialog.findViewById(R.id.bargainParent);
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         database.getReference().child("Bargain").child(bargainId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -345,13 +350,13 @@ public class ActivityProductDetails extends AppCompatActivity {
                 Integer priceDiff = origPrice - bargainPrice;
                 Long timestamp = bargain.getTimestamp();
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy   hh:mm a");
                 SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
                 txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
-                txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time: &nbsp; <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
-                txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Original Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
+                //    txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time: &nbsp; <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
+                txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
                 txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
-                txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference: &nbsp; <big>Rs.{0}</big>", priceDiff)));
+                //     txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference: &nbsp; <big>Rs.{0}</big>", priceDiff)));
 
             }
 
@@ -361,6 +366,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        assert imgClose != null;
         imgClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -368,6 +374,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        assert btnCancelRequest != null;
         btnCancelRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -375,8 +382,30 @@ public class ActivityProductDetails extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         isExist = false;
-
                         Snackbar.make(findViewById(R.id.parent), "Bargain Request cancelled successfully", Snackbar.LENGTH_SHORT).show();
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+            }
+        });
+
+        assert btnChangePrice != null;
+        btnChangePrice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String price = edPrice.getText().toString();
+                if (price.isEmpty()) {
+                    Snackbar.make(parent, "Empty Field", Snackbar.LENGTH_SHORT).show();
+                    edPrice.requestFocus();
+                    return;
+                }
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("bargainPrice", Integer.valueOf(price));
+                map.put("timestamp", new Date().getTime());
+                database.getReference().child("Bargain").child(bargainId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Snackbar.make(findViewById(R.id.parent), "Bargain request sent successfully", Snackbar.LENGTH_SHORT).show();
                         bottomSheetDialog.dismiss();
                     }
                 });

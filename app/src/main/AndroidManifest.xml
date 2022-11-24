@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
+            android:name=".seller.MessageActivity"
+            android:exported="false" />
+        <activity
             android:name=".seller.EditVariantActivity"
             android:exported="false" />
         <activity

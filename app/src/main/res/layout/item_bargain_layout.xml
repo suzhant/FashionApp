@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cart_layout_parent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:strokeColor="@color/skyBlue"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:layout_marginBottom="16dp"
+    app:strokeWidth="0.5dp"
+    app:cardPreventCornerOverlap="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="2dp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="4dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/imgProduct"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/red_skirt" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtProdName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/gilroy_medium"
+                        android:layout_marginTop="4dp"
+                        android:textSize="15sp"
+                        android:maxWidth="250dp"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:text="Product Name" />
+
+                    <TextView
+                        android:id="@+id/txtBrand"
+                        style="@style/TextAppearance.AppCompat.Small"
+                        android:layout_width="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"
+                        android:text="Brand: Nike" />
+
+                    <TextView
+                        android:id="@+id/txtStock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="11sp"
+                        android:visibility="gone"
+                        android:textColor="@color/red"
+                        android:text="only 5 item(s) in stock" />
+
+                    <TextView
+                        android:id="@+id/txtPrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/gilroy_medium"
+                        android:textColor="@color/skyBlue"
+                        android:text="Rs. 2000" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Bargain price: Rs. 1500" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_marginHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditProduct"
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                app:shapeAppearanceOverlay="@style/Widget.MaterialComponents.Button"
+                app:cornerRadius="2dp"
+                android:text="Accept"
+                android:layout_marginEnd="5dp"
+                android:textSize="11sp"
+                android:drawableTint="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                android:layout_width="160dp"
+                android:layout_height="match_parent"
+                app:shapeAppearanceOverlay="@style/Widget.MaterialComponents.Button"
+                app:cornerRadius="2dp"
+                android:text="Reject"
+                android:backgroundTint="@color/red"
+                android:textSize="11sp"
+                android:drawableTint="@color/white" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNegotiate"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:shapeAppearanceOverlay="@style/Widget.MaterialComponents.Button"
+            app:cornerRadius="2dp"
+            app:icon="@drawable/ic_fluent_delete_24_regular"
+            app:iconGravity="textStart"
+            android:text="Negotiate"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:backgroundTint="@color/skyBlue"
+            android:textSize="11sp"
+            android:drawableTint="@color/white" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

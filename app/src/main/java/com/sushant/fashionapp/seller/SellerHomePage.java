@@ -1,5 +1,6 @@
 package com.sushant.fashionapp.seller;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -17,7 +18,6 @@ import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.Dialogs;
 import com.sushant.fashionapp.databinding.ActivitySellerHomePageBinding;
 import com.sushant.fashionapp.fragments.Seller.SellerAccountFragment;
-import com.sushant.fashionapp.fragments.Seller.SellerChatFragment;
 import com.sushant.fashionapp.fragments.Seller.SellerHomeFragment;
 import com.sushant.fashionapp.fragments.Seller.SellerStoreFragment;
 
@@ -48,7 +48,8 @@ public class SellerHomePage extends AppCompatActivity {
                         replaceFragment(new SellerHomeFragment());
                         break;
                     case R.id.page_2:
-                        replaceFragment(new SellerChatFragment());
+                        startActivity(new Intent(SellerHomePage.this, MessageActivity.class));
+                        // replaceFragment(new SellerChatFragment());
                         break;
                     case R.id.page_3:
                         replaceFragment(new SellerStoreFragment());
@@ -89,7 +90,19 @@ public class SellerHomePage extends AppCompatActivity {
 
         }
     }
-//    private void logoutDialog() {
+
+    @Override
+    protected void onResume() {
+        binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    //    private void logoutDialog() {
 //        if (CheckConnection.isOnline(ActivityHomePage.this)) {
 //            new MaterialAlertDialogBuilder(this, R.style.RoundShapeTheme)
 //                    .setMessage("Do you want to logout?")

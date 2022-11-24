@@ -2,7 +2,7 @@ package com.sushant.fashionapp.Models;
 
 public class Bargain {
     private Integer originalPrice, bargainPrice;
-    private String buyerId, storeId, productId, bargainId;
+    private String buyerId, storeId, productId, bargainId, sellerId;
     private Long timestamp;
     private Boolean isAccepted;
 
@@ -78,5 +78,13 @@ public class Bargain {
 
     public void setBargainId(String bargainId) {
         this.bargainId = bargainId;
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 }

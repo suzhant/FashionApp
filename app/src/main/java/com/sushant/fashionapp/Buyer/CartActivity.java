@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -41,7 +40,6 @@ public class CartActivity extends AppCompatActivity {
     ActivityCartBinding binding;
     CartAdapter cartAdapter;
     ArrayList<Product> products = new ArrayList<>();
-    ArrayList<Product> oldProducts = new ArrayList<>();
     FirebaseDatabase database;
     FirebaseAuth auth;
     ProductClickListener productClickListener;
@@ -49,12 +47,10 @@ public class CartActivity extends AppCompatActivity {
     ValueEventListener valueEventListener;
     DatabaseReference databaseReference;
     int size = 0;
-    BottomNavigationView bottomNavigationView;
     int sum;
     public boolean isActionMode = false;
     int stock;
     SwipeHelper helper;
-    int productPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +60,7 @@ public class CartActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+
 
         binding.imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
