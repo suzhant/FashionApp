@@ -3,7 +3,6 @@ package com.sushant.fashionapp.Buyer;
 import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.denzcoskun.imageslider.models.SlideModel;
@@ -53,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class ActivityProductDetails extends AppCompatActivity {
 
@@ -76,6 +75,10 @@ public class ActivityProductDetails extends AppCompatActivity {
     String bargainId;
     DatabaseReference reference;
     ValueEventListener valueEventListener;
+    Integer noOfTries;
+    Boolean isBlocked;
+    Long timestamp, cutoff;
+    String sellerId;
 
     int index;
 
@@ -297,6 +300,21 @@ public class ActivityProductDetails extends AppCompatActivity {
                         if (bargain.getProductId().equals(pId) && bargain.getBuyerId().equals(auth.getUid())) {
                             bargainId = bargain.getBargainId();
                             isExist = true;
+                            noOfTries = bargain.getNoOfTries();
+                            isBlocked = bargain.getBlocked();
+                            timestamp = bargain.getTimestamp();
+
+                            if (isBlocked) {
+                                cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS); //1 day old
+                                if (timestamp < cutoff) {
+                                    HashMap<String, Object> map = new HashMap<>();
+                                    map.put("blocked", false);
+                                    map.put("noOfTries", 5);
+                                    database.getReference().child("Bargain").child(bargainId).updateChildren(map);
+                                }
+                            }
+
+
                             break;
                         }
 
@@ -323,6 +341,18 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        database.getReference().child("Store").child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                sellerId = snapshot.child("sellerId").getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
 
     }
 
@@ -333,9 +363,8 @@ public class ActivityProductDetails extends AppCompatActivity {
         MaterialButton btnChangePrice = bottomSheetDialog.findViewById(R.id.btnChangePrice);
         TextView txtOriginalPrice = bottomSheetDialog.findViewById(R.id.txtOrigPrice);
         TextView txtBargainPrice = bottomSheetDialog.findViewById(R.id.txtBargainPrice);
-        //  TextView txtPriceDiff = bottomSheetDialog.findViewById(R.id.txtPriceDiff);
         TextView txtBargainDate = bottomSheetDialog.findViewById(R.id.txtBargainDate);
-        //    TextView txtBargainTime = bottomSheetDialog.findViewById(R.id.txtBargainTime);
+        TextView txtRemainingTries = bottomSheetDialog.findViewById(R.id.txtRemainingTries);
         ImageView imgClose = bottomSheetDialog.findViewById(R.id.imgClose);
         EditText edPrice = bottomSheetDialog.findViewById(R.id.edPrice);
         LinearLayout parent = bottomSheetDialog.findViewById(R.id.bargainParent);
@@ -356,8 +385,8 @@ public class ActivityProductDetails extends AppCompatActivity {
                 //    txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time: &nbsp; <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
                 txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
                 txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
+                txtRemainingTries.setText(MessageFormat.format("Remaining Tries: {0}", noOfTries));
                 //     txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference: &nbsp; <big>Rs.{0}</big>", priceDiff)));
-
             }
 
             @Override
@@ -399,22 +428,34 @@ public class ActivityProductDetails extends AppCompatActivity {
                     edPrice.requestFocus();
                     return;
                 }
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("bargainPrice", Integer.valueOf(price));
-                map.put("timestamp", new Date().getTime());
-                database.getReference().child("Bargain").child(bargainId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Snackbar.make(findViewById(R.id.parent), "Bargain request sent successfully", Snackbar.LENGTH_SHORT).show();
-                        bottomSheetDialog.dismiss();
+                if (!isBlocked) {
+                    if (noOfTries > 0) {
+                        HashMap<String, Object> map = new HashMap<>();
+                        map.put("bargainPrice", Integer.valueOf(price));
+                        map.put("timestamp", new Date().getTime());
+                        if (noOfTries == 1) {
+                            map.put("blocked", true);
+                        }
+                        noOfTries = noOfTries - 1;
+                        map.put("noOfTries", noOfTries);
+                        database.getReference().child("Bargain").child(bargainId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Snackbar.make(findViewById(R.id.parent), "Bargain request sent successfully", Snackbar.LENGTH_SHORT).show();
+                                bottomSheetDialog.dismiss();
+                            }
+                        });
                     }
-                });
+                } else {
+                    Snackbar.make(parent, "Try after some time.", Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 
 
         bottomSheetDialog.show();
     }
+
 
     private void openBargainDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
@@ -446,7 +487,10 @@ public class ActivityProductDetails extends AppCompatActivity {
                     bargain.setProductId(pId);
                     bargain.setBuyerId(auth.getUid());
                     bargain.setStoreId(storeId);
-                    bargain.setAccepted(false);
+                    bargain.setStatus("netural");
+                    bargain.setNoOfTries(5);
+                    bargain.setBlocked(false);
+                    bargain.setSellerId(sellerId);
                     assert key != null;
                     database.getReference().child("Bargain").child(key).setValue(bargain).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -469,29 +513,6 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     }
 
-
-    // Generate palette synchronously and return it
-    public Palette createPaletteSync(Bitmap bitmap) {
-        Palette p = Palette.from(bitmap).generate();
-        return p;
-    }
-
-    // Generate palette asynchronously and use it on a different
-// thread using onGenerated()
-    public void createPaletteAsync(Bitmap bitmap) {
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-            public void onGenerated(Palette p) {
-                // Use generated instance
-                Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
-                if (vibrantSwatch != null) {
-                    int backgroundColor = vibrantSwatch.getRgb();
-                    int textColor = vibrantSwatch.getTitleTextColor();
-                    int dominantColor = p.getDominantColor(backgroundColor);
-                    binding.imgSlider.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue));
-                }
-            }
-        });
-    }
 
     private void initVariantRecycler() {
         Log.d("variantAdapter", "created");

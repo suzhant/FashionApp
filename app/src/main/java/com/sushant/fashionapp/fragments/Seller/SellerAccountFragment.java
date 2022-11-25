@@ -48,9 +48,21 @@ public class SellerAccountFragment extends Fragment {
                         name = snapshot.child("userName").getValue(String.class);
                         email = snapshot.child("userEmail").getValue(String.class);
                         phone = snapshot.child("userPhone").getValue(String.class);
-                        binding.txtName.setText(TextUtils.captializeAllFirstLetter(name));
                         binding.txtEmail.setText(email);
                         binding.txtPhone.setText(phone);
+                        String storeId = snapshot.child("storeId").getValue(String.class);
+                        database.getReference().child("Store").child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                String storeName = snapshot.child("storeName").getValue(String.class);
+                                binding.txtName.setText(TextUtils.captializeAllFirstLetter(storeName));
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
 
                     @Override

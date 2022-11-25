@@ -64,6 +64,7 @@ public class SellerHomeFragment extends Fragment {
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (snapshot.exists()) {
                                         sellerName = snapshot.child("userName").getValue(String.class);
+                                        String storeId = snapshot.child("storeId").getValue(String.class);
                                         if (snapshot.child("userPic").exists()) {
                                             sellerPic = snapshot.child("userPic").getValue(String.class);
                                             if (getActivity() != null) {
@@ -72,9 +73,19 @@ public class SellerHomeFragment extends Fragment {
                                                         .into(binding.circleImageView);
                                             }
                                         }
-                                        assert sellerName != null;
-                                        binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">"
-                                                + TextUtils.captializeAllFirstLetter(sellerName) + "</font"));
+                                        database.getReference().child("Store").child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                String storeName = snapshot.child("storeName").getValue(String.class);
+                                                binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">"
+                                                        + TextUtils.captializeAllFirstLetter(storeName) + "</font"));
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
                                     }
                                 }
 

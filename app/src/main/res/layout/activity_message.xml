@@ -7,6 +7,12 @@
     android:orientation="vertical"
     tools:context=".seller.MessageActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        app:title="Messages"
+        app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:navigationIcon="@drawable/ic_arrow_back_24" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
