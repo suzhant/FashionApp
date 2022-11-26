@@ -11,9 +11,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Rating;
 import com.sushant.fashionapp.R;
 
 import java.text.MessageFormat;
@@ -39,11 +46,52 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
-       Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.productImg);
+        Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.productImg);
         holder.productName.setText(product.getpName());
         holder.productPrice.setText(MessageFormat.format("Rs. {0}", product.getpPrice()));
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+
+        holder.ratingBar.setOnClickListener(null);
+        FirebaseDatabase.getInstance().getReference().child("Ratings").child(product.getpId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    int count = 0;
+                    float sum = 0;
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Rating rating = snapshot1.getValue(Rating.class);
+                        sum += rating.getRating();
+                        count++;
+                    }
+                    float finalRating = sum / count;
+                    holder.txtNoOfRating.setText(MessageFormat.format("({0})", count));
+                    holder.ratingBar.setRating(finalRating);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(context, ActivityProductDetails.class);
+//                intent.putExtra("pPic", product.getPreviewPic());
+//                intent.putExtra("pName", product.getpName());
+//                intent.putExtra("pPrice", product.getpPrice());
+//                intent.putExtra("pId", product.getpId());
+//                intent.putExtra("pDesc", product.getDesc());
+//                intent.putExtra("storeId", product.getStoreId());
+//                intent.putExtra("index", product.getVariantIndex());
+//                context.startActivity(intent);
+//            }
+//        });
+        
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ActivityProductDetails.class);
@@ -58,19 +106,6 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
             }
         });
 
-//        holder.imgLove.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (product.getLove() == 0) {
-//                    holder.imgLove.setImageResource(R.drawable.ic_favorite_24);
-//                    product.setLove(1);
-//                } else {
-//                    holder.imgLove.setImageResource(R.drawable.ic_favorite_border_24);
-//                    product.setLove(0);
-//                }
-//            }
-//        });
-
 
     }
 
@@ -84,12 +119,18 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
         private final ShapeableImageView productImg;
         private final TextView productName;
         private final TextView productPrice;
+        private final TextView txtNoOfRating;
+        private final SimpleRatingBar ratingBar;
+        private final MaterialCardView cardView;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             productImg = itemView.findViewById(R.id.imgProductPic);
             productName = itemView.findViewById(R.id.txtProductName);
             productPrice = itemView.findViewById(R.id.txtProductPrice);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
+            txtNoOfRating = itemView.findViewById(R.id.txtNumberOfRating);
+            cardView = itemView.findViewById(R.id.cardLyt);
         }
     }
 

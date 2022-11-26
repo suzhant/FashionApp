@@ -5,6 +5,7 @@ import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -37,17 +38,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Rating;
 import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -367,6 +371,85 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        database.getReference().child("Ratings").child(pId).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("rating").exists()) {
+                    Float rating = snapshot.child("rating").getValue(Float.class);
+                    binding.rating.setRating(rating);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        database.getReference().child("Ratings").child(pId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    float rat = 0;
+                    int count = 0, one = 0, two = 0, three = 0, four = 0, five = 0;
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Rating rating = snapshot1.getValue(Rating.class);
+                        rat += rating.getRating();
+                        int number = Math.round(rating.getRating());
+                        if (number == 1.0) {
+                            one++;
+                        }
+                        if (number == 2.0) {
+                            two++;
+                        }
+                        if (number == 3.0) {
+                            three++;
+                        }
+                        if (number == 4.0) {
+                            four++;
+                        }
+                        if (number == 5.0) {
+                            five++;
+                        }
+                        count++;
+                    }
+                    float finalRating = rat / count;
+                    float number = BigDecimal.valueOf(finalRating)
+                            .setScale(1, BigDecimal.ROUND_HALF_UP)
+                            .floatValue();
+                    binding.ratingBar.setRating(number);
+                    binding.txtRating.setText(MessageFormat.format("{0}.0", number));
+                    binding.txtUsers.setText(MessageFormat.format("{0}", count));
+                    one = (int) ((one / (float) count) * 100);
+                    two = (int) ((two / (float) count) * 100);
+                    three = (int) ((three / (float) count) * 100);
+                    four = (int) ((four / (float) count) * 100);
+                    five = (int) ((five / (float) count) * 100);
+                    binding.progress1.setProgress(one);
+                    binding.progress2.setProgress(two);
+                    binding.progress3.setProgress(three);
+                    binding.progress4.setProgress(four);
+                    binding.progress5.setProgress(five);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        binding.rating.setOnRatingBarChangeListener(new SimpleRatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(SimpleRatingBar simpleRatingBar, float rating, boolean fromUser) {
+                Rating rating1 = new Rating();
+                rating1.setRating(rating);
+                rating1.setProductId(pId);
+                rating1.setUserId(auth.getUid());
+                database.getReference().child("Ratings").child(pId).child(auth.getUid()).setValue(rating1);
+            }
+        });
+
 
     }
 
@@ -511,6 +594,15 @@ public class ActivityProductDetails extends AppCompatActivity {
                         public void onSuccess(Void unused) {
                             Snackbar.make(findViewById(R.id.parent), "Bargain Request sent successfully", Snackbar.LENGTH_SHORT).show();
                             bottomSheetDialog.dismiss();
+                            Handler handler = new Handler();
+                            Runnable runnable = new Runnable() {
+                                @Override
+                                public void run() {
+                                    openCancelBargainDialog();
+                                }
+                            };
+                            handler.postDelayed(runnable, 1000);
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
