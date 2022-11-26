@@ -28,7 +28,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.seller.SellerHomePage;
+import com.sushant.fashionapp.Seller.SellerHomePage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

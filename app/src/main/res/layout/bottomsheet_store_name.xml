@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/phoneParent"
+    android:id="@+id/nameParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg"
@@ -17,19 +17,6 @@
         android:src="@drawable/horizontal_rule"
         android:layout_gravity="center" />
 
-    <com.hbb20.CountryCodePicker
-        android:id="@+id/cpp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:ccpDialog_backgroundColor="@color/skyBlue"
-        app:ccpDialog_cornerRadius="6dp"
-        app:ccpDialog_searchEditTextTint="@color/white"
-        app:ccp_autoDetectCountry="true"
-        app:ccp_showArrow="false"
-        app:ccp_showNameCode="false"
-        app:ccp_showPhoneCode="false" />
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -41,7 +28,7 @@
             android:layout_alignParentStart="true"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:text="Change Phone"
+            android:text="Change Name"
             android:textSize="16sp" />
 
         <TextView
@@ -68,28 +55,27 @@
         app:dividerColor="@color/medium_gray" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/ipPhoneNumber"
+        android:id="@+id/ipName"
         style="@style/Widget.App.TextInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Enter Phone no."
+        android:hint="Enter Name"
         android:textColorHint="@color/hintColor"
         app:boxStrokeColor="@color/skyBlue"
         app:endIconMode="clear_text">
 
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edPhone"
+            android:id="@+id/edName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:importantForAutofill="no"
-            android:inputType="phone"
+            android:inputType="textPersonName|textCapWords"
             android:textSize="14sp" />
     </com.google.android.material.textfield.TextInputLayout>
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnSave"

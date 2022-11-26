@@ -8,8 +8,8 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.sushant.fashionapp.Seller.SellerHomePage;
 import com.sushant.fashionapp.databinding.ActivityOnBoardingBinding;
-import com.sushant.fashionapp.seller.SellerHomePage;
 
 public class OnBoarding extends AppCompatActivity {
 

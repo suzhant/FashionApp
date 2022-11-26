@@ -64,21 +64,29 @@ public class SellerHomeFragment extends Fragment {
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (snapshot.exists()) {
                                         sellerName = snapshot.child("userName").getValue(String.class);
-                                        String storeId = snapshot.child("storeId").getValue(String.class);
-                                        if (snapshot.child("userPic").exists()) {
-                                            sellerPic = snapshot.child("userPic").getValue(String.class);
-                                            if (getActivity() != null) {
-                                                Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(R.drawable.avatar)
-                                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                                        .into(binding.circleImageView);
-                                            }
-                                        }
+                                        final String storeId = snapshot.child("storeId").getValue(String.class);
+//                                        if (snapshot.child("userPic").exists()) {
+//                                            sellerPic = snapshot.child("userPic").getValue(String.class);
+//                                            if (getActivity() != null) {
+//                                                Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(R.drawable.avatar)
+//                                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                                                        .into(binding.circleImageView);
+//                                            }
+//                                        }
                                         database.getReference().child("Store").child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 String storeName = snapshot.child("storeName").getValue(String.class);
-                                                binding.txtUserName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">"
+                                                binding.txtStoreName.setText(Html.fromHtml("Welcome <br><font color=\"#09AEA3\">"
                                                         + TextUtils.captializeAllFirstLetter(storeName) + "</font"));
+                                                if (snapshot.child("storePic").exists()) {
+                                                    String storePic = snapshot.child("storePic").getValue(String.class);
+                                                    if (getActivity() != null) {
+                                                        Glide.with(SellerHomeFragment.this).load(storePic).placeholder(R.drawable.avatar)
+                                                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                                                .into(binding.circleImageView);
+                                                    }
+                                                }
                                             }
 
                                             @Override

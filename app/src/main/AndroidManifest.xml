@@ -17,16 +17,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
-            android:name=".seller.MessageActivity"
+            android:name=".Seller.SellerProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".seller.EditVariantActivity"
+            android:name=".Seller.SellerSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".seller.EditProductDetailsActivity"
+            android:name=".Seller.MessageActivity"
             android:exported="false" />
         <activity
-            android:name=".seller.EditProductActivity"
+            android:name=".Seller.EditVariantActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Seller.EditProductDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Seller.EditProductActivity"
             android:exported="false" />
         <activity
             android:name=".Buyer.SearchResultActivity"
@@ -35,7 +41,7 @@
             android:name=".Buyer.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".seller.DisplayProductActivity"
+            android:name=".Seller.DisplayProductActivity"
             android:exported="false" />
         <activity
             android:name=".Buyer.OTPActivity"
@@ -65,13 +71,13 @@
             android:name=".ImageActivity"
             android:exported="false" />
         <activity
-            android:name=".seller.ActivityAddProduct"
+            android:name=".Seller.ActivityAddProduct"
             android:exported="false" />
         <activity
-            android:name=".seller.SellerHomePage"
+            android:name=".Seller.SellerHomePage"
             android:exported="false" />
         <activity
-            android:name=".seller.SellerRegistration"
+            android:name=".Seller.SellerRegistration"
             android:exported="false" />
         <activity
             android:name=".Buyer.CartActivity"

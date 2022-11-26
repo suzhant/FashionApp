@@ -22,10 +22,10 @@ import com.sushant.fashionapp.Buyer.BuyerSettingActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
 import com.sushant.fashionapp.Models.Seller;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Seller.SellerHomePage;
+import com.sushant.fashionapp.Seller.SellerRegistration;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.databinding.FragmentAccountBinding;
-import com.sushant.fashionapp.seller.SellerHomePage;
-import com.sushant.fashionapp.seller.SellerRegistration;
 
 import java.util.Objects;
 

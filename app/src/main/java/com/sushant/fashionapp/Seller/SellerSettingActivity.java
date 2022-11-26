@@ -1,4 +1,4 @@
-package com.sushant.fashionapp.Buyer;
+package com.sushant.fashionapp.Seller;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,22 +6,23 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.sushant.fashionapp.databinding.ActivityBuyerSettingBinding;
+import com.sushant.fashionapp.databinding.ActivitySellerSettingBinding;
 
-public class BuyerSettingActivity extends AppCompatActivity {
+public class SellerSettingActivity extends AppCompatActivity {
 
-    ActivityBuyerSettingBinding binding;
+    ActivitySellerSettingBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityBuyerSettingBinding.inflate(getLayoutInflater());
+        binding = ActivitySellerSettingBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         binding.lytChangeProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(BuyerSettingActivity.this, BuyerProfileActivity.class));
+                startActivity(new Intent(SellerSettingActivity.this, SellerProfileActivity.class));
             }
         });
 
@@ -32,11 +33,5 @@ public class BuyerSettingActivity extends AppCompatActivity {
             }
         });
 
-        binding.lytSecurity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(BuyerSettingActivity.this, BuyerSecurityActivity.class));
-            }
-        });
     }
 }

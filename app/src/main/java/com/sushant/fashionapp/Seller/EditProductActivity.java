@@ -1,10 +1,11 @@
-package com.sushant.fashionapp.seller;
+package com.sushant.fashionapp.Seller;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -12,33 +13,34 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sushant.fashionapp.Adapters.CardAdapters;
+import com.sushant.fashionapp.Adapters.EditProductAdapter;
 import com.sushant.fashionapp.Models.Product;
-import com.sushant.fashionapp.databinding.ActivityDisplayProductBinding;
+import com.sushant.fashionapp.databinding.ActivityEditProductBinding;
 
 import java.util.ArrayList;
 
-public class DisplayProductActivity extends AppCompatActivity {
+public class EditProductActivity extends AppCompatActivity {
 
-    ActivityDisplayProductBinding binding;
+    ActivityEditProductBinding binding;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    CardAdapters adapters;
+    EditProductAdapter adapters;
     ArrayList<Product> products = new ArrayList<>();
     String sellerId, storeId;
     DatabaseReference reference;
+    ValueEventListener valueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityDisplayProductBinding.inflate(getLayoutInflater());
+        binding = ActivityEditProductBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
         reference = database.getReference().child("Users").child(auth.getUid());
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 sellerId = snapshot.child("sellerId").getValue(String.class);
@@ -46,9 +48,10 @@ public class DisplayProductActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         storeId = snapshot.child("storeId").getValue(String.class);
-                        database.getReference().child("Products").addListenerForSingleValueEvent(new ValueEventListener() {
+                        database.getReference().child("Products").addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                products.clear();
                                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                                     Product product = snapshot1.getValue(Product.class);
                                     assert product != null;
@@ -77,18 +80,25 @@ public class DisplayProductActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
+        };
+        reference.addListenerForSingleValueEvent(valueEventListener);
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
         });
 
 
         initRecyclerView();
 
-
     }
 
     private void initRecyclerView() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         binding.viewMoreRecycler.setLayoutManager(layoutManager);
-        adapters = new CardAdapters(products, this);
+        adapters = new EditProductAdapter(products, this);
         binding.viewMoreRecycler.setAdapter(adapters);
     }
 }

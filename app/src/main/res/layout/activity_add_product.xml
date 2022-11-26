@@ -5,7 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".seller.ActivityAddProduct">
+    tools:context=".Seller.ActivityAddProduct">
 
     <LinearLayout
         android:id="@+id/linearLayout3"

@@ -10,6 +10,8 @@ public class Store {
     private String storeVAT;
     private String storeDesc;
     private String sellerId;
+    private String storePic;
+    private String storeSecondaryEmail;
 
 
     public Store() {
@@ -25,6 +27,7 @@ public class Store {
         this.storeVAT = builder.storeVAT;
         this.storeDesc = builder.storeDesc;
         this.sellerId = builder.sellerId;
+        this.storePic = builder.storePic;
     }
 
     public String getStoreName() {
@@ -67,6 +70,18 @@ public class Store {
         this.sellerId = sellerId;
     }
 
+    public String getStorePic() {
+        return storePic;
+    }
+
+    public String getStoreSecondaryEmail() {
+        return storeSecondaryEmail;
+    }
+
+    public void setStoreSecondaryEmail(String storeSecondaryEmail) {
+        this.storeSecondaryEmail = storeSecondaryEmail;
+    }
+
     public static class StoreBuilder {
         //required
         private final String storeName;
@@ -79,6 +94,8 @@ public class Store {
         private String storeVAT;
         private String storeDesc;
         private String sellerId;
+        private String storePic;
+        private String storeSecondaryEmail;
 
         //required fields
         public StoreBuilder(String storeName, String storePhone, String storeEmail) {
@@ -114,6 +131,16 @@ public class Store {
 
         public Store.StoreBuilder ownerId(String ownerId) {
             this.sellerId = ownerId;
+            return this;
+        }
+
+        public Store.StoreBuilder storePic(String storePic) {
+            this.storePic = storePic;
+            return this;
+        }
+
+        public Store.StoreBuilder storeSecondaryEmail(String storeSecondaryEmail) {
+            this.storeSecondaryEmail = storeSecondaryEmail;
             return this;
         }
 

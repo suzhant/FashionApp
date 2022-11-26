@@ -16,7 +16,7 @@ import com.google.android.material.button.MaterialButton;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.seller.EditVariantActivity;
+import com.sushant.fashionapp.Seller.EditVariantActivity;
 
 import java.util.ArrayList;
 

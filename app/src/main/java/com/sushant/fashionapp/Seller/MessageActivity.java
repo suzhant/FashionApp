@@ -1,4 +1,4 @@
-package com.sushant.fashionapp.seller;
+package com.sushant.fashionapp.Seller;
 
 import android.os.Bundle;
 

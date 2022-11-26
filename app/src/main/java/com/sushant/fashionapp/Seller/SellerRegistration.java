@@ -1,4 +1,4 @@
-package com.sushant.fashionapp.seller;
+package com.sushant.fashionapp.Seller;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -394,6 +394,7 @@ public class SellerRegistration extends AppCompatActivity {
             public void onSuccess(Void unused) {
                 HashMap<String, Object> buyer = new HashMap<>();
                 buyer.put("sellerId", sellerId);
+                buyer.put("storeId", storeId);
                 database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).updateChildren(buyer).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {

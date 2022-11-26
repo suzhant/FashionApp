@@ -5,7 +5,7 @@
     android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".seller.SellerRegistration">
+    tools:context=".Seller.SellerRegistration">
 
     <LinearLayout
         android:layout_width="match_parent"

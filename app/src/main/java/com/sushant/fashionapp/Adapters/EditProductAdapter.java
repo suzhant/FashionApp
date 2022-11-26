@@ -21,9 +21,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Seller.EditProductDetailsActivity;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.Utils.TextUtils;
-import com.sushant.fashionapp.seller.EditProductDetailsActivity;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
