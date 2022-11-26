@@ -63,7 +63,8 @@ import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Seller;
-import com.sushant.fashionapp.Models.Store;
+import com.sushant.fashionapp.Models.Size;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.Utils.ImageUtils;
@@ -83,7 +84,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     ArrayList<String> tempImages = new ArrayList<>();
     ActivityResultLauncher<Intent> imgLauncher;
     ActivityResultLauncher<Intent> photoLauncher;
-    ArrayList<Product> variants = new ArrayList<>();
+    ArrayList<Variants> variants = new ArrayList<>();
     ArrayList<String> catList = new ArrayList<>();
     ArrayList<String> subCatList = new ArrayList<>();
     ArrayList<String> subSubCatList = new ArrayList<>();
@@ -97,7 +98,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     String size, brandName, season;
     VariantClickListener productClickListener;
 
-    ArrayList<Product> sizes;
+    ArrayList<Size> sizes;
     ArrayList<String> photos;
     EditSizeAdapter editSizeAdapter;
     String color;
@@ -118,9 +119,14 @@ public class ActivityAddProduct extends AppCompatActivity {
 
         productClickListener = new VariantClickListener() {
             @Override
-            public void onClick(Product product, int pos) {
+            public void onClick(Variants product, int pos) {
                 openDialog(product);
                 position = pos;
+            }
+
+            @Override
+            public void onProductClick(Product product, int pos) {
+
             }
         };
 
@@ -298,18 +304,11 @@ public class ActivityAddProduct extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.child("sellerId").exists()) {
                     Seller user = snapshot.getValue(Seller.class);
-                    String sellerId = user.getSellerId();
-                    database.getReference().child("Store").addListenerForSingleValueEvent(new ValueEventListener() {
+                    storeId = user.getStoreId();
+                    database.getReference().child("Store").child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                Store store = snapshot1.getValue(Store.class);
-                                if (sellerId.equals(store.getSellerId())) {
-                                    storeId = store.getStoreId();
-                                    storeName = store.getStoreName();
-                                }
-                                break;
-                            }
+                            storeName = snapshot.child("storeName").getValue(String.class);
                         }
 
                         @Override
@@ -348,7 +347,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
     }
 
-    private void openDialog(Product product) {
+    private void openDialog(Variants product) {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(R.layout.bottomsheet_edit_variant_dialog);
         Button btnSave = bottomSheetDialog.findViewById(R.id.btnDone);
@@ -430,7 +429,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                             if (!upLoadPic.isEmpty()) {
                                 createPhotoBitmap(sizes);
                             } else {
-                                Product product = new Product();
+                                Variants product = new Variants();
                                 product.setColor(color);
                                 product.setSizes(sizes);
                                 product.setPhotos(photos);
@@ -468,7 +467,7 @@ public class ActivityAddProduct extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Product product = new Product();
+                Size product = new Size();
                 String size = autoSize.getText().toString();
                 String stock = edStock.getText().toString();
                 product.setSize(size);
@@ -539,7 +538,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                             dialog.setMessage("Please wait while we are adding your product");
                             dialog.setCancelable(false);
 
-                            Product product1 = new Product(key, pName, storeName, variants.get(0).getPhotos().get(0));
+                            Product product1 = new Product(key, pName, variants.get(0).getPhotos().get(0));
                             product1.setLove(0);
                             product1.setpPrice(Integer.valueOf(price));
                             product1.setCategory(cat);
@@ -574,7 +573,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
     private void showDialog() {
         tempImages.clear();
-        ArrayList<Product> sizes = new ArrayList<>();
+        ArrayList<Size> sizes = new ArrayList<>();
 
         Dialog variantDialog = new Dialog(this);
         variantDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -642,7 +641,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
     }
 
-    private void showSizeDialog(ArrayList<Product> sizes) {
+    private void showSizeDialog(ArrayList<Size> sizes) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ActivityAddProduct.this);
         builder.setMessage("Enter size details");
         builder.setCancelable(false);
@@ -683,7 +682,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                     Toast.makeText(ActivityAddProduct.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Product product = new Product();
+                Size product = new Size();
                 product.setSize(size);
                 product.setStock(Integer.valueOf(stock));
                 sizes.add(product);
@@ -695,7 +694,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
     }
 
-    private void createImageBitmap(ArrayList<Product> sizes) {
+    private void createImageBitmap(ArrayList<Size> sizes) {
         ArrayList<byte[]> images = new ArrayList<>();
         for (String image : tempImages) {
             Bitmap bitmap = null;
@@ -716,7 +715,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     }
 
 
-    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, ArrayList<Product> sizes) {
+    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, ArrayList<Size> sizes) {
         ArrayList<String> finalImageList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(this);
@@ -738,7 +737,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                                 String filePath = uri.toString();
                                 finalImageList.add(filePath);
                                 if (finalImageList.size() == imgList.size()) {
-                                    Product product = new Product();
+                                    Variants product = new Variants();
                                     product.setColor(color);
                                     product.setSizes(sizes);
                                     product.setPhotos(finalImageList);
@@ -775,7 +774,7 @@ public class ActivityAddProduct extends AppCompatActivity {
         variantSummaryAdapter.notifyDataSetChanged();
     }
 
-    private void createPhotoBitmap(ArrayList<Product> sizes) {
+    private void createPhotoBitmap(ArrayList<Size> sizes) {
         ArrayList<byte[]> images = new ArrayList<>();
         int count = photos.size();
         for (String image : photos) {
@@ -800,7 +799,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     }
 
 
-    private void uploadMultiplePhotoToFirebase(ArrayList<byte[]> imgList, ArrayList<Product> sizes) {
+    private void uploadMultiplePhotoToFirebase(ArrayList<byte[]> imgList, ArrayList<Size> sizes) {
         ArrayList<String> finalImageList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(this);
@@ -825,7 +824,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                                     dialog.dismiss();
                                     photos.removeAll(upLoadPic);
                                     photos.addAll(finalImageList);
-                                    Product product = new Product();
+                                    Variants product = new Variants();
                                     product.setColor(color);
                                     product.setSizes(sizes);
                                     product.setPhotos(photos);

@@ -40,7 +40,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.sushant.fashionapp.Adapters.EditSizeAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.Utils.ImageUtils;
@@ -59,8 +60,8 @@ public class EditVariantActivity extends AppCompatActivity {
     int variantIndex;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    ArrayList<Product> sizes = new ArrayList<>();
-    ArrayList<Product> variant = new ArrayList<>();
+    ArrayList<Size> sizes = new ArrayList<>();
+    ArrayList<Variants> variant = new ArrayList<>();
     ArrayList<String> photos = new ArrayList<>();
     ArrayList<String> tempPic = new ArrayList<>();
     ArrayList<String> upLoadPic = new ArrayList<>();
@@ -84,8 +85,8 @@ public class EditVariantActivity extends AppCompatActivity {
         variantIndex = getIntent().getIntExtra("variantIndex", 0);
         photos = getIntent().getStringArrayListExtra("photos");
         color = getIntent().getStringExtra("color");
-        sizes = (ArrayList<Product>) getIntent().getSerializableExtra("sizes");
-        variant = (ArrayList<Product>) getIntent().getSerializableExtra("origVariant");
+        sizes = (ArrayList<Size>) getIntent().getSerializableExtra("sizes");
+        variant = (ArrayList<Variants>) getIntent().getSerializableExtra("origVariant");
 
         binding.edColorName.setText(color);
         tempPic.addAll(photos);
@@ -184,7 +185,7 @@ public class EditVariantActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Product product = new Product();
+                Size product = new Size();
                 String size = autoSize.getText().toString();
                 String stock = edStock.getText().toString();
                 product.setSize(size);
@@ -233,7 +234,7 @@ public class EditVariantActivity extends AppCompatActivity {
                                 createImageBitmap(sizes);
                             } else {
                                 String color = binding.edColorName.getText().toString();
-                                Product product = new Product();
+                                Variants product = new Variants();
                                 product.setColor(color);
                                 product.setSizes(sizes);
                                 product.setPhotos(photos);
@@ -257,7 +258,7 @@ public class EditVariantActivity extends AppCompatActivity {
         }
     }
 
-    private void createImageBitmap(ArrayList<Product> sizes) {
+    private void createImageBitmap(ArrayList<Size> sizes) {
         ArrayList<byte[]> images = new ArrayList<>();
         for (String image : upLoadPic) {
             Bitmap bitmap = null;
@@ -278,7 +279,7 @@ public class EditVariantActivity extends AppCompatActivity {
     }
 
 
-    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, ArrayList<Product> sizes) {
+    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, ArrayList<Size> sizes) {
         ArrayList<String> finalImageList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(this);
@@ -305,7 +306,7 @@ public class EditVariantActivity extends AppCompatActivity {
                                     photos.addAll(tempPic);
                                     photos.addAll(finalImageList);
                                     String color = binding.edColorName.getText().toString();
-                                    Product product = new Product();
+                                    Variants product = new Variants();
                                     product.setColor(color);
                                     product.setSizes(sizes);
                                     product.setPhotos(photos);

@@ -57,6 +57,8 @@ import com.sushant.fashionapp.Adapters.EditVariantAdapter;
 import com.sushant.fashionapp.Adapters.SizeSummaryAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.CheckConnection;
 import com.sushant.fashionapp.Utils.ImageUtils;
@@ -81,7 +83,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> imgLauncher;
     SizeSummaryAdapter sizeSummaryAdapter;
     VariantPhotoAdapter photoAdapter;
-    ArrayList<Product> variants = new ArrayList<>();
+    ArrayList<Variants> variants = new ArrayList<>();
     String size;
     FirebaseStorage storage;
     ArrayList<String> subCatList = new ArrayList<>();
@@ -100,7 +102,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
 
         pid = getIntent().getStringExtra("pId");
-        variants = (ArrayList<Product>) getIntent().getSerializableExtra("origVariant");
+        variants = (ArrayList<Variants>) getIntent().getSerializableExtra("origVariant");
         variantIndex = getIntent().getIntExtra("variantIndex", 0);
 
         binding.btnAddVariant.setOnClickListener(new View.OnClickListener() {
@@ -396,7 +398,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
 
     private void showDialog() {
         tempImages.clear();
-        ArrayList<Product> sizes = new ArrayList<>();
+        ArrayList<Size> sizes = new ArrayList<>();
 
         Dialog variantDialog = new Dialog(this);
         variantDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -461,7 +463,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         });
     }
 
-    private void showSizeDialog(ArrayList<Product> sizes) {
+    private void showSizeDialog(ArrayList<Size> sizes) {
         AlertDialog.Builder builder = new AlertDialog.Builder(EditProductDetailsActivity.this);
         builder.setMessage("Enter size details");
         builder.setCancelable(false);
@@ -502,7 +504,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                     Toast.makeText(EditProductDetailsActivity.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Product product = new Product();
+                Size product = new Size();
                 product.setSize(size);
                 product.setStock(Integer.valueOf(stock));
                 sizes.add(product);
@@ -513,7 +515,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         });
     }
 
-    private void createImageBitmap(TextInputEditText colorName, ArrayList<Product> sizes) {
+    private void createImageBitmap(TextInputEditText colorName, ArrayList<Size> sizes) {
         ArrayList<byte[]> images = new ArrayList<>();
         for (String image : tempImages) {
             Bitmap bitmap = null;
@@ -534,7 +536,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     }
 
 
-    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, TextInputEditText colorName, ArrayList<Product> sizes) {
+    private void uploadMultipleImageToFirebase(ArrayList<byte[]> imgList, TextInputEditText colorName, ArrayList<Size> sizes) {
         ArrayList<String> finalImageList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         ProgressDialog dialog = new ProgressDialog(this);
@@ -556,7 +558,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                                 String filePath = uri.toString();
                                 finalImageList.add(filePath);
                                 if (finalImageList.size() == imgList.size()) {
-                                    Product product = new Product();
+                                    Variants product = new Variants();
                                     product.setColor(colorName.getText().toString());
                                     product.setSizes(sizes);
                                     product.setPhotos(finalImageList);

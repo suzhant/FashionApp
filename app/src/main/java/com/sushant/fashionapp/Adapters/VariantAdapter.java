@@ -14,19 +14,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 
 import java.util.ArrayList;
 
 public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHolder> {
 
-    ArrayList<Product> products;
+    ArrayList<Variants> products;
     Context context;
     VariantClickListener productClickListener;
     int selectedItemPos;
 
-    public VariantAdapter(ArrayList<Product> products, Context context, VariantClickListener productClickListener, int selectedItemPos) {
+    public VariantAdapter(ArrayList<Variants> products, Context context, VariantClickListener productClickListener, int selectedItemPos) {
         this.products = products;
         this.context = context;
         this.productClickListener = productClickListener;
@@ -42,7 +42,7 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product product = products.get(position);
+        Variants product = products.get(position);
         Glide.with(context).load(product.getPhotos().get(0)).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
         holder.txtColor.setText(product.getColor());
         if (holder.getAbsoluteAdapterPosition() == selectedItemPos) {

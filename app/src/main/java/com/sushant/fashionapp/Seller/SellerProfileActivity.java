@@ -307,7 +307,6 @@ public class SellerProfileActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
                 if (task.isSuccessful()) {
-                    dialog.dismiss();
                     reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @RequiresApi(api = Build.VERSION_CODES.P)
                         @Override
@@ -315,7 +314,13 @@ public class SellerProfileActivity extends AppCompatActivity {
                             String filePath = uri.toString();
                             HashMap<String, Object> image = new HashMap<>();
                             image.put("storePic", filePath);
-                            database.getReference().child("Store").child(storeId).updateChildren(image);
+                            database.getReference().child("Store").child(storeId).updateChildren(image).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    dialog.dismiss();
+                                    Snackbar.make(binding.getRoot(), "Store Photo changed successfully", Snackbar.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     });
                 }
@@ -363,6 +368,28 @@ public class SellerProfileActivity extends AppCompatActivity {
                         bottomSheetDialog.dismiss();
                         dialog.dismiss();
                         Snackbar.make(binding.getRoot(), "Name Changed successfully", Snackbar.LENGTH_SHORT).show();
+//                        Query query=database.getReference().child("Products").orderByChild("storeId").equalTo(storeId);
+//                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                for (DataSnapshot snapshot1:snapshot.getChildren()){
+//                                    Product product=snapshot1.getValue(Product.class);
+//                                    database.getReference().child("Products").child(product.getpId()).updateChildren(name).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                        @Override
+//                                        public void onSuccess(Void unused) {
+//                                            bottomSheetDialog.dismiss();
+//                                            dialog.dismiss();
+//                                            Snackbar.make(binding.getRoot(), "Name Changed successfully", Snackbar.LENGTH_SHORT).show();
+//                                        }
+//                                    });
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@NonNull DatabaseError error) {
+//
+//                            }
+//                        });
                     }
                 });
 

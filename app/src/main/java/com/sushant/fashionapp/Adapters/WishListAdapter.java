@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
@@ -35,12 +36,12 @@ import java.util.Objects;
 
 public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHolder> {
 
-    ArrayList<Product> products;
+    ArrayList<Cart> products;
     Context context;
     WishListActivity wishListActivity;
     int stock;
 
-    public WishListAdapter(ArrayList<Product> products, Context context) {
+    public WishListAdapter(ArrayList<Cart> products, Context context) {
         this.products = products;
         this.context = context;
         this.wishListActivity = (WishListActivity) context;
@@ -55,7 +56,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product product = products.get(position);
+        Cart product = products.get(position);
         Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgProduct);
         holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(product.getStoreName()));
         holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getpPrice())));
@@ -98,6 +99,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                 intent.putExtra("pName", product.getpName());
                 intent.putExtra("pPrice", product.getpPrice());
                 intent.putExtra("pId", product.getpId());
+                intent.putExtra("storeId", product.getStoreId());
                 intent.putExtra("sName", product.getStoreName());
                 intent.putExtra("pDesc", product.getDesc());
                 intent.putExtra("index", product.getVariantIndex());
@@ -113,7 +115,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                 intent.putExtra("pName", product.getpName());
                 intent.putExtra("pPrice", product.getpPrice());
                 intent.putExtra("pId", product.getpId());
-                intent.putExtra("stock", product.getStock());
+                intent.putExtra("storeId", product.getStoreId());
                 intent.putExtra("sName", product.getStoreName());
                 intent.putExtra("index", product.getVariantIndex());
                 context.startActivity(intent);
@@ -157,7 +159,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                                         .setAnchorView(wishListActivity.findViewById(R.id.fabAddToCart)).show();
                             }
                         } else {
-                            Product item = new Product(product.getpId(), product.getpName(), product.getpPic(), product.getpPrice(), product.getStoreName(), product.getStock());
+                            Cart item = new Cart(product.getpId(), product.getpName(), product.getpPic(), product.getpPrice());
                             item.setVariantPId(product.getVariantPId());
                             item.setVariantIndex(product.getVariantIndex());
                             item.setSizeIndex(product.getSizeIndex());
@@ -165,6 +167,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                             item.setSize(product.getSize());
                             item.setMaxLimit(product.getMaxLimit());
                             item.setColor(product.getColor());
+                            item.setStoreName(product.getStoreName());
+                            item.setStoreId(product.getStoreId());
                             item.setQuantity(1);
                             if (stock != 0) {
                                 updateStock(product);

@@ -39,7 +39,7 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
-      Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.productImg);
+       Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.productImg);
         holder.productName.setText(product.getpName());
         holder.productPrice.setText(MessageFormat.format("Rs. {0}", product.getpPrice()));
 
@@ -51,7 +51,6 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
                 intent.putExtra("pName", product.getpName());
                 intent.putExtra("pPrice", product.getpPrice());
                 intent.putExtra("pId", product.getpId());
-                intent.putExtra("sName", product.getStoreName());
                 intent.putExtra("pDesc", product.getDesc());
                 intent.putExtra("storeId", product.getStoreId());
                 intent.putExtra("index", product.getVariantIndex());

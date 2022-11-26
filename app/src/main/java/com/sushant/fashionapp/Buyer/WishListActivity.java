@@ -15,7 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.WishListAdapter;
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.databinding.ActivityWishListBinding;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class WishListActivity extends AppCompatActivity {
     ActivityWishListBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
-    ArrayList<Product> products = new ArrayList<>();
+    ArrayList<Cart> products = new ArrayList<>();
     WishListAdapter adapter;
 
     @Override
@@ -43,7 +43,7 @@ public class WishListActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
+                    Cart product = snapshot1.getValue(Cart.class);
                     products.add(product);
                 }
                 adapter.notifyDataSetChanged();

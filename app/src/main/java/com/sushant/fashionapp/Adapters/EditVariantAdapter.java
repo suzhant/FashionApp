@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Seller.EditVariantActivity;
 
@@ -22,12 +22,12 @@ import java.util.ArrayList;
 
 public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.viewHolder> {
 
-    ArrayList<Product> list;
+    ArrayList<Variants> list;
     Context context;
     String pId;
     VariantClickListener productClickListener;
 
-    public EditVariantAdapter(ArrayList<Product> list, Context context, String pId, VariantClickListener productClickListener) {
+    public EditVariantAdapter(ArrayList<Variants> list, Context context, String pId, VariantClickListener productClickListener) {
         this.list = list;
         this.context = context;
         this.pId = pId;
@@ -43,7 +43,7 @@ public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product product = list.get(position);
+        Variants product = list.get(position);
         Glide.with(context).load(product.getPhotos().get(0)).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgProduct);
         holder.txtColor.setText(product.getColor());
 

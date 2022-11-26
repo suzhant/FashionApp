@@ -5,16 +5,17 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
 
 import java.util.ArrayList;
 
 public class CartDiffUtils extends DiffUtil.Callback {
 
-    private final ArrayList<Product> mOldProducts;
-    private final ArrayList<Product> mNewProducts;
+    private final ArrayList<Cart> mOldProducts;
+    private final ArrayList<Cart> mNewProducts;
 
-    public CartDiffUtils(ArrayList<Product> mOldProducts, ArrayList<Product> mNewProducts) {
+    public CartDiffUtils(ArrayList<Cart> mOldProducts, ArrayList<Cart> mNewProducts) {
         this.mOldProducts = mOldProducts;
         this.mNewProducts = mNewProducts;
     }
@@ -44,8 +45,8 @@ public class CartDiffUtils extends DiffUtil.Callback {
     @Nullable
     @Override
     public Object getChangePayload(int oldItemPosition, int newItemPosition) {
-        final Product oldProduct = mOldProducts.get(oldItemPosition);
-        final Product newProduct = mNewProducts.get(newItemPosition);
+        final Cart oldProduct = mOldProducts.get(oldItemPosition);
+        final Cart newProduct = mNewProducts.get(newItemPosition);
 
         Bundle bundle = new Bundle();
         if (!oldProduct.getpName().equals(newProduct.getpName())) {
@@ -54,8 +55,6 @@ public class CartDiffUtils extends DiffUtil.Callback {
             bundle.putInt("newPrice", newProduct.getpPrice());
         } else if (!oldProduct.getStoreName().equals(newProduct.getStoreName())) {
             bundle.putString("newStoreName", newProduct.getStoreName());
-        } else if (oldProduct.getStock() != newProduct.getStock()) {
-            bundle.putInt("newStock", newProduct.getStock());
         } else if (oldProduct.getQuantity() != newProduct.getQuantity()) {
             bundle.putInt("newQuantity", newProduct.getQuantity());
         }

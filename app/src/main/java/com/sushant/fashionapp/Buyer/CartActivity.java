@@ -24,6 +24,7 @@ import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.CartAdapter;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Inteface.SwipeHelper;
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.ImageUtils;
@@ -39,7 +40,7 @@ public class CartActivity extends AppCompatActivity {
 
     ActivityCartBinding binding;
     CartAdapter cartAdapter;
-    ArrayList<Product> products = new ArrayList<>();
+    ArrayList<Cart> products = new ArrayList<>();
     FirebaseDatabase database;
     FirebaseAuth auth;
     ProductClickListener productClickListener;
@@ -103,7 +104,7 @@ public class CartActivity extends AppCompatActivity {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
-                                Product product = products.get(pos);
+                                Cart product = products.get(pos);
                                 showDeleteMessage(product);
                                 deleteProductFromDB(product);
                                 products.remove(pos);
@@ -139,7 +140,7 @@ public class CartActivity extends AppCompatActivity {
                 products.clear();
                 sum = 0;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
+                    Cart product = snapshot1.getValue(Cart.class);
                     assert product != null;
                     if (product.getpId() != null) {
                         products.add(product);
@@ -213,7 +214,7 @@ public class CartActivity extends AppCompatActivity {
         cartAdapter.notifyDataSetChanged();
     }
 
-    private void showDeleteMessage(Product product) {
+    private void showDeleteMessage(Cart product) {
         Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
                 Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
             @Override

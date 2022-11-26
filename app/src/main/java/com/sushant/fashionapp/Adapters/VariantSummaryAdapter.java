@@ -15,20 +15,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 
 import java.util.ArrayList;
 
 public class VariantSummaryAdapter extends RecyclerView.Adapter<VariantSummaryAdapter.viewHolder> {
 
-    ArrayList<Product> products;
+    ArrayList<Variants> products;
     Context context;
     VariantPhotoAdapter adapter;
     SizeSummaryAdapter sizeSummaryAdapter;
     int i;
 
-    public VariantSummaryAdapter(ArrayList<Product> products, Context context) {
+    public VariantSummaryAdapter(ArrayList<Variants> products, Context context) {
         this.products = products;
         this.context = context;
     }
@@ -43,7 +43,7 @@ public class VariantSummaryAdapter extends RecyclerView.Adapter<VariantSummaryAd
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product variant = products.get(position);
+        Variants variant = products.get(position);
         //   holder.txtStock.setText(String.format("Stock: %s", variant.getStock().toString()));
         holder.txtColorName.setText(String.format("Color: %s", variant.getColor()));
         //   holder.txtSize.setText(String.format("Sizes: %s",chips.toString()));

@@ -18,7 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textfield.TextInputEditText;
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.R;
 
 import java.util.ArrayList;
@@ -26,10 +26,10 @@ import java.util.Objects;
 
 public class EditSizeAdapter extends RecyclerView.Adapter<EditSizeAdapter.viewHolder> {
 
-    ArrayList<Product> sizes;
+    ArrayList<Size> sizes;
     Context context;
 
-    public EditSizeAdapter(ArrayList<Product> sizes, Context context) {
+    public EditSizeAdapter(ArrayList<Size> sizes, Context context) {
         this.sizes = sizes;
         this.context = context;
     }
@@ -43,7 +43,7 @@ public class EditSizeAdapter extends RecyclerView.Adapter<EditSizeAdapter.viewHo
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product product = sizes.get(position);
+        Size product = sizes.get(position);
         String size = product.getSize();
         String stock = product.getStock().toString();
         holder.txtStock.setText(String.format("Stock: %s", stock));
@@ -89,7 +89,7 @@ public class EditSizeAdapter extends RecyclerView.Adapter<EditSizeAdapter.viewHo
             @Override
             public void onClick(View view) {
                 sizes.remove(holder.getAbsoluteAdapterPosition());
-                Product product = new Product();
+                Size product = new Size();
                 String size = autoSize.getText().toString();
                 String stock = edStock.getText().toString();
                 product.setSize(size);

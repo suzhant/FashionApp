@@ -6,10 +6,10 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class Product implements Serializable {
-    private String pId, pName, storeName, size, maxLimit, color, desc, pPic, brandName, variantPId;
-    private Integer pPrice, stock, love, quantity, productCode, variantIndex, sizeIndex;
-    private ArrayList<Product> variants;
-    private ArrayList<Product> sizes;
+    private String pId, pName, maxLimit, desc, pPic, brandName, variantPId;
+    private Integer pPrice, love, quantity, productCode, variantIndex, sizeIndex;
+    private ArrayList<Variants> variants;
+    private ArrayList<Size> sizes;
     private ArrayList<String> photos;
     private Long timeStamp;
     private String previewPic;
@@ -20,34 +20,29 @@ public class Product implements Serializable {
     public Product() {
     }
 
-    public Product(String pId, String pName, String pPic, Integer pPrice, String storeName, Integer stock) {
+    public Product(String pId, String pName, String pPic, Integer pPrice) {
         this.pId = pId;
         this.pName = pName;
         this.pPic = pPic;
         this.pPrice = pPrice;
-        this.storeName = storeName;
-        this.stock = stock;
     }
 
-    public Product(String pId, String size, Integer pPrice, Integer stock) {
+    public Product(String pId, Integer pPrice) {
         this.pId = pId;
-        this.size = size;
         this.pPrice = pPrice;
-        this.stock = stock;
     }
 
-    public Product(String pId, String pName, String storeName, String previewPic) {
+    public Product(String pId, String pName, String previewPic) {
         this.pId = pId;
         this.pName = pName;
-        this.storeName = storeName;
         this.previewPic = previewPic;
     }
 
-    public Product(String pId, String color, String pPic) {
+    public Product(String pId, String pPic) {
         this.pId = pId;
-        this.color = color;
         this.pPic = pPic;
     }
+
 
     public String getpId() {
         return pId;
@@ -67,36 +62,21 @@ public class Product implements Serializable {
 
 
 
-    public String getStoreName() {
-        return storeName;
-    }
-
-    public void setStoreName(String storeName) {
-        this.storeName = storeName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return pPrice == product.pPrice && pPic == product.pPic && love == product.love && stock == product.stock
+        return pPrice == product.pPrice && pPic == product.pPic && love == product.love
                 && Objects.equals(pId, product.pId) && Objects.equals(pName, product.pName)
-                && Objects.equals(storeName, product.storeName) && quantity == product.quantity;
+                && quantity == product.quantity;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(pId, pName, storeName, pPrice, pPic, love, stock);
+        return Objects.hash(pId, pName, pPrice, pPic, love);
     }
 
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
 
     public String getMaxLimit() {
         return maxLimit;
@@ -106,27 +86,20 @@ public class Product implements Serializable {
         this.maxLimit = maxLimit;
     }
 
-    public ArrayList<Product> getVariants() {
+    public ArrayList<Variants> getVariants() {
         return variants;
     }
 
-    public void setVariants(ArrayList<Product> variants) {
+    public void setVariants(ArrayList<Variants> variants) {
         this.variants = variants;
     }
 
-    public String getColor() {
-        return color;
-    }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public ArrayList<Product> getSizes() {
+    public ArrayList<Size> getSizes() {
         return sizes;
     }
 
-    public void setSizes(ArrayList<Product> sizes) {
+    public void setSizes(ArrayList<Size> sizes) {
         this.sizes = sizes;
     }
 
@@ -136,14 +109,6 @@ public class Product implements Serializable {
 
     public void setpPrice(Integer pPrice) {
         this.pPrice = pPrice;
-    }
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
     }
 
     public Integer getLove() {

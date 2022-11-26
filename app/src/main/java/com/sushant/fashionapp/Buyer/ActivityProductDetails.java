@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.bumptech.glide.Glide;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.devs.readmoreoption.ReadMoreOption;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,7 +40,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Bargain;
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
@@ -61,15 +65,15 @@ public class ActivityProductDetails extends AppCompatActivity {
     String maxLimit;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, sName, pId, color, pDesc, storeId;
+    String pName, sName, pId, color, pDesc, storeId, storePic;
     String sizeId, actualProductId;
-    ArrayList<Product> products = new ArrayList<>();
+    ArrayList<Variants> products = new ArrayList<>();
     VariantAdapter variantAdapter;
     List<SlideModel> list = new ArrayList<>();
     VariantClickListener variantClickListener;
     ValueEventListener variantListener, wishListListener;
     DatabaseReference variantRef, wishListRef;
-    ArrayList<Product> sizes = new ArrayList<>();
+    ArrayList<Size> sizes = new ArrayList<>();
     ArrayList<Product> wishList = new ArrayList<>();
     boolean isLoved, isAccepted, isExist = false;
     String bargainId;
@@ -94,7 +98,6 @@ public class ActivityProductDetails extends AppCompatActivity {
 
         price = getIntent().getIntExtra("pPrice", 0);
         pic = getIntent().getStringExtra("pPic");
-        sName = getIntent().getStringExtra("sName");
         storeId = getIntent().getStringExtra("storeId");
         pId = getIntent().getStringExtra("pId");
         pDesc = getIntent().getStringExtra("pDesc");
@@ -104,12 +107,11 @@ public class ActivityProductDetails extends AppCompatActivity {
 
         binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
         binding.txtPrdtName.setText(captializeAllFirstLetter(pName));
-        binding.txtStoreName.setText(captializeAllFirstLetter(sName));
 
 
         variantClickListener = new VariantClickListener() {
             @Override
-            public void onClick(Product product, int pos) {
+            public void onClick(Variants product, int pos) {
                 Log.d("variants", "called");
                 pic = product.getPhotos().get(0);
                 color = product.getColor();
@@ -146,6 +148,12 @@ public class ActivityProductDetails extends AppCompatActivity {
                 binding.imgWish.setImageResource(R.drawable.ic_love);
                 binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
             }
+
+            @Override
+            public void onProductClick(Product product, int pos) {
+
+            }
+
         };
 
 
@@ -159,7 +167,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                 Log.d("variantListener", "called");
                 products.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
+                    Variants product = snapshot1.getValue(Variants.class);
                     products.add(product);
                 }
 //                for (Product product:products) {
@@ -224,7 +232,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         sizeId = chip.getText().toString();
                         actualProductId = pId + TextUtils.getFirstLetter(color) + sizeId;
                         for (int j = 0; j < sizes.size(); j++) {
-                            Product p = sizes.get(j);
+                            Size p = sizes.get(j);
                             if (sizeId.equals(p.getSize())) {
                                 stock = p.getStock();
                                 sizeIndex = j;
@@ -345,6 +353,12 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 sellerId = snapshot.child("sellerId").getValue(String.class);
+                if (snapshot.child("storePic").exists()) {
+                    storePic = snapshot.child("storePic").getValue(String.class);
+                    Glide.with(ActivityProductDetails.this).load(storePic).placeholder(R.drawable.avatar).into(binding.imgStorePic);
+                }
+                sName = snapshot.child("storeName").getValue(String.class);
+                binding.txtStoreName.setText(captializeAllFirstLetter(sName));
             }
 
             @Override
@@ -537,7 +551,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
                     }
                 } else {
-                    Product product = new Product(pId, pName, pic, price, sName, stock);
+                    Cart product = new Cart(pId, pName, pic, price);
                     product.setVariantPId(actualProductId);
                     product.setVariantIndex(variantPos);
                     product.setSizeIndex(sizeIndex);
@@ -546,6 +560,8 @@ public class ActivityProductDetails extends AppCompatActivity {
                     product.setMaxLimit(maxLimit);
                     product.setColor(color);
                     product.setQuantity(1);
+                    product.setStoreName(sName);
+                    product.setStoreId(storeId);
                     updateStock(stock);
                     database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -598,7 +614,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     private void addToWishList() {
         binding.imgWish.setVisibility(View.GONE);
         binding.progressCircular.setVisibility(View.VISIBLE);
-        Product product = new Product(pId, pName, pic, price, sName, stock);
+        Cart product = new Cart(pId, pName, pic, price);
         product.setVariantPId(actualProductId);
         product.setVariantIndex(variantPos);
         product.setSizeIndex(sizeIndex);
@@ -606,6 +622,8 @@ public class ActivityProductDetails extends AppCompatActivity {
         product.setSize(sizeId);
         product.setMaxLimit(maxLimit);
         product.setColor(color);
+        product.setStoreName(sName);
+        product.setStoreId(storeId);
         database.getReference().child("WishList").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {

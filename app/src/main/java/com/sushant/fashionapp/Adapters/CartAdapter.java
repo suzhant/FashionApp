@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,9 +26,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.Utils.CartDiffUtils;
 import com.sushant.fashionapp.Utils.TextUtils;
 
 import java.text.MessageFormat;
@@ -38,13 +37,13 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
-    ArrayList<Product> products;
+    ArrayList<Cart> products;
     Context context;
     ProductClickListener productClickListener;
     private final CartActivity cartActivity;
     int stock;
 
-    public CartAdapter(ArrayList<Product> products, Context context, ProductClickListener productClickListener) {
+    public CartAdapter(ArrayList<Cart> products, Context context, ProductClickListener productClickListener) {
         this.products = products;
         this.context = context;
         this.productClickListener = productClickListener;
@@ -60,7 +59,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product product = products.get(position);
+        Cart product = products.get(position);
         Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgProduct);
         holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(product.getStoreName()));
         holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getpPrice())));
@@ -161,6 +160,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         intent.putExtra("pName", product.getpName());
                         intent.putExtra("pPrice", product.getpPrice());
                         intent.putExtra("pId", product.getpId());
+                        intent.putExtra("storeId", product.getStoreId());
                         intent.putExtra("sName", product.getStoreName());
                         intent.putExtra("pDesc", product.getDesc());
                         intent.putExtra("index", product.getVariantIndex());
@@ -181,7 +181,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         intent.putExtra("pName", product.getpName());
                         intent.putExtra("pPrice", product.getpPrice());
                         intent.putExtra("pId", product.getpId());
-                        intent.putExtra("stock", product.getStock());
+                        intent.putExtra("storeId", product.getStoreId());
                         intent.putExtra("sName", product.getStoreName());
                         intent.putExtra("index", product.getVariantIndex());
                         context.startActivity(intent);
@@ -277,11 +277,4 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                 .child(String.valueOf(product.getSizeIndex())).updateChildren(stock);
     }
 
-    public void updateCartList(ArrayList<Product> products) {
-        final CartDiffUtils diffCallback = new CartDiffUtils(this.products, products);
-        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
-        this.products.clear();
-        this.products.addAll(products);
-        diffResult.dispatchUpdatesTo(this);
-    }
 }

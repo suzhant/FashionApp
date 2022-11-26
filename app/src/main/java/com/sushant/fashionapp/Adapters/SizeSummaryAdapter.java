@@ -10,18 +10,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.R;
 
 import java.util.ArrayList;
 
 public class SizeSummaryAdapter extends RecyclerView.Adapter<SizeSummaryAdapter.viewHolder> {
 
-    ArrayList<Product> sizes;
+    ArrayList<Size> sizes;
     Context context;
     int type;
 
-    public SizeSummaryAdapter(ArrayList<Product> sizes, Context context, int type) {
+    public SizeSummaryAdapter(ArrayList<Size> sizes, Context context, int type) {
         this.sizes = sizes;
         this.context = context;
         this.type = type;
@@ -36,7 +36,7 @@ public class SizeSummaryAdapter extends RecyclerView.Adapter<SizeSummaryAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
-        Product product = sizes.get(position);
+        Size product = sizes.get(position);
         holder.txtStock.setText(String.format("Stock: %s", product.getStock().toString()));
         holder.txtSize.setText(String.format("Size: %s", product.getSize()));
 
