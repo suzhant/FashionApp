@@ -62,14 +62,14 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
+                    Buyer buyer = snapshot.getValue(Buyer.class);
+                    assert buyer != null;
                     if (snapshot.child("userPic").exists()) {
-                        Buyer buyer = snapshot.getValue(Buyer.class);
-                        assert buyer != null;
                         String userPic = buyer.getUserPic();
-                        String userName = buyer.getUserName();
                         Glide.with(context).load(userPic).placeholder(R.drawable.avatar).into(holder.imgUser);
-                        holder.txtUserName.setText(userName);
                     }
+                    String userName = buyer.getUserName();
+                    holder.txtUserName.setText(userName);
                 }
 
             }

@@ -143,12 +143,18 @@ public class CartActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
                 sum = 0;
+                int price;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Cart product = snapshot1.getValue(Cart.class);
                     assert product != null;
                     if (product.getpId() != null) {
                         products.add(product);
-                        sum = sum + product.getpPrice() * product.getQuantity();
+                        if (product.getBargainPrice() != null) {
+                            price = product.getBargainPrice();
+                        } else {
+                            price = product.getpPrice();
+                        }
+                        sum = sum + price * product.getQuantity();
                     }
                 }
                 binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", sum)));

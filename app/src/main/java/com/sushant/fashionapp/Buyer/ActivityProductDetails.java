@@ -5,6 +5,7 @@ import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,7 +33,6 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -54,7 +55,10 @@ import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,8 +80,8 @@ public class ActivityProductDetails extends AppCompatActivity {
     VariantAdapter variantAdapter;
     List<SlideModel> list = new ArrayList<>();
     VariantClickListener variantClickListener;
-    ValueEventListener variantListener, wishListListener;
-    DatabaseReference variantRef, wishListRef;
+    ValueEventListener variantListener, wishListListener, ratingListener;
+    DatabaseReference variantRef, wishListRef, ratingRef;
     ArrayList<Size> sizes = new ArrayList<>();
     ArrayList<Product> wishList = new ArrayList<>();
     boolean isLoved, isAccepted, isExist = false;
@@ -381,6 +385,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         reference.addValueEventListener(valueEventListener);
 
         binding.btnBargain.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
                 if (!isExist) {
@@ -433,7 +438,8 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
-        database.getReference().child("Ratings").child(pId).addListenerForSingleValueEvent(new ValueEventListener() {
+        ratingRef = database.getReference().child("Ratings").child(pId);
+        ratingListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -484,7 +490,8 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        ratingRef.addValueEventListener(ratingListener);
 
         binding.rating.setOnRatingBarChangeListener(new SimpleRatingBar.OnRatingBarChangeListener() {
             @Override
@@ -500,22 +507,27 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void openApprovedDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain_accepted);
         TextView txtOriginalPrice = bottomSheetDialog.findViewById(R.id.txtOrigPrice);
         TextView txtBargainPrice = bottomSheetDialog.findViewById(R.id.txtBargainPrice);
         TextView txtBargainDate = bottomSheetDialog.findViewById(R.id.txtBargainDate);
+        TextView txtValidity = bottomSheetDialog.findViewById(R.id.txtValidity);
         TextView txtStatus = bottomSheetDialog.findViewById(R.id.txtStatus);
         ImageView imgClose = bottomSheetDialog.findViewById(R.id.imgClose);
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy   hh:mm a");
-        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Approved Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
-        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
-        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
-        txtStatus.setText(Html.fromHtml(MessageFormat.format("Status: &nbsp; <big> <span style=color:blue>{0}</span> </big>", captializeAllFirstLetter(status))));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a");
+        LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+        LocalDateTime afterDate = dateTime.plusDays(2);
+        // long longDate = (timestamp + TimeUnit.DAYS.toMillis(2));
+        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Approved Date:&nbsp; {0}", dateTime.format(formatter))));
+        txtValidity.setText(Html.fromHtml(MessageFormat.format("Validity:&nbsp; {0}", afterDate.format(formatter))));
+        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price:&nbsp; Rs. {0}", origPrice)));
+        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price:&nbsp; Rs. {0}", bargainPrice)));
+        txtStatus.setText(Html.fromHtml(MessageFormat.format("Status:&nbsp; <b><span style=color:#09AEA3>{0}</span></b>", captializeAllFirstLetter(status))));
 
         assert imgClose != null;
         imgClose.setOnClickListener(new View.OnClickListener() {
@@ -529,6 +541,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         bottomSheetDialog.show();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void openCancelBargainDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain_cancel);
@@ -544,8 +557,9 @@ public class ActivityProductDetails extends AppCompatActivity {
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy   hh:mm a");
-        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a");
+        LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateTime.format(formatter))));
         txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
         txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
         txtRemainingTries.setText(MessageFormat.format("Remaining Tries: {0}", noOfTries));
@@ -620,7 +634,6 @@ public class ActivityProductDetails extends AppCompatActivity {
         MaterialButton btnRequest = bottomSheetDialog.findViewById(R.id.btnRequest);
         MaterialButton btnGetCurrentPrice = bottomSheetDialog.findViewById(R.id.btnGetCurrentPrice);
         TextInputEditText edPrice = bottomSheetDialog.findViewById(R.id.edPrices);
-        TextInputLayout ipPrice = bottomSheetDialog.findViewById(R.id.ipPrice);
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         assert btnGetCurrentPrice != null;
@@ -657,6 +670,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                             dialog.dismiss();
                             bottomSheetDialog.dismiss();
                             Snackbar.make(findViewById(R.id.parent), "Bargain Request sent successfully", Snackbar.LENGTH_SHORT).setAction("Negotiate", new View.OnClickListener() {
+                                @RequiresApi(api = Build.VERSION_CODES.O)
                                 @Override
                                 public void onClick(View view) {
                                     openCancelBargainDialog();
@@ -846,6 +860,9 @@ public class ActivityProductDetails extends AppCompatActivity {
         }
         if (reference != null) {
             reference.removeEventListener(valueEventListener);
+        }
+        if (ratingRef != null) {
+            ratingRef.removeEventListener(ratingListener);
         }
     }
 
