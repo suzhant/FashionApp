@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.BargainUserAdapter;
 import com.sushant.fashionapp.Models.Bargain;
@@ -28,6 +30,8 @@ public class BargainFragment extends Fragment {
     FirebaseDatabase database;
     FirebaseAuth auth;
     String sellerId;
+    ValueEventListener valueEventListener;
+    DatabaseReference reference;
 
     FragmentBargainBinding binding;
 
@@ -44,22 +48,24 @@ public class BargainFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        reference = database.getReference().child("Users").child(auth.getUid());
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 sellerId = snapshot.child("sellerId").getValue(String.class);
-                database.getReference().child("Bargain").addListenerForSingleValueEvent(new ValueEventListener() {
+                Query query = database.getReference().child("Bargain").orderByChild("sellerId").equalTo(sellerId);
+                query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         bargains.clear();
                         for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                             Bargain bargain = snapshot1.getValue(Bargain.class);
                             assert bargain != null;
-                            if (sellerId.equals(bargain.getSellerId())) {
+                            if (bargain.getStatus().equals("pending")) {
                                 bargains.add(bargain);
                             }
                         }
-                        adapter.notifyItemInserted(bargains.size());
+                        adapter.notifyDataSetChanged();
                     }
 
                     @Override
@@ -73,7 +79,8 @@ public class BargainFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        reference.addValueEventListener(valueEventListener);
 
         initRecycler();
 
@@ -86,5 +93,13 @@ public class BargainFragment extends Fragment {
         binding.recyclerBargain.setLayoutManager(layoutManager);
         adapter = new BargainUserAdapter(bargains, getActivity());
         binding.recyclerBargain.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (reference != null) {
+            reference.removeEventListener(valueEventListener);
+        }
     }
 }

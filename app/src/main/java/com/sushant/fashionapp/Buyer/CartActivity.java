@@ -19,11 +19,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.CartAdapter;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
 import com.sushant.fashionapp.Inteface.SwipeHelper;
+import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
@@ -32,9 +34,11 @@ import com.sushant.fashionapp.databinding.ActivityCartBinding;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class CartActivity extends AppCompatActivity {
 
@@ -159,6 +163,52 @@ public class CartActivity extends AppCompatActivity {
         };
         databaseReference.addValueEventListener(valueEventListener);
 
+        database.getReference().child("Bargain").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Bargain bargain = snapshot1.getValue(Bargain.class);
+                        assert bargain != null;
+                        if (bargain.getBuyerId().equals(auth.getUid()) && bargain.getStatus().equals("accepted")) {
+                            Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
+                            if (bargain.getTimestamp() < cutoff) {
+                                Query query = database.getReference().child("Cart").child(auth.getUid()).child("Product Details").orderByChild("pId").equalTo(bargain.getProductId());
+                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot snapshot11 : snapshot.getChildren()) {
+                                            Cart cart = snapshot11.getValue(Cart.class);
+                                            HashMap<String, Object> map = new HashMap<>();
+                                            map.put("bargainPrice", null);
+                                            database.getReference().child("Cart").child(auth.getUid()).child("Product Details")
+                                                    .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    database.getReference().child("Bargain").child(bargain.getBargainId()).removeValue();
+                                                }
+                                            });
+
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
         binding.imgDelete.setOnClickListener(new View.OnClickListener() {
@@ -370,7 +420,9 @@ public class CartActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        databaseReference.removeEventListener(valueEventListener);
+        if (databaseReference != null) {
+            databaseReference.removeEventListener(valueEventListener);
+        }
         super.onDestroy();
     }
 

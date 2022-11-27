@@ -62,7 +62,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         Cart product = products.get(position);
         Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgProduct);
         holder.txtStoreName.setText(TextUtils.captializeAllFirstLetter(product.getStoreName()));
-        holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getpPrice())));
+        if (product.getBargainPrice() != null) {
+            holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getBargainPrice())));
+        } else {
+            holder.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", product.getpPrice())));
+        }
+
         holder.txtProductName.setText(TextUtils.captializeAllFirstLetter(product.getpName()));
         holder.txtSize.setText(MessageFormat.format("Size: {0}", product.getSize()));
         holder.txtQuantity.setText(String.valueOf(product.getQuantity()));

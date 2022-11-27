@@ -13,17 +13,25 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Buyer;
+import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Seller.MessageActivity;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -32,10 +40,12 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
 
     ArrayList<Bargain> list;
     Context context;
+    MessageActivity activity;
 
     public BargainUserAdapter(ArrayList<Bargain> list, Context context) {
         this.list = list;
         this.context = context;
+        this.activity = (MessageActivity) context;
     }
 
     @NonNull
@@ -93,7 +103,39 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
             public void onClick(View view) {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("status", "accepted");
-                FirebaseDatabase.getInstance().getReference().child("Bargain").child(bargain.getBargainId()).updateChildren(map);
+                map.put("timestamp", new Date().getTime());
+                FirebaseDatabase.getInstance().getReference().child("Bargain").child(bargain.getBargainId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Snackbar.make(activity.findViewById(R.id.parent), "Approved", Snackbar.LENGTH_SHORT).show();
+                        Query query = FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid())
+                                .child("Product Details").orderByChild("pId").equalTo(bargain.getProductId());
+                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                        Cart cart = snapshot1.getValue(Cart.class);
+                                        HashMap<String, Object> map1 = new HashMap<>();
+                                        map1.put("bargainPrice", bargain.getBargainPrice());
+                                        FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details")
+                                                .child(cart.getVariantPId()).updateChildren(map1);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Snackbar.make(activity.findViewById(R.id.parent), "Operation Failed !!", Snackbar.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 

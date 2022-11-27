@@ -173,6 +173,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                             if (stock != 0) {
                                 updateStock(product);
                             }
+                            if (product.getBargainPrice() != null) {
+                                item.setBargainPrice(product.getBargainPrice());
+                            }
                             FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details")
                                     .child(item.getVariantPId()).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

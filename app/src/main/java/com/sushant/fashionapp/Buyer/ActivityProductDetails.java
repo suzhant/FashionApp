@@ -2,10 +2,10 @@ package com.sushant.fashionapp.Buyer;
 
 import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -37,6 +37,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
@@ -83,10 +84,11 @@ public class ActivityProductDetails extends AppCompatActivity {
     String bargainId;
     DatabaseReference reference;
     ValueEventListener valueEventListener;
-    Integer noOfTries;
+    Integer noOfTries, origPrice, bargainPrice;
     Boolean isBlocked;
     Long timestamp, cutoff;
-    String sellerId;
+    String sellerId, status;
+    ProgressDialog dialog;
 
     int index;
 
@@ -99,6 +101,9 @@ public class ActivityProductDetails extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Please wait...");
 
         price = getIntent().getIntExtra("pPrice", 0);
         pic = getIntent().getStringExtra("pPic");
@@ -311,10 +316,14 @@ public class ActivityProductDetails extends AppCompatActivity {
                         Bargain bargain = snapshot1.getValue(Bargain.class);
                         if (bargain.getProductId().equals(pId) && bargain.getBuyerId().equals(auth.getUid())) {
                             bargainId = bargain.getBargainId();
+                            status = bargain.getStatus();
                             isExist = true;
                             noOfTries = bargain.getNoOfTries();
                             isBlocked = bargain.getBlocked();
                             timestamp = bargain.getTimestamp();
+                            origPrice = bargain.getOriginalPrice();
+                            bargainPrice = bargain.getBargainPrice();
+
 
                             if (isBlocked) {
                                 cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS); //1 day old
@@ -325,8 +334,37 @@ public class ActivityProductDetails extends AppCompatActivity {
                                     database.getReference().child("Bargain").child(bargainId).updateChildren(map);
                                 }
                             }
+                            if (status.equals("accepted")) {
+                                Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
+                                if (timestamp < cutoff) {
+                                    isExist = false;
+                                    Query query = database.getReference().child("Cart").child(auth.getUid()).child("Product Details").orderByChild("pId").equalTo(pId);
+                                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot snapshot11 : snapshot.getChildren()) {
+                                                Cart cart = snapshot11.getValue(Cart.class);
+                                                HashMap<String, Object> map = new HashMap<>();
+                                                map.put("bargainPrice", null);
+                                                database.getReference().child("Cart").child(auth.getUid()).child("Product Details")
+                                                        .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                        database.getReference().child("Bargain").child(bargainId).removeValue();
+                                                    }
+                                                });
 
+                                            }
+                                        }
 
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+                                }
+                            }
                             break;
                         }
 
@@ -348,7 +386,16 @@ public class ActivityProductDetails extends AppCompatActivity {
                 if (!isExist) {
                     openBargainDialog();
                 } else {
-                    openCancelBargainDialog();
+                    if (status != null) {
+                        switch (status) {
+                            case "accepted":
+                                openApprovedDialog();
+                                break;
+                            case "pending":
+                                openCancelBargainDialog();
+                                break;
+                        }
+                    }
                 }
             }
         });
@@ -453,6 +500,35 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     }
 
+    private void openApprovedDialog() {
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain_accepted);
+        TextView txtOriginalPrice = bottomSheetDialog.findViewById(R.id.txtOrigPrice);
+        TextView txtBargainPrice = bottomSheetDialog.findViewById(R.id.txtBargainPrice);
+        TextView txtBargainDate = bottomSheetDialog.findViewById(R.id.txtBargainDate);
+        TextView txtStatus = bottomSheetDialog.findViewById(R.id.txtStatus);
+        ImageView imgClose = bottomSheetDialog.findViewById(R.id.imgClose);
+        Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy   hh:mm a");
+        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Approved Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
+        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
+        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
+        txtStatus.setText(Html.fromHtml(MessageFormat.format("Status: &nbsp; <big> <span style=color:blue>{0}</span> </big>", captializeAllFirstLetter(status))));
+
+        assert imgClose != null;
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bottomSheetDialog.dismiss();
+            }
+        });
+
+
+        bottomSheetDialog.show();
+    }
+
     private void openCancelBargainDialog() {
         final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(R.layout.bottomsheet_bargain_cancel);
@@ -467,30 +543,12 @@ public class ActivityProductDetails extends AppCompatActivity {
         LinearLayout parent = bottomSheetDialog.findViewById(R.id.bargainParent);
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        database.getReference().child("Bargain").child(bargainId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Bargain bargain = snapshot.getValue(Bargain.class);
-                Integer origPrice = bargain.getOriginalPrice();
-                Integer bargainPrice = bargain.getBargainPrice();
-                Integer priceDiff = origPrice - bargainPrice;
-                Long timestamp = bargain.getTimestamp();
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy   hh:mm a");
-                SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm a");
-                txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
-                //    txtBargainTime.setText(Html.fromHtml(MessageFormat.format("Bargain Time: &nbsp; <big>{0}</big>", timeFormat.format(new Date(timestamp)))));
-                txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
-                txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
-                txtRemainingTries.setText(MessageFormat.format("Remaining Tries: {0}", noOfTries));
-                //     txtPriceDiff.setText(Html.fromHtml(MessageFormat.format("Price Difference: &nbsp; <big>Rs.{0}</big>", priceDiff)));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy   hh:mm a");
+        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateFormat.format(new Date(timestamp)))));
+        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
+        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
+        txtRemainingTries.setText(MessageFormat.format("Remaining Tries: {0}", noOfTries));
 
         assert imgClose != null;
         imgClose.setOnClickListener(new View.OnClickListener() {
@@ -527,6 +585,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                 }
                 if (!isBlocked) {
                     if (noOfTries > 0) {
+                        dialog.show();
                         HashMap<String, Object> map = new HashMap<>();
                         map.put("bargainPrice", Integer.valueOf(price));
                         map.put("timestamp", new Date().getTime());
@@ -538,6 +597,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         database.getReference().child("Bargain").child(bargainId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
+                                dialog.dismiss();
                                 Snackbar.make(findViewById(R.id.parent), "Bargain request sent successfully", Snackbar.LENGTH_SHORT).show();
                                 bottomSheetDialog.dismiss();
                             }
@@ -578,6 +638,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onClick(View view) {
                 String bargainPrice = edPrice.getText().toString();
                 if (!bargainPrice.isEmpty()) {
+                    dialog.show();
                     String key = database.getReference().child("Bargain").push().getKey();
                     Bargain bargain = new Bargain(price, Integer.valueOf(bargainPrice), key);
                     bargain.setTimestamp(new Date().getTime());
@@ -588,20 +649,19 @@ public class ActivityProductDetails extends AppCompatActivity {
                     bargain.setNoOfTries(5);
                     bargain.setBlocked(false);
                     bargain.setSellerId(sellerId);
+                    bargain.setStatus("pending");
                     assert key != null;
                     database.getReference().child("Bargain").child(key).setValue(bargain).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Snackbar.make(findViewById(R.id.parent), "Bargain Request sent successfully", Snackbar.LENGTH_SHORT).show();
+                            dialog.dismiss();
                             bottomSheetDialog.dismiss();
-                            Handler handler = new Handler();
-                            Runnable runnable = new Runnable() {
+                            Snackbar.make(findViewById(R.id.parent), "Bargain Request sent successfully", Snackbar.LENGTH_SHORT).setAction("Negotiate", new View.OnClickListener() {
                                 @Override
-                                public void run() {
+                                public void onClick(View view) {
                                     openCancelBargainDialog();
                                 }
-                            };
-                            handler.postDelayed(runnable, 1000);
+                            }).show();
 
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -654,6 +714,11 @@ public class ActivityProductDetails extends AppCompatActivity {
                     product.setQuantity(1);
                     product.setStoreName(sName);
                     product.setStoreId(storeId);
+                    if (status != null) {
+                        if (status.equals("accepted")) {
+                            product.setBargainPrice(bargainPrice);
+                        }
+                    }
                     updateStock(stock);
                     database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -716,6 +781,11 @@ public class ActivityProductDetails extends AppCompatActivity {
         product.setColor(color);
         product.setStoreName(sName);
         product.setStoreId(storeId);
+        if (status != null) {
+            if (status.equals("accepted")) {
+                product.setBargainPrice(bargainPrice);
+            }
+        }
         database.getReference().child("WishList").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
