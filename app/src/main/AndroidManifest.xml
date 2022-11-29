@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp">
         <activity
+            android:name=".Buyer.BargainHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".Seller.SellerProfileActivity"
             android:exported="false" />
         <activity

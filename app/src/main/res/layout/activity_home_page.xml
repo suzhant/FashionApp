@@ -45,21 +45,21 @@
         app:menu="@menu/bottom_navigation_menu" />
 
 
-    <!--    <me.ibrahimsn.lib.SmoothBottomBar-->
-    <!--        android:id="@+id/bottomBar"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="70dp"-->
-    <!--        app:backgroundColor="@color/white"-->
-    <!--        app:textColor="@color/white"-->
-    <!--        app:iconTint="@color/black"-->
-    <!--        app:iconTintActive="@color/white"-->
-    <!--        app:indicatorColor="@color/skyBlue"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:iconSize="24dp"-->
-    <!--        app:indicatorRadius="10dp"-->
-    <!--        android:elevation="4dp"-->
-    <!--        app:menu="@menu/bottom_navigation_menu" />-->
+    <!--        <me.ibrahimsn.lib.SmoothBottomBar-->
+    <!--            android:id="@+id/bottomBar"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="70dp"-->
+    <!--            app:backgroundColor="@color/white"-->
+    <!--            app:textColor="@color/white"-->
+    <!--            app:iconTint="@color/black"-->
+    <!--            app:iconTintActive="@color/white"-->
+    <!--            app:indicatorColor="@color/skyBlue"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:iconSize="24dp"-->
+    <!--            app:indicatorRadius="10dp"-->
+    <!--            android:elevation="4dp"-->
+    <!--            app:menu="@menu/bottom_navigation_menu" />-->
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

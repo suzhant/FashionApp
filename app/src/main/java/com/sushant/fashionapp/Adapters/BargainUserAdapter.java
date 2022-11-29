@@ -51,7 +51,7 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_user_layout, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_seller_bargain_layout, parent, false);
         return new viewHolder(view);
     }
 

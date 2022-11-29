@@ -118,12 +118,12 @@
     </style>
 
     <style name="TextAppearance.Active" parent="">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">13sp</item>
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="TextAppearance.Inactive" parent="">
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="fontFamily">sans-serif</item>
     </style>
 

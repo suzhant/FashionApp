@@ -18,5 +18,8 @@
     <color name="egyptian_blue">#1434A4</color>
     <color name="royal_blue">#4169E1</color>
     <color name="dark_night">#303030</color>
+    <color name="golden_yellow">#FFC000</color>
+    <color name="pistachio">#93C572</color>
+    <color name="yello_orange">#FFAA33</color>
 
 </resources>
