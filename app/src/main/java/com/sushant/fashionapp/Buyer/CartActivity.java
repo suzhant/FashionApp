@@ -137,7 +137,7 @@ public class CartActivity extends AppCompatActivity {
 
 
         initRecyclerView();
-        databaseReference = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid())).child("Product Details");
+        databaseReference = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid()));
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -179,7 +179,7 @@ public class CartActivity extends AppCompatActivity {
                         if (bargain.getBuyerId().equals(auth.getUid()) && bargain.getStatus().equals("accepted")) {
                             Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
                             if (bargain.getTimestamp() < cutoff) {
-                                Query query = database.getReference().child("Cart").child(auth.getUid()).child("Product Details").orderByChild("pId").equalTo(bargain.getProductId());
+                                Query query = database.getReference().child("Cart").child(auth.getUid()).orderByChild("pId").equalTo(bargain.getProductId());
                                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -187,7 +187,7 @@ public class CartActivity extends AppCompatActivity {
                                             Cart cart = snapshot11.getValue(Cart.class);
                                             HashMap<String, Object> map = new HashMap<>();
                                             map.put("bargainPrice", null);
-                                            database.getReference().child("Cart").child(auth.getUid()).child("Product Details")
+                                            database.getReference().child("Cart").child(auth.getUid())
                                                     .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void unused) {
@@ -334,7 +334,7 @@ public class CartActivity extends AppCompatActivity {
                     stock = snapshot.child("stock").getValue(Integer.class);
                     updateStock(p, stock - p.getQuantity());
                 }
-                database.getReference().child("Cart").child(auth.getUid()).child("Product Details").child(p.getVariantPId()).setValue(p);
+                database.getReference().child("Cart").child(auth.getUid()).child(p.getVariantPId()).setValue(p);
             }
 
             @Override
@@ -368,7 +368,7 @@ public class CartActivity extends AppCompatActivity {
                 }
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(p.getVariantPId(), null);
-                database.getReference().child("Cart").child(auth.getUid()).child("Product Details").updateChildren(map);
+                database.getReference().child("Cart").child(auth.getUid()).updateChildren(map);
             }
 
             @Override

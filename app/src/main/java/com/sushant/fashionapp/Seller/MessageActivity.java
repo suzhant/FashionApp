@@ -18,7 +18,6 @@ public class MessageActivity extends AppCompatActivity {
         binding = ActivityMessageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
         binding.viewPager.setAdapter(new FragmentAdapter(getSupportFragmentManager(), getLifecycle()));
         String[] titles = {"Bargain", "Chats"};
         new TabLayoutMediator(binding.tabLayout, binding.viewPager,

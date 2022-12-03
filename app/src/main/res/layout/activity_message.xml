@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         app:title="Messages"
+        app:menu="@menu/message_menu"
         app:titleTextAppearance="@style/TextAppearance.AppCompat.Medium"
         app:navigationIcon="@drawable/ic_arrow_back_24" />
 

@@ -139,7 +139,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                                 context.startActivity(new Intent(context, CartActivity.class));
                             }
                         });
-                FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details")
+                FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid())
                         .child(product.getVariantPId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -176,7 +176,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                             if (product.getBargainPrice() != null) {
                                 item.setBargainPrice(product.getBargainPrice());
                             }
-                            FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid()).child("Product Details")
+                            FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid())
                                     .child(item.getVariantPId()).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
@@ -250,7 +250,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
         q = q + 1;
         HashMap<String, Object> quantity = new HashMap<>();
         quantity.put("quantity", q);
-        FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child("Product Details")
+        FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
                 .child(product.getVariantPId())
                 .updateChildren(quantity);
     }

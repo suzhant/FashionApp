@@ -68,6 +68,7 @@
         android:layout_height="wrap_content"
         android:text="Original Price"
         android:fontFamily="sans-serif"
+        android:visibility="gone"
         android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp" />
@@ -78,20 +79,9 @@
         android:layout_height="wrap_content"
         android:text="Bargain Price"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp" />
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/txtPriceDiff"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="Price difference"-->
-    <!--        android:fontFamily="sans-serif"-->
-    <!--        android:layout_marginTop="10dp"-->
-    <!--        android:layout_marginStart="20dp"-->
-    <!--        android:layout_marginEnd="20dp" />-->
-
 
     <TextView
         android:id="@+id/txtBargainDate"
@@ -99,19 +89,41 @@
         android:layout_height="wrap_content"
         android:text="Bargain date"
         android:fontFamily="sans-serif"
-        android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp" />
 
-    <!--    <TextView-->
-    <!--        android:id="@+id/txtBargainTime"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text="Bargain date"-->
-    <!--        android:fontFamily="sans-serif"-->
-    <!--        android:layout_marginTop="10dp"-->
-    <!--        android:layout_marginStart="20dp"-->
-    <!--        android:layout_marginEnd="20dp" />-->
+    <LinearLayout
+        android:id="@+id/linearOffer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:visibility="gone"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rectangle_bg"
+        android:backgroundTint="@color/alice_blue">
+
+        <TextView
+            android:id="@+id/txtCounterPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Offered Price"
+            android:layout_marginStart="5dp"
+            android:textColor="@color/skyBlue"
+            android:layout_weight="@integer/material_motion_duration_long_1"
+            android:fontFamily="sans-serif-medium" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAccept"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cornerRadius="4dp"
+            android:layout_marginEnd="5dp"
+            app:strokeColor="@color/skyBlue"
+            android:text="Accept"
+            android:textAllCaps="false"
+            android:textColor="@color/skyBlue" />
+    </LinearLayout>
 
     <EditText
         android:id="@+id/edPrice"
@@ -119,7 +131,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/rectangle_bg"
         android:padding="10dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:hint="Change your rate"
@@ -127,6 +139,18 @@
         android:textSize="15sp"
         android:ems="10" />
 
+    <TextView
+        android:id="@+id/txtMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your offer has been rejected. Try again."
+        android:textColor="@color/red"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="13sp"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
 
     <TextView
         android:id="@+id/txtRemainingTries"
@@ -153,14 +177,12 @@
         android:textAllCaps="false"
         android:textColor="@color/white" />
 
-
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:id="@+id/btnCancelRequest"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         app:cornerRadius="4dp"
         app:strokeColor="@color/red"

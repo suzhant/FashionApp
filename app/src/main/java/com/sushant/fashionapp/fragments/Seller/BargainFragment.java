@@ -61,7 +61,7 @@ public class BargainFragment extends Fragment {
                         for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                             Bargain bargain = snapshot1.getValue(Bargain.class);
                             assert bargain != null;
-                            if (bargain.getStatus().equals("pending")) {
+                            if (bargain.getStatus().equals("pending") || bargain.getStatus().equals("countered")) {
                                 bargains.add(bargain);
                             }
                         }

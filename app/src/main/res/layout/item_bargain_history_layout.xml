@@ -71,6 +71,16 @@
                         android:fontFamily="sans-serif"
                         android:layout_marginTop="4dp" />
 
+
+                    <TextView
+                        android:id="@+id/txtOfferedPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Offered Price"
+                        android:visibility="gone"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="4dp" />
+
                     <TextView
                         android:id="@+id/txtBargainDate"
                         android:layout_width="wrap_content"

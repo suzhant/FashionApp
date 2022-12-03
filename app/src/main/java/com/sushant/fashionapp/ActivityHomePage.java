@@ -109,7 +109,7 @@ public class ActivityHomePage extends AppCompatActivity {
             }
         });
 
-        cartRef = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid())).child("Product Details");
+        cartRef = database.getReference().child("Cart").child(Objects.requireNonNull(auth.getUid()));
         cartListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

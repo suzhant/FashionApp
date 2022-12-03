@@ -133,7 +133,7 @@ public abstract class SwipeHelper extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-        int pos = viewHolder.getAdapterPosition();
+        int pos = viewHolder.getAbsoluteAdapterPosition();
         float translationX = dX;
         View itemView = viewHolder.itemView;
 

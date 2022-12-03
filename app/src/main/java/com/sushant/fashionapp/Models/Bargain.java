@@ -1,10 +1,10 @@
 package com.sushant.fashionapp.Models;
 
 public class Bargain {
-    private Integer originalPrice, bargainPrice, noOfTries;
+    private Integer originalPrice, bargainPrice, noOfTries, sellerPrice;
     private String buyerId, storeId, productId, bargainId, sellerId, status;
     private Long timestamp;
-    private Boolean isBlocked;
+    private Boolean isBlocked, isCountered;
 
 
     public Bargain() {
@@ -102,5 +102,21 @@ public class Bargain {
 
     public void setBlocked(Boolean blocked) {
         isBlocked = blocked;
+    }
+
+    public Integer getSellerPrice() {
+        return sellerPrice;
+    }
+
+    public void setSellerPrice(Integer sellerPrice) {
+        this.sellerPrice = sellerPrice;
+    }
+
+    public Boolean getCountered() {
+        return isCountered;
+    }
+
+    public void setCountered(Boolean countered) {
+        isCountered = countered;
     }
 }

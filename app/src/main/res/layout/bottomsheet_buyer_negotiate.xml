@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/parent"
+    android:id="@+id/bargainParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_bg"
@@ -31,6 +31,14 @@
             android:gravity="center"
             android:text="Bargain"
             android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/imgClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_close_24" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
@@ -47,67 +55,62 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter your desired price"
+        android:text="Your offer has been countered by the seller."
         android:fontFamily="sans-serif-medium"
+        android:textColor="@color/red"
         android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:textSize="16sp" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/ipPrice"
-        style="@style/Widget.App.TextInputLayout"
-        android:layout_width="match_parent"
+
+    <TextView
+        android:id="@+id/txtBargainPrice"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:text="Bargain Price"
+        android:fontFamily="sans-serif"
+        android:textSize="16sp"
         android:layout_marginTop="10dp"
-        android:hint="Enter your Price"
-        app:prefixText="Rs."
-        android:textColorHint="@color/hintColor"
-        app:boxStrokeColor="@color/skyBlue"
-        app:endIconMode="clear_text">
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
 
+    <TextView
+        android:id="@+id/txtCounterPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Offered Price"
+        android:textSize="16sp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="sans-serif"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edPrices"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:textSize="14sp" />
-    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        android:id="@+id/btnAccept"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        app:cornerRadius="4dp"
+        app:strokeColor="@color/skyBlue"
+        android:text="Accept"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
+
 
     <com.google.android.material.button.MaterialButton
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:id="@+id/btnGetCurrentPrice"
+        android:id="@+id/btnChangePrice"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         app:cornerRadius="4dp"
-        app:strokeColor="@color/skyBlue"
-        app:iconGravity="textStart"
-        app:iconPadding="10dp"
-        app:icon="@drawable/ic_baseline_attach_money"
-        app:iconTint="@color/skyBlue"
-        android:text="Get Current Price"
+        app:strokeColor="@color/royal_blue"
+        android:text="Change Price"
         android:textAllCaps="false"
-        android:textColor="@color/skyBlue" />
-
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnRequest"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        app:backgroundTint="@color/skyBlue"
-        app:cornerRadius="4dp"
-        android:text="Request"
-        android:textColor="@color/white" />
-
+        android:textColor="@color/royal_blue" />
 
 </LinearLayout>

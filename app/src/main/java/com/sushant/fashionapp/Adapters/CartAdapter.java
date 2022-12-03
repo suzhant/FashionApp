@@ -269,8 +269,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     private void updateCartQuantity(Product product) {
         HashMap<String, Object> quantity = new HashMap<>();
         quantity.put("quantity", product.getQuantity());
-        FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).
-                child("Product Details").child(product.getVariantPId()).updateChildren(quantity);
+        FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
+                .child(product.getVariantPId()).updateChildren(quantity);
 
     }
 

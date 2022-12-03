@@ -101,6 +101,10 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
         holder.txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;{0}", dateTime.format(formatter))));
         holder.txtOrigPrice.setText(Html.fromHtml(MessageFormat.format("Original Price: &nbsp;Rs. {0}", bargain.getOriginalPrice())));
         holder.txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp;Rs. {0}", bargain.getBargainPrice())));
+        if (bargain.getSellerPrice() != null) {
+            holder.txtOfferedPrice.setVisibility(View.VISIBLE);
+            holder.txtOfferedPrice.setText(Html.fromHtml(MessageFormat.format("Offered Price: &nbsp;Rs. {0}", bargain.getSellerPrice())));
+        }
         switch (bargain.getStatus()) {
             case "pending":
                 color = ContextCompat.getColor(context, R.color.yello_orange);
@@ -114,9 +118,12 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
                 color = ContextCompat.getColor(context, R.color.red);
                 holder.linearLayout.setVisibility(View.VISIBLE);
                 break;
+            case "countered":
+                color = ContextCompat.getColor(context, R.color.royal_blue);
+                holder.linearLayout.setVisibility(View.VISIBLE);
+                break;
         }
         holder.txtStatus.setText(Html.fromHtml(MessageFormat.format("Status:&nbsp; <b><span style=color:" + color + ">{0}</span></b>", captializeAllFirstLetter(bargain.getStatus()))));
-
     }
 
     @Override
@@ -127,7 +134,7 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
     public class viewHolder extends RecyclerView.ViewHolder {
 
         ImageView imgProduct, imgDrop;
-        TextView txtProductName, txtOrigPrice, txtBargainPrice, txtBargainDate, txtStatus;
+        TextView txtProductName, txtOrigPrice, txtBargainPrice, txtBargainDate, txtStatus, txtOfferedPrice;
         CircleImageView imgStore;
         TextView txtStoreName, txtAvailability;
         MaterialButton btnNegotiate, btnCancel;
@@ -150,6 +157,7 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
             mainLayout = itemView.findViewById(R.id.mainLayout);
             childLayout = itemView.findViewById(R.id.childLayout);
             imgDrop = itemView.findViewById(R.id.imgDrop);
+            txtOfferedPrice = itemView.findViewById(R.id.txtOfferedPrice);
 
             mainLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
