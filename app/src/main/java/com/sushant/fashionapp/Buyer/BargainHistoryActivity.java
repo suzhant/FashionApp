@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -30,8 +31,9 @@ public class BargainHistoryActivity extends AppCompatActivity {
     ArrayList<Bargain> list = new ArrayList<>();
     FirebaseDatabase database;
     FirebaseAuth auth;
-
     ActivityBargainHistoryBinding binding;
+    ValueEventListener valueEventListener;
+    DatabaseReference reference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,8 @@ public class BargainHistoryActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
 
-        database.getReference().child("Bargain").addListenerForSingleValueEvent(new ValueEventListener() {
+        reference = database.getReference().child("Bargain");
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
@@ -59,7 +62,8 @@ public class BargainHistoryActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
+        };
+        reference.addValueEventListener(valueEventListener);
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +79,16 @@ public class BargainHistoryActivity extends AppCompatActivity {
                     for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                         Bargain bargain = snapshot1.getValue(Bargain.class);
                         assert bargain != null;
+                        boolean isBlocked = bargain.getBlocked();
+                        if (isBlocked) {
+                            long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES); //1 day old
+                            if (bargain.getTimestamp() < cutoff) {
+                                HashMap<String, Object> map = new HashMap<>();
+                                map.put("blocked", false);
+                                map.put("noOfTries", 5);
+                                database.getReference().child("Bargain").child(bargain.getBargainId()).updateChildren(map);
+                            }
+                        }
                         if (bargain.getBuyerId().equals(auth.getUid()) && bargain.getStatus().equals("accepted")) {
                             Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
                             if (bargain.getTimestamp() < cutoff) {
@@ -125,4 +139,13 @@ public class BargainHistoryActivity extends AppCompatActivity {
         adapter = new BuyerBargainAdapter(list, this);
         binding.recyclerBargainHistory.setAdapter(adapter);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (reference != null) {
+            reference.removeEventListener(valueEventListener);
+        }
+    }
+
 }

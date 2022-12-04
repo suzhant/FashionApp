@@ -62,13 +62,6 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         // getSupportActionBar().hide();
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.progress_dialog);
-        lottieAnimationView = dialog.findViewById(R.id.lottie_create);
-        btnLogin = dialog.findViewById(R.id.btnLogin);
-        imgClose = dialog.findViewById(R.id.imgClose);
-        txtVerification = dialog.findViewById(R.id.txtVerification);
 
         //setting gender adapter for dropdown menu
         String[] genders = getResources().getStringArray(R.array.gender);
@@ -392,6 +385,13 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
 
 
     private void showCreatingDialog() {
+        dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.create_dialog);
+        lottieAnimationView = dialog.findViewById(R.id.lottie_create);
+        btnLogin = dialog.findViewById(R.id.btnLogin);
+        imgClose = dialog.findViewById(R.id.imgClose);
+        txtVerification = dialog.findViewById(R.id.txtVerification);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;

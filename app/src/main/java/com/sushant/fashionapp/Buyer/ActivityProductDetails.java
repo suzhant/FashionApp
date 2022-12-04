@@ -41,10 +41,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
+import com.khalti.checkout.helper.Config;
+import com.khalti.checkout.helper.KhaltiCheckOut;
+import com.khalti.checkout.helper.OnCheckOutListener;
+import com.khalti.checkout.helper.PaymentPreference;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Cart;
+import com.sushant.fashionapp.Models.Payment;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Rating;
 import com.sushant.fashionapp.Models.Size;
@@ -63,12 +68,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ActivityProductDetails extends AppCompatActivity {
 
     ActivityProductDetailsBinding binding;
+    private final static String pub = "test_public_key_7ad13f903bd34864b8939125903e80ed";
     int price, stock, quantity, variantPos, sizeIndex;
     String pic;
     String maxLimit;
@@ -108,6 +115,7 @@ public class ActivityProductDetails extends AppCompatActivity {
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
 
         price = getIntent().getIntExtra("pPrice", 0);
         pic = getIntent().getStringExtra("pPic");
@@ -515,7 +523,50 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        binding.khaltiButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                integrateKhalti();
+            }
+        });
 
+
+    }
+
+    private void integrateKhalti() {
+
+        long priceInPaisa;
+        if (bargainPrice != null) {
+            priceInPaisa = bargainPrice;
+        } else {
+            priceInPaisa = price;
+        }
+
+        Config.Builder builder = new Config.Builder(pub, pId, pName, priceInPaisa, new OnCheckOutListener() {
+            @Override
+            public void onError(@NonNull String action, @NonNull Map<String, String> errorMap) {
+                Log.i(action, errorMap.toString());
+            }
+
+            @Override
+            public void onSuccess(@NonNull Map<String, Object> data) {
+                Log.i("success", data.toString());
+                String key = database.getReference().child("Payment").push().getKey();
+                Payment payment = new Payment(pId, pName, priceInPaisa);
+                payment.setMobileNumber(data.get("mobile").toString());
+                payment.setPaymentId(key);
+                payment.setToken(data.get("token").toString());
+                payment.setSellerId(sellerId);
+                payment.setStoreId(storeId);
+                database.getReference().child("Payment").child(auth.getUid()).child(key).setValue(payment);
+            }
+        }).paymentPreferences(new ArrayList<PaymentPreference>() {{
+            add(PaymentPreference.KHALTI);
+        }});
+        Config config = builder.build();
+        binding.khaltiButton.setCheckOutConfig(config);
+        KhaltiCheckOut khaltiCheckOut = new KhaltiCheckOut(this, config);
+        khaltiCheckOut.show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -797,6 +848,8 @@ public class ActivityProductDetails extends AppCompatActivity {
                         noOfTries = noOfTries - 1;
                         map.put("noOfTries", noOfTries);
                         map.put("status", "pending");
+                        map.put("sellerPrice", null);
+                        map.put("countered", false);
                         database.getReference().child("Bargain").child(bargainId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -838,6 +891,7 @@ public class ActivityProductDetails extends AppCompatActivity {
 
     private void addProductToCart() {
         Snackbar snackbar = getSnackbar();
+        dialog.show();
         database.getReference().child("Cart").child(auth.getUid()).child(actualProductId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -846,8 +900,10 @@ public class ActivityProductDetails extends AppCompatActivity {
                     if (quantity < 5) {
                         updateCartQuantity(quantity);
                         updateStock(stock);
+                        dialog.dismiss();
                         snackbar.show();
                     } else {
+                        dialog.dismiss();
                         Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
                     }
                 } else {
@@ -871,6 +927,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     database.getReference().child("Cart").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
+                            dialog.dismiss();
                             snackbar.show();
                         }
                     });

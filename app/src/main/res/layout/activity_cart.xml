@@ -153,21 +153,21 @@
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/gilroy_bold"
-                    android:text="Rs. 0"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Rs. 1000"
                     android:textColor="@color/skyBlue"
-                    android:textSize="24sp" />
+                    android:textSize="20sp" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/btnCheckout"
-                style="@style/Widget.AppCompat.Button"
-                android:layout_width="112dp"
-                android:layout_height="61dp"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginEnd="16dp"
                 android:gravity="center"
-                android:text="Checkout"
+                android:text="Check Out"
                 android:textAllCaps="false" />
 
         </LinearLayout>
