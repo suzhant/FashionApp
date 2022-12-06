@@ -17,12 +17,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.iarcuschin.simpleratingbar.SimpleRatingBar;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Rating;
 import com.sushant.fashionapp.R;
 
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 
@@ -51,7 +51,7 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
         holder.productPrice.setText(MessageFormat.format("Rs. {0}", product.getpPrice()));
 
 
-        holder.ratingBar.setOnClickListener(null);
+        //    holder.ratingBar.setOnClickListener(null);
         FirebaseDatabase.getInstance().getReference().child("Ratings").child(product.getpId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -64,8 +64,12 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
                         count++;
                     }
                     float finalRating = sum / count;
+                    float number = BigDecimal.valueOf(finalRating)
+                            .setScale(1, BigDecimal.ROUND_HALF_UP)
+                            .floatValue();
                     holder.txtNoOfRating.setText(MessageFormat.format("({0})", count));
-                    holder.ratingBar.setRating(finalRating);
+                    // holder.ratingBar.setRating(finalRating);
+                    holder.txtRating.setText(MessageFormat.format("{0}/5", number));
                 }
 
             }
@@ -120,17 +124,19 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
         private final TextView productName;
         private final TextView productPrice;
         private final TextView txtNoOfRating;
-        private final SimpleRatingBar ratingBar;
+        // private final SimpleRatingBar ratingBar;
         private final MaterialCardView cardView;
+        private final TextView txtRating;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             productImg = itemView.findViewById(R.id.imgProductPic);
             productName = itemView.findViewById(R.id.txtProductName);
             productPrice = itemView.findViewById(R.id.txtProductPrice);
-            ratingBar = itemView.findViewById(R.id.ratingBar);
+            //  ratingBar = itemView.findViewById(R.id.ratingBar);
             txtNoOfRating = itemView.findViewById(R.id.txtNumberOfRating);
             cardView = itemView.findViewById(R.id.cardLyt);
+            txtRating = itemView.findViewById(R.id.txtRating);
         }
     }
 

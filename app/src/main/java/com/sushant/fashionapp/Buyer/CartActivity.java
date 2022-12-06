@@ -36,6 +36,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -143,6 +144,8 @@ public class CartActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
                 sum = 0;
+                HashSet<String> set = new HashSet<>();
+                int shipping;
                 int price;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Cart product = snapshot1.getValue(Cart.class);
@@ -155,9 +158,13 @@ public class CartActivity extends AppCompatActivity {
                             price = product.getpPrice();
                         }
                         sum = sum + price * product.getQuantity();
+                        set.add(product.getStoreName());
                     }
                 }
-                binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}</big>", sum)));
+                shipping = set.size() * 70;
+                sum = sum + shipping;
+                binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Total: <span style=color:#09AEA3> <b>Rs. <big>{0}</big></b></span>", sum)));
+                binding.txtShipping.setText(Html.fromHtml(MessageFormat.format("Shipping: <span style=color:#09AEA3> Rs. <big>{0}</big></span>", shipping)));
                 cartAdapter.notifyDataSetChanged();
                 showorhideCartBottomlyt();
             }

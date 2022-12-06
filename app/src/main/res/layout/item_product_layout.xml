@@ -20,16 +20,10 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgProductPic"
                 android:layout_width="match_parent"
-                android:layout_height="170dp"
+                android:layout_height="200dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/denim_black_jean_style" />
 
@@ -47,44 +41,55 @@
                 android:text="Floral skirt"
                 android:textSize="14sp" />
 
+            <TextView
+                android:id="@+id/txtProductPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/skyBlue"
+                android:text="Rs 900"
+                android:layout_marginTop="2dp"
+                android:textSize="14sp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center"
+                android:layout_marginBottom="5dp"
                 android:orientation="horizontal">
+
+                <!--                <com.iarcuschin.simpleratingbar.SimpleRatingBar-->
+                <!--                    android:id="@+id/ratingBar"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    app:srb_maxStarSize="15dp"-->
+                <!--                    app:srb_numberOfStars="5"-->
+                <!--                    android:padding="10dp" />-->
+                <ImageView
+                    android:id="@+id/ratingBar"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:src="@drawable/star_24px"
+                    app:tint="@color/golden_stars" />
 
                 <TextView
-                    android:id="@+id/txtProductPrice"
+                    android:id="@+id/txtRating"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/skyBlue"
-                    android:text="Rs 900"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.iarcuschin.simpleratingbar.SimpleRatingBar
-                    android:id="@+id/ratingBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:srb_maxStarSize="15dp"
-                    app:srb_numberOfStars="5"
-                    android:padding="10dp" />
+                    android:layout_height="match_parent"
+                    android:text="0/5"
+                    android:layout_marginStart="2dp"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:textColor="@color/hintColor" />
 
                 <TextView
                     android:id="@+id/txtNumberOfRating"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="(0)"
+                    android:layout_marginStart="5dp"
                     android:gravity="center"
                     android:textSize="12sp"
                     android:textColor="@color/hintColor" />

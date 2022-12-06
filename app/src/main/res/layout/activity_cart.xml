@@ -142,21 +142,21 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/txtShipping"
+                    style="@style/TextAppearance.AppCompat.Small"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/gilroy_medium"
-                    android:text="Subtotal"
-                    android:textColor="#9A9A9A"
-                    android:textSize="20sp" />
+                    android:text="Shipping: Rs 140"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Rs. 1000"
-                    android:textColor="@color/skyBlue"
-                    android:textSize="20sp" />
+                    android:fontFamily="sans-serif"
+                    android:text="Total: Rs 5,100"
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <Button

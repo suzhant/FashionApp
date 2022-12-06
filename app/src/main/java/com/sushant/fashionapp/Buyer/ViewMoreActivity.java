@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +25,7 @@ import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.SortModel;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Utils.AutoFitGridLayoutManager;
 import com.sushant.fashionapp.databinding.ActivityViewMoreBinding;
 
 import java.util.ArrayList;
@@ -341,7 +341,8 @@ public class ViewMoreActivity extends AppCompatActivity {
 
 
     private void initRecyclerView() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        AutoFitGridLayoutManager layoutManager = new AutoFitGridLayoutManager(this, 500);
+        //  GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         binding.viewMoreRecycler.setLayoutManager(layoutManager);
         adapters = new CardAdapters(products, this);
         binding.viewMoreRecycler.setAdapter(adapters);

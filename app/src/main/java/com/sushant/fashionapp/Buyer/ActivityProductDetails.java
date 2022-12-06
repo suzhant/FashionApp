@@ -21,9 +21,9 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.denzcoskun.imageslider.models.SlideModel;
 import com.devs.readmoreoption.ReadMoreOption;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -45,6 +45,7 @@ import com.khalti.checkout.helper.Config;
 import com.khalti.checkout.helper.KhaltiCheckOut;
 import com.khalti.checkout.helper.OnCheckOutListener;
 import com.khalti.checkout.helper.PaymentPreference;
+import com.sushant.fashionapp.Adapters.VPAdapter;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Bargain;
@@ -85,7 +86,8 @@ public class ActivityProductDetails extends AppCompatActivity {
     String sizeId, actualProductId;
     ArrayList<Variants> products = new ArrayList<>();
     VariantAdapter variantAdapter;
-    List<SlideModel> list = new ArrayList<>();
+    //  List<SlideModel> list = new ArrayList<>();
+    ArrayList<String> list = new ArrayList<>();
     VariantClickListener variantClickListener;
     ValueEventListener variantListener, wishListListener, ratingListener;
     DatabaseReference variantRef, wishListRef, ratingRef;
@@ -100,6 +102,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     Long timestamp, cutoff;
     String sellerId, status;
     ProgressDialog dialog;
+    VPAdapter vpAdapter;
 
     int index;
 
@@ -160,9 +163,14 @@ public class ActivityProductDetails extends AppCompatActivity {
 
                 //  adding pic in slider
                 list.clear();
-                for (int i = 0; i < product.getPhotos().size(); i++) {
-                    list.add(new SlideModel(product.getPhotos().get(i), null));
-                    binding.imgSlider.setImageList(list);
+                // list.add(new SlideModel(product.getPhotos().get(i), null));
+                // binding.imgSlider.setImageList(list);
+                list.addAll(product.getPhotos());
+                vpAdapter = new VPAdapter(list, ActivityProductDetails.this, true);
+                binding.viewPager.setAdapter(vpAdapter);
+                if (list.size() > 1) {
+                    binding.txtNoOfPics.setVisibility(View.VISIBLE);
+                    binding.txtNoOfPics.setText(MessageFormat.format("{0}/" + list.size(), 1));
                 }
 
                 //resetting wish icon to normal
@@ -176,6 +184,26 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
 
         };
+
+
+        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                //  binding.txtNoOfPics.setText(MessageFormat.format("{0}/"+list.size(),position+1));
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                binding.txtNoOfPics.setText(MessageFormat.format("{0}/" + list.size(), position + 1));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+            }
+        });
 
 
         initVariantRecycler();
