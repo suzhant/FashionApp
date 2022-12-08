@@ -55,8 +55,10 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
     ArrayList<Bargain> list;
     Context context;
     int color;
-    boolean isExpanded = false;
+    boolean isExpanded;
     BargainHistoryActivity activity;
+    private int mCheckedPostion = -1;
+    ;
 
     public BuyerBargainAdapter(ArrayList<Bargain> list, Context context) {
         this.list = list;
@@ -131,6 +133,7 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
                 holder.linearLayout.setVisibility(View.GONE);
                 break;
             case "rejected":
+            case "cancelled":
                 color = ContextCompat.getColor(context, R.color.red);
                 holder.linearLayout.setVisibility(View.VISIBLE);
                 break;
@@ -163,6 +166,11 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
                 });
             }
         });
+
+        if (holder.getAbsoluteAdapterPosition() == mCheckedPostion) {
+            holder.childLayout.setVisibility(View.VISIBLE);
+            holder.imgDrop.setImageResource(com.hbb20.R.drawable.ccp_ic_arrow_drop_down);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -370,16 +378,17 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
             imgDrop = itemView.findViewById(R.id.imgDrop);
             txtOfferedPrice = itemView.findViewById(R.id.txtOfferedPrice);
 
+
             mainLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    isExpanded = !isExpanded;
-                    if (isExpanded) {
-                        childLayout.setVisibility(View.VISIBLE);
-                        imgDrop.setImageResource(com.hbb20.R.drawable.ccp_ic_arrow_drop_down);
-                    } else {
+                    if (getAbsoluteAdapterPosition() == mCheckedPostion) {
                         childLayout.setVisibility(View.GONE);
                         imgDrop.setImageResource(R.drawable.ic_baseline_arrow_drop_up_24);
+                        mCheckedPostion = -1;
+                    } else {
+                        mCheckedPostion = getAbsoluteAdapterPosition();
+                        notifyDataSetChanged();
                     }
                     //  notifyItemChanged(getAbsoluteAdapterPosition());
                 }

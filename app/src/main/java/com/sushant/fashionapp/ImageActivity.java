@@ -66,8 +66,6 @@ public class ImageActivity extends AppCompatActivity {
         });
 
 
-        //  Glide.with(this).load(pic).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(binding.fullScreenImage);
-
         binding.imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

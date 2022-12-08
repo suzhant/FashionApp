@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.card.MaterialCardView;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Variants;
@@ -43,7 +44,7 @@ public class VariantAdapter extends RecyclerView.Adapter<VariantAdapter.viewHold
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Variants product = products.get(position);
-        Glide.with(context).load(product.getPhotos().get(0)).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
+        Glide.with(context).load(product.getPhotos().get(0)).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.imgVariant);
         holder.txtColor.setText(product.getColor());
         if (holder.getAbsoluteAdapterPosition() == selectedItemPos) {
             holder.cardVariant.setStrokeColor(ContextCompat.getColorStateList(context, R.color.black));

@@ -250,6 +250,12 @@ public class CartActivity extends AppCompatActivity {
             }
         });
 
+        binding.btnCheckout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), CheckOutAcitivity.class));
+            }
+        });
 
     }
 

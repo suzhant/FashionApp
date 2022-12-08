@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parent"
+    android:layout_width="300dp"
+    android:layout_height="140dp"
+    android:layout_marginEnd="10dp"
+    app:strokeColor="@color/white"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/imgCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_check_circle_24"
+                app:tint="@color/skyBlue" />
+
+            <TextView
+                android:id="@+id/txtLabel"
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/imgCheck"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/rectangle_outline"
+                android:padding="5dp"
+                android:text="Default"
+                android:textColor="@color/skyBlue"
+                android:textSize="12sp"
+                app:tint="@color/skyBlue" />
+
+            <ImageView
+                android:id="@+id/imgEdit"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="10dp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/imgDelete"
+                android:src="@drawable/edit_square_24px" />
+
+            <ImageView
+                android:id="@+id/imgDelete"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_fluent_delete_24_regular" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/linear_address"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Address"
+                android:elegantTextHeight="true" />
+
+            <TextView
+                android:id="@+id/txtPhone"
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="9880948607" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

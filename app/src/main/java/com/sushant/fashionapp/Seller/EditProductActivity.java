@@ -59,7 +59,7 @@ public class EditProductActivity extends AppCompatActivity {
                                         products.add(product);
                                     }
                                 }
-                                adapters.notifyItemInserted(products.size());
+                                adapters.notifyDataSetChanged();
                             }
 
                             @Override

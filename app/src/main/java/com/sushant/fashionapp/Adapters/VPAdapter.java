@@ -22,12 +22,12 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.viewHolder> {
 
     ArrayList<String> list;
     Context context;
-    Boolean type;
+    Boolean touchable;
 
-    public VPAdapter(ArrayList<String> list, Context context, Boolean type) {
+    public VPAdapter(ArrayList<String> list, Context context, Boolean touchable) {
         this.list = list;
         this.context = context;
-        this.type = type;
+        this.touchable = touchable;
     }
 
     @NonNull
@@ -40,11 +40,12 @@ public class VPAdapter extends RecyclerView.Adapter<VPAdapter.viewHolder> {
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         String pics = list.get(position);
-        Glide.with(context).load(pics).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.imgProduct);
+        Glide.with(context).load(pics).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL)
+                .onlyRetrieveFromCache(true).into(holder.imgProduct);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (type) {
+                if (touchable) {
                     Intent intent = new Intent(context, ImageActivity.class);
                     intent.putStringArrayListExtra("images", list);
                     intent.putExtra("position", holder.getAbsoluteAdapterPosition());

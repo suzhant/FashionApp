@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.sushant.fashionapp.R;
 
@@ -37,7 +38,7 @@ public class VariantPhotoAdapter extends RecyclerView.Adapter<VariantPhotoAdapte
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         String image = products.get(position);
-        Glide.with(context).load(image).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgVariant);
+        Glide.with(context).load(image).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.imgVariant);
 
         if (type == 1) {
             holder.imgDelete.setVisibility(View.VISIBLE);

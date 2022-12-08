@@ -90,6 +90,7 @@
                     android:id="@+id/edUserName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:importantForAutofill="no"
                     android:inputType="textPersonName|textCapWords"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -151,38 +152,31 @@
 
             </RelativeLayout>
 
-
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ipPhoneNumber"
+                style="@style/Widget.App.TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="Phone Number"
+                android:textColorHint="@color/hintColor"
+                app:boxStrokeColor="@color/skyBlue"
+                app:counterEnabled="false"
+                app:counterMaxLength="10"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                app:counterTextColor="@color/design_default_color_error"
+                app:endIconMode="clear_text"
+                app:prefixTextAppearance="@style/prefix">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/ipPhoneNumber"
-                    style="@style/Widget.App.TextInputLayout"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edPhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Phone Number"
-                    android:textColorHint="@color/hintColor"
-                    app:boxStrokeColor="@color/skyBlue"
-                    app:counterEnabled="false"
-                    app:counterMaxLength="10"
-                    app:counterTextColor="@color/design_default_color_error"
-                    app:endIconMode="clear_text"
-                    app:prefixTextAppearance="@style/prefix">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edPhone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="phone"
-                        android:textSize="14sp" />
+                    android:inputType="phone"
+                    android:importantForAutofill="no"
+                    android:textSize="14sp" />
                 </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
 
 
             <com.google.android.material.textfield.TextInputLayout

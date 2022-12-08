@@ -51,11 +51,11 @@ public class BargainHistoryActivity extends AppCompatActivity {
                 list.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Bargain bargain = snapshot1.getValue(Bargain.class);
-                    if (auth.getUid().equals(bargain.getBuyerId())) {
+                    if (bargain.getBuyerId().equals(auth.getUid())) {
                         list.add(bargain);
                     }
                 }
-                adapter.notifyItemInserted(list.size());
+                adapter.notifyDataSetChanged();
             }
 
             @Override
