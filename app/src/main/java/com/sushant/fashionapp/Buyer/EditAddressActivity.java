@@ -27,46 +27,75 @@ import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
 import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.databinding.ActivityAddressBinding;
+import com.sushant.fashionapp.databinding.ActivityEditAddressBinding;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class AddressActivity extends AppCompatActivity {
+public class EditAddressActivity extends AppCompatActivity {
 
-    ActivityAddressBinding binding;
+    ActivityEditAddressBinding binding;
+    String addressId;
     FirebaseDatabase database;
     FirebaseAuth auth;
-    ArrayList<String> provinceList = new ArrayList<>();
     String label = "";
-    ProgressDialog dialog;
     Boolean isDefault = false;
     String id = "";
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityAddressBinding.inflate(getLayoutInflater());
+        binding = ActivityEditAddressBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         Objects.requireNonNull(getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        database = FirebaseDatabase.getInstance();
+        addressId = getIntent().getStringExtra("addressId");
+
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
         dialog = new ProgressDialog(this);
         dialog.setMessage("Please wait...");
         dialog.setCancelable(false);
 
-        database.getReference().child("Area").addListenerForSingleValueEvent(new ValueEventListener() {
+
+        database.getReference().child("Shipping Address").child(addressId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                provinceList.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String province = snapshot1.getKey();
-                    provinceList.add(province);
+                Address address = snapshot.getValue(Address.class);
+                String fullName = address.getName();
+                String mobile = address.getMobile();
+                String streetAddress = address.getStreetAddress();
+                String city = address.getCity();
+                String province = address.getProvince();
+                if (address.getAddress() != null) {
+                    String apt = address.getAddress();
+                    binding.addressLayout.edAddress.setText(apt);
                 }
+                if (address.getLandmark() != null) {
+                    String landmark = address.getLandmark();
+                    binding.addressLayout.edLandmark.setText(landmark);
+                }
+                if (address.getLabel() != null) {
+                    label = address.getLabel();
+                    if (label.equals("Home")) {
+                        binding.addressLayout.chipGroup.check(R.id.chipHome);
+                    } else if (label.equals("Office")) {
+                        binding.addressLayout.chipGroup.check(R.id.chipOffice);
+                    }
+                }
+                if (address.getDefault() != null) {
+                    Boolean isDefault = address.getDefault();
+                    binding.addressLayout.switchShipping.setChecked(isDefault);
+                }
+                binding.addressLayout.edFullName.setText(fullName);
+                binding.addressLayout.edPhone.setText(mobile);
+                binding.addressLayout.edStreetAddress.setText(streetAddress);
+                binding.addressLayout.edCity.setText(city);
+                binding.addressLayout.autoProvince.setText(province);
+                String[] provinceList = getResources().getStringArray(R.array.province);
                 binding.addressLayout.autoProvince.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, provinceList));
             }
 
@@ -89,12 +118,14 @@ public class AddressActivity extends AppCompatActivity {
         binding.addressLayout.chipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup group, @NonNull List<Integer> checkedIds) {
-                binding.addressLayout.chipGroup.getCheckedChipId();
                 for (int i = 0; i < binding.addressLayout.chipGroup.getChildCount(); i++) {
                     Chip child = (Chip) binding.addressLayout.chipGroup.getChildAt(i);
                     if (child.isChecked()) {
                         label = child.getText().toString();
                     }
+                }
+                if (binding.addressLayout.chipGroup.getCheckedChipIds().size() == 0) {
+                    label = "";
                 }
             }
         });
@@ -139,43 +170,66 @@ public class AddressActivity extends AppCompatActivity {
     private void confirmDialog() {
         new MaterialAlertDialogBuilder(this)
                 .setMessage("Are you sure?")
-                .setTitle("Add Address")
+                .setTitle("Edit Address")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        {
-                            String phone = binding.addressLayout.edPhone.getText().toString();
-                            String fullName = binding.addressLayout.edFullName.getText().toString();
-                            String streetAddress = binding.addressLayout.edStreetAddress.getText().toString();
-                            String city = binding.addressLayout.edCity.getText().toString();
-                            String province = binding.addressLayout.autoProvince.getText().toString();
-                            String address = binding.addressLayout.edAddress.getText().toString();
-                            String landMark = binding.addressLayout.edLandmark.getText().toString();
-                            if (phone.isEmpty() | fullName.isEmpty() | streetAddress.isEmpty() | city.isEmpty() | province.isEmpty()) {
-                                Snackbar.make(findViewById(R.id.parent), "Please fill all the fields", Snackbar.LENGTH_SHORT).show();
+                        String phone = binding.addressLayout.edPhone.getText().toString();
+                        String fullName = binding.addressLayout.edFullName.getText().toString();
+                        String streetAddress = binding.addressLayout.edStreetAddress.getText().toString();
+                        String city = binding.addressLayout.edCity.getText().toString();
+                        String province = binding.addressLayout.autoProvince.getText().toString();
+                        String address = binding.addressLayout.edAddress.getText().toString();
+                        String landMark = binding.addressLayout.edLandmark.getText().toString();
+                        if (phone.isEmpty() | fullName.isEmpty() | streetAddress.isEmpty() | city.isEmpty() | province.isEmpty()) {
+                            Snackbar.make(findViewById(R.id.parent), "Please fill all the fields", Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
+                        boolean isValid = validatePhoneNumber(binding.addressLayout.ipPhoneNumber, binding.addressLayout.cpp);
+                        if (isValid) {
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put("name", fullName);
+                            map.put("mobile", phone);
+                            map.put("streetAddress", streetAddress);
+                            map.put("province", province);
+                            map.put("default", isDefault);
+                            if (!address.isEmpty()) {
+                                map.put("address", address);
+                            } else {
+                                map.put("address", null);
+                            }
+                            if (!landMark.isEmpty()) {
+                                map.put("landmark", landMark);
+                            } else {
+                                map.put("landmark", null);
+                            }
+                            if (!label.isEmpty()) {
+                                map.put("label", label);
+                            } else {
+                                map.put("label", null);
+                            }
+                            dialog.show();
+
+                            if (!isDefault || id.isEmpty()) {
+                                database.getReference().child("Shipping Address").child(addressId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        dialog.dismiss();
+                                        Intent intent = new Intent(getApplicationContext(), CheckOutAcitivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        startActivity(intent);
+                                    }
+                                });
                                 return;
                             }
-                            boolean isValid = validatePhoneNumber(binding.addressLayout.ipPhoneNumber, binding.addressLayout.cpp);
-                            if (isValid) {
-                                String key = database.getReference().child("Shipping Address").push().getKey();
-                                Address address1 = new Address(fullName, phone, streetAddress, city, province);
-                                address1.setuId(auth.getUid());
-                                address1.setDefault(isDefault);
-                                address1.setAddressId(key);
-                                if (!address.isEmpty()) {
-                                    address1.setAddress(address);
-                                }
-                                if (!landMark.isEmpty()) {
-                                    address1.setLandmark(landMark);
-                                }
-                                if (!label.isEmpty()) {
-                                    address1.setLabel(label);
-                                }
-                                dialog.show();
 
-                                if (!isDefault || id.isEmpty()) {
-                                    database.getReference().child("Shipping Address").child(key).setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            HashMap<String, Object> map1 = new HashMap<>();
+                            map1.put("default", false);
+                            database.getReference().child("Shipping Address").child(id).updateChildren(map1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    database.getReference().child("Shipping Address").child(addressId).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             dialog.dismiss();
@@ -184,27 +238,9 @@ public class AddressActivity extends AppCompatActivity {
                                             startActivity(intent);
                                         }
                                     });
-                                    return;
                                 }
+                            });
 
-                                HashMap<String, Object> map = new HashMap<>();
-                                map.put("default", false);
-                                database.getReference().child("Shipping Address").child(id).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        database.getReference().child("Shipping Address").child(key).setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                dialog.dismiss();
-                                                Intent intent = new Intent(getApplicationContext(), CheckOutAcitivity.class);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                startActivity(intent);
-                                            }
-                                        });
-                                    }
-                                });
-
-                            }
                         }
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {

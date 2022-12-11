@@ -29,6 +29,16 @@
         <item>Spring</item>
     </string-array>
 
+    <string-array name="province">
+        <item>Bagmati Province</item>
+        <item>Gandaki Province</item>
+        <item>Karnali Province</item>
+        <item>Lumbini Province</item>
+        <item>Madhesh Province</item>
+        <item>Province No 1</item>
+        <item>Sudurpashchim Province</item>
+    </string-array>
+
     <string name="Policy">I agree to the <font color="#09AEA3"><u> Terms and Conditions</u></font> and  <font color="#09AEA3"><u>Privacy Policy</u></font></string>
 
     <item name="item_click_support" type="id" />

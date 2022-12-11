@@ -20,6 +20,7 @@ import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.databinding.ActivityCheckOutAcitivityBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 public class CheckOutAcitivity extends AppCompatActivity {
@@ -64,15 +65,18 @@ public class CheckOutAcitivity extends AppCompatActivity {
                 addresses.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Address address = snapshot1.getValue(Address.class);
+                    assert address != null;
                     addresses.add(address);
-                }
-                for (int i = 0; i < addresses.size(); i++) {
-                    Address address = addresses.get(i);
                     if (address.getDefault()) {
-                        addresses.remove(address);
-                        addresses.add(0, address);
+                        Collections.swap(addresses, 0, addresses.indexOf(address));
                     }
                 }
+//                for (int i = 0; i < addresses.size(); i++) {
+//                    Address address = addresses.get(i);
+//                    if (address.getDefault()) {
+//                        Collections.swap(addresses,0,i);
+//                    }
+//                }
                 adapter.notifyItemInserted(addresses.size());
             }
 

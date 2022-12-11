@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Buyer.AddressActivity">
+    tools:context=".Buyer.EditAddressActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout5"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navigationIcon="@drawable/ic_arrow_back_24"
-            app:title="Add new shipping Address"
+            app:title="Edit Shipping Address"
             app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:text="SAve" />
+            android:text="Confirm" />
     </LinearLayout>
 
 
