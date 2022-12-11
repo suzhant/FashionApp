@@ -29,6 +29,8 @@ public class CheckOutAcitivity extends AppCompatActivity {
     AddressAdapter adapter;
     FirebaseAuth auth;
     FirebaseDatabase database;
+    Query query;
+    ValueEventListener valueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,21 +50,28 @@ public class CheckOutAcitivity extends AppCompatActivity {
             }
         });
 
-        binding.txtAddAddress.setOnClickListener(new View.OnClickListener() {
+        binding.linearAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), AddressActivity.class));
             }
         });
 
-        Query query = database.getReference().child("Shipping Address").orderByChild("uId").equalTo(auth.getUid());
-        query.addValueEventListener(new ValueEventListener() {
+        query = database.getReference().child("Shipping Address").orderByChild("uId").equalTo(auth.getUid());
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 addresses.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Address address = snapshot1.getValue(Address.class);
                     addresses.add(address);
+                }
+                for (int i = 0; i < addresses.size(); i++) {
+                    Address address = addresses.get(i);
+                    if (address.getDefault()) {
+                        addresses.remove(address);
+                        addresses.add(0, address);
+                    }
                 }
                 adapter.notifyItemInserted(addresses.size());
             }
@@ -71,8 +80,8 @@ public class CheckOutAcitivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
-        });
-
+        };
+        query.addValueEventListener(valueEventListener);
 
         initRecycler();
     }
@@ -84,4 +93,11 @@ public class CheckOutAcitivity extends AppCompatActivity {
         binding.recyclerAddress.setAdapter(adapter);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (query != null) {
+            query.removeEventListener(valueEventListener);
+        }
+    }
 }

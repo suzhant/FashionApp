@@ -15,12 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize">
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:title="CHECKOUT"
+                app:title="Checkout"
                 app:navigationIcon="@drawable/ic_arrow_back_24"
+                app:titleTextColor="@color/black"
                 app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -28,28 +29,45 @@
             style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delivery Address"
+            android:text="Select Delivery Address"
             android:layout_marginTop="10dp"
-            android:textAllCaps="true"
-            android:textColor="@color/teal_700"
-            android:textSize="15sp"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textSize="16sp"
             android:layout_marginStart="20dp" />
 
-        <TextView
-            android:id="@+id/txtAddAddress"
+        <LinearLayout
+            android:id="@+id/linear_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/rectangle_bg"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
             android:padding="10dp"
-            android:textAllCaps="true"
-            android:textAlignment="center"
-            android:background="@drawable/dashed_rectangle"
-            android:text="Add delivery Address"
-            android:layout_margin="20dp" />
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_add_circle_outline_24"
+                android:backgroundTint="@color/black" />
+
+            <TextView
+                android:id="@+id/txtAddAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAllCaps="false"
+                android:layout_marginStart="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Add New Address" />
+        </LinearLayout>
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_address"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
+            android:layout_height="wrap_content"
             android:padding="5dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp" />
@@ -60,9 +78,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
-            android:textAllCaps="true"
-            android:textSize="15sp"
-            android:textColor="@color/teal_700"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
             android:text="Order Summary" />
 
 

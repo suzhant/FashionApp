@@ -1,7 +1,8 @@
 package com.sushant.fashionapp.Models;
 
 public class Address {
-    private String name, mobile, streetAddress, city, province, address, landmark, label, uId;
+    private String name, mobile, streetAddress, city, province, address, landmark, label, uId, addressId;
+    private Boolean isDefault;
 
     public Address() {
     }
@@ -84,5 +85,21 @@ public class Address {
 
     public void setuId(String uId) {
         this.uId = uId;
+    }
+
+    public Boolean getDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(Boolean aDefault) {
+        isDefault = aDefault;
+    }
+
+    public String getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(String addressId) {
+        this.addressId = addressId;
     }
 }

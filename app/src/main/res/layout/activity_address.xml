@@ -46,8 +46,8 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-medium"
                 android:text="Contact Person"
-                android:textAllCaps="true"
-                android:textSize="15sp" />
+                android:textAllCaps="false"
+                android:textSize="16sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/ipFullName"
@@ -106,8 +106,8 @@
                 android:layout_marginTop="15sp"
                 android:fontFamily="sans-serif-medium"
                 android:text="Address Details"
-                android:textAllCaps="true"
-                android:textSize="15sp" />
+                android:textAllCaps="false"
+                android:textSize="16sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/ipStreetAddress"
@@ -233,8 +233,8 @@
                 android:layout_marginTop="15sp"
                 android:fontFamily="sans-serif-medium"
                 android:text="Address Label (optional)"
-                android:textAllCaps="true"
-                android:textSize="15sp" />
+                android:textAllCaps="false"
+                android:textSize="16sp" />
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chip_group"
@@ -242,7 +242,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="50dp"
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
@@ -261,6 +260,35 @@
                     android:text="Office"
                     app:chipCornerRadius="4dp" />
             </com.google.android.material.chip.ChipGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="15sp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="50dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Default Shipping Address"
+                    android:textAllCaps="false"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_shipping"
+                    style="@style/Widget.AppCompat.CompoundButton.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:switchMinWidth="60dp"
+                    android:minHeight="0dp"
+                    app:trackTint="@color/address_track_bg"
+                    app:thumbTint="@color/medium_gray" />
+            </LinearLayout>
+
 
             <com.hbb20.CountryCodePicker
                 android:id="@+id/cpp"

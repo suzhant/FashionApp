@@ -72,7 +72,8 @@ public class BargainHistoryActivity extends AppCompatActivity {
             }
         });
 
-        database.getReference().child("Bargain").addListenerForSingleValueEvent(new ValueEventListener() {
+        Query query = database.getReference().child("Bargain").orderByChild("buyerId").equalTo(auth.getUid());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -89,31 +90,34 @@ public class BargainHistoryActivity extends AppCompatActivity {
                                 database.getReference().child("Bargain").child(bargain.getBargainId()).updateChildren(map);
                             }
                         }
-                        if (bargain.getBuyerId().equals(auth.getUid()) && bargain.getStatus().equals("accepted")) {
+                        if (bargain.getStatus().equals("accepted")) {
                             Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
                             if (bargain.getTimestamp() < cutoff) {
-                                Query query = database.getReference().child("Cart").child(auth.getUid()).orderByChild("pId").equalTo(bargain.getProductId());
-                                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                database.getReference().child("Bargain").child(bargain.getBargainId()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        for (DataSnapshot snapshot11 : snapshot.getChildren()) {
-                                            Cart cart = snapshot11.getValue(Cart.class);
-                                            HashMap<String, Object> map = new HashMap<>();
-                                            map.put("bargainPrice", null);
-                                            database.getReference().child("Cart").child(auth.getUid())
-                                                    .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-                                                    database.getReference().child("Bargain").child(bargain.getBargainId()).removeValue();
+                                    public void onSuccess(Void unused) {
+                                        Query query = database.getReference().child("Cart").child(auth.getUid()).orderByChild("pId").equalTo(bargain.getProductId());
+                                        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for (DataSnapshot snapshot11 : snapshot.getChildren()) {
+                                                    Cart cart = snapshot11.getValue(Cart.class);
+                                                    HashMap<String, Object> map = new HashMap<>();
+                                                    map.put("bargainPrice", null);
+                                                    database.getReference().child("Cart").child(auth.getUid())
+                                                            .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                        }
+                                                    });
                                                 }
-                                            });
+                                            }
 
-                                        }
-                                    }
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
 
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
-
+                                            }
+                                        });
                                     }
                                 });
                             }

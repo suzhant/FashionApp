@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.hbb20.CountryCodePicker;
 import com.sushant.fashionapp.Models.Address;
@@ -26,6 +28,7 @@ import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityAddressBinding;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +40,8 @@ public class AddressActivity extends AppCompatActivity {
     ArrayList<String> provinceList = new ArrayList<>();
     String label = "";
     ProgressDialog dialog;
+    Boolean isDefault = false;
+    String id = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +96,35 @@ public class AddressActivity extends AppCompatActivity {
             }
         });
 
+        binding.switchShipping.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                isDefault = b;
+            }
+        });
+
+        Query query = database.getReference().child("Shipping Address").orderByChild("uId").equalTo(auth.getUid());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Address address = snapshot1.getValue(Address.class);
+                        assert address != null;
+                        if (address.getDefault()) {
+                            id = address.getAddressId();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         binding.btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,8 +141,11 @@ public class AddressActivity extends AppCompatActivity {
                 }
                 boolean isValid = validatePhoneNumber(binding.ipPhoneNumber, binding.cpp);
                 if (isValid) {
+                    String key = database.getReference().child("Shipping Address").push().getKey();
                     Address address1 = new Address(fullName, phone, streetAddress, city, province);
                     address1.setuId(auth.getUid());
+                    address1.setDefault(isDefault);
+                    address1.setAddressId(key);
                     if (!address.isEmpty()) {
                         address1.setAddress(address);
                     }
@@ -119,15 +156,37 @@ public class AddressActivity extends AppCompatActivity {
                         address1.setLabel(label);
                     }
                     dialog.show();
-                    database.getReference().child("Shipping Address").push().setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                    if (!isDefault || id.isEmpty()) {
+                        database.getReference().child("Shipping Address").child(key).setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                dialog.dismiss();
+                                Intent intent = new Intent(getApplicationContext(), CheckOutAcitivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                            }
+                        });
+                        return;
+                    }
+                    
+                    HashMap<String, Object> map = new HashMap<>();
+                    map.put("default", false);
+                    database.getReference().child("Shipping Address").child(id).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            dialog.dismiss();
-                            Intent intent = new Intent(getApplicationContext(), CheckOutAcitivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
+                            database.getReference().child("Shipping Address").child(key).setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    dialog.dismiss();
+                                    Intent intent = new Intent(getApplicationContext(), CheckOutAcitivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                }
+                            });
                         }
                     });
+
                 }
             }
         });

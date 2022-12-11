@@ -103,6 +103,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     String sellerId, status;
     ProgressDialog dialog;
     VPAdapter vpAdapter;
+    Query query;
 
     int index;
 
@@ -348,13 +349,14 @@ public class ActivityProductDetails extends AppCompatActivity {
 
 
         reference = database.getReference().child("Bargain");
+        query = reference.orderByChild("buyerId").equalTo(auth.getUid());
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                         Bargain bargain = snapshot1.getValue(Bargain.class);
-                        if (bargain.getProductId().equals(pId) && bargain.getBuyerId().equals(auth.getUid())) {
+                        if (bargain.getProductId().equals(pId)) {
                             bargainId = bargain.getBargainId();
                             status = bargain.getStatus();
                             isExist = true;
@@ -384,31 +386,35 @@ public class ActivityProductDetails extends AppCompatActivity {
                                 Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
                                 if (timestamp < cutoff) {
                                     isExist = false;
-                                    Query query = database.getReference().child("Cart").child(auth.getUid()).child("Product Details").orderByChild("pId").equalTo(pId);
-                                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    database.getReference().child("Bargain").child(bargainId).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            for (DataSnapshot snapshot11 : snapshot.getChildren()) {
-                                                Cart cart = snapshot11.getValue(Cart.class);
-                                                HashMap<String, Object> map = new HashMap<>();
-                                                map.put("bargainPrice", null);
-                                                database.getReference().child("Cart").child(auth.getUid()).child("Product Details")
-                                                        .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void unused) {
-                                                        database.getReference().child("Bargain").child(bargainId).removeValue();
+                                        public void onSuccess(Void unused) {
+                                            Query query = database.getReference().child("Cart").child(auth.getUid()).orderByChild("pId").equalTo(pId);
+                                            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    for (DataSnapshot snapshot11 : snapshot.getChildren()) {
+                                                        Cart cart = snapshot11.getValue(Cart.class);
+                                                        HashMap<String, Object> map = new HashMap<>();
+                                                        map.put("bargainPrice", null);
+                                                        database.getReference().child("Cart").child(auth.getUid()).child("Product Details")
+                                                                .child(cart.getVariantPId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void unused) {
+
+                                                            }
+                                                        });
+
                                                     }
-                                                });
+                                                }
 
-                                            }
-                                        }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-
+                                                }
+                                            });
                                         }
                                     });
-
                                 }
                             }
                             break;
@@ -424,7 +430,7 @@ public class ActivityProductDetails extends AppCompatActivity {
 
             }
         };
-        reference.addValueEventListener(valueEventListener);
+        query.addValueEventListener(valueEventListener);
 
         binding.btnBargain.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -564,7 +570,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     private void integrateKhalti() {
 
         long priceInPaisa;
-        if (bargainPrice != null) {
+        if (bargainPrice != null && status.equals("accepted")) {
             priceInPaisa = bargainPrice;
         } else {
             priceInPaisa = price;
@@ -1077,8 +1083,8 @@ public class ActivityProductDetails extends AppCompatActivity {
         if (wishListRef != null) {
             wishListRef.removeEventListener(wishListListener);
         }
-        if (reference != null) {
-            reference.removeEventListener(valueEventListener);
+        if (query != null) {
+            query.removeEventListener(valueEventListener);
         }
         if (ratingRef != null) {
             ratingRef.removeEventListener(ratingListener);
@@ -1088,16 +1094,16 @@ public class ActivityProductDetails extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (reference != null) {
-            reference.addValueEventListener(valueEventListener);
+        if (query != null) {
+            query.addValueEventListener(valueEventListener);
         }
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-        if (reference != null) {
-            reference.addValueEventListener(valueEventListener);
+        if (query != null) {
+            query.addValueEventListener(valueEventListener);
         }
     }
 

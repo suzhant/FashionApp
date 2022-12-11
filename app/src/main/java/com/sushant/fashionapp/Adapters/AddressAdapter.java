@@ -1,6 +1,8 @@
 package com.sushant.fashionapp.Adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.R;
 
@@ -60,10 +65,12 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
         holder.txtPhone.setText(address.getMobile());
 
         if (holder.getAbsoluteAdapterPosition() == mCheckedPostion) {
-            holder.imgCheck.setVisibility(View.VISIBLE);
+            //    holder.imgCheck.setVisibility(View.VISIBLE);
+            holder.imgCheck.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
             holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.skyBlue));
         } else {
-            holder.imgCheck.setVisibility(View.GONE);
+            //   holder.imgCheck.setVisibility(View.GONE);
+            holder.imgCheck.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, com.khalti.R.color.material_on_background_disabled)));
             holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.white));
         }
 
@@ -72,7 +79,8 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
             @Override
             public void onClick(View view) {
                 if (holder.getAbsoluteAdapterPosition() == mCheckedPostion) {
-                    holder.imgCheck.setVisibility(View.GONE);
+                    //    holder.imgCheck.setVisibility(View.GONE);
+                    holder.imgCheck.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, com.khalti.R.color.material_on_background_disabled)));
                     holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.white));
                     mCheckedPostion = -1;
                 } else {
@@ -81,6 +89,44 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
                 }
             }
         });
+
+        if (address.getLabel() == null) {
+            holder.txtLabel.setText("UnLabeled");
+        }
+
+        holder.txtName.setText(address.getName());
+        holder.imgDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDialog(holder, address.getAddressId());
+            }
+        });
+
+        if (address.getDefault()) {
+            holder.txtDefault.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    private void showDialog(viewHolder holder, String addressId) {
+        new MaterialAlertDialogBuilder(context, R.style.RoundShapeTheme)
+                .setMessage("Are you sure?")
+                .setTitle("Delete Address")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        list.remove(holder.getAbsoluteAdapterPosition());
+                        notifyItemRemoved(holder.getAbsoluteAdapterPosition());
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Shipping Address");
+                        reference.child(addressId).removeValue();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        }).show();
     }
 
     @Override
@@ -90,8 +136,8 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
 
     public static class viewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtAddress, txtPhone, txtLabel;
-        ImageView imgCheck;
+        TextView txtAddress, txtPhone, txtLabel, txtName, txtDefault;
+        ImageView imgCheck, imgDelete;
         MaterialCardView cardView;
         LinearLayout linearAddress;
 
@@ -103,6 +149,9 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
             imgCheck = itemView.findViewById(R.id.imgCheck);
             cardView = itemView.findViewById(R.id.parent);
             linearAddress = itemView.findViewById(R.id.linear_address);
+            txtName = itemView.findViewById(R.id.txtName);
+            imgDelete = itemView.findViewById(R.id.imgDelete);
+            txtDefault = itemView.findViewById(R.id.txtDefault);
         }
     }
 }

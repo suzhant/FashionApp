@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/parent"
     android:layout_width="300dp"
-    android:layout_height="140dp"
+    android:layout_height="150dp"
     android:layout_marginEnd="10dp"
     app:strokeColor="@color/white"
     app:cardElevation="2dp"
@@ -17,56 +17,79 @@
         android:padding="10dp"
         android:orientation="vertical">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:gravity="center">
+            android:layout_marginEnd="4dp">
 
             <ImageView
                 android:id="@+id/imgCheck"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:visibility="gone"
                 android:src="@drawable/ic_baseline_check_circle_24"
-                app:tint="@color/skyBlue" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/material_on_background_disabled" />
+
 
             <TextView
                 android:id="@+id/txtLabel"
                 style="@style/TextAppearance.AppCompat.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/imgCheck"
-                android:layout_marginStart="5dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/rectangle_outline"
+                android:padding="5dp"
+                android:text="UnLabel"
+                android:textColor="@color/skyBlue"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imgCheck"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                app:tint="@color/skyBlue" />
+
+            <TextView
+                android:id="@+id/txtDefault"
+                style="@style/TextAppearance.AppCompat.Small"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:background="@drawable/rectangle_outline"
                 android:padding="5dp"
                 android:text="Default"
+                android:visibility="gone"
                 android:textColor="@color/skyBlue"
                 android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/txtLabel"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
                 app:tint="@color/skyBlue" />
 
             <ImageView
                 android:id="@+id/imgEdit"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginEnd="10dp"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@id/imgDelete"
-                android:src="@drawable/edit_square_24px" />
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/edit_square_24px"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/imgDelete"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/imgDelete"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_fluent_delete_24_regular" />
+                android:src="@drawable/ic_fluent_delete_24_regular"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/linear_address"
@@ -76,6 +99,13 @@
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:text="Sushant Shrestha" />
 
             <TextView
                 android:id="@+id/txtAddress"
