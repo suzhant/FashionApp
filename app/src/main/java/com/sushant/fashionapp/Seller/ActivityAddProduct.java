@@ -546,8 +546,8 @@ public class ActivityAddProduct extends AppCompatActivity {
                             product1.setSubSubCategory(subSubCat);
                             product1.setDesc(pDes);
                             product1.setTimeStamp(new Date().getTime());
-                            product1.setVariants(variants);
                             product1.setBrandName(brandName);
+                            product1.setVariants(variants);
                             product1.setSeason(season);
                             product1.setStoreId(storeId);
 

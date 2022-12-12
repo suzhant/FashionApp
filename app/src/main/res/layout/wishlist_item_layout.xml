@@ -121,23 +121,26 @@
                         android:textColor="@color/red"
                         android:text="only 5 item(s) in stock" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                    <TextView
+                        android:id="@+id/txtPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
                         android:layout_marginTop="4dp"
-                        android:orientation="horizontal">
+                        android:fontFamily="@font/gilroy_medium"
+                        android:textColor="@color/skyBlue"
+                        android:text="Rs. 100" />
 
-                        <TextView
-                            android:id="@+id/txtPrice"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/gilroy_medium"
-                            android:textColor="@color/skyBlue"
-                            android:text="Rs. 100" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/txtUnavailable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/gilroy_medium"
+                        android:textColor="@color/red"
+                        android:text="Unavailable" />
 
                 </LinearLayout>
 

@@ -941,6 +941,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
                     }
                 } else {
+                    updateStock(stock);
                     Cart product = new Cart(pId, pName, pic, price);
                     product.setVariantPId(actualProductId);
                     product.setVariantIndex(variantPos);
@@ -952,12 +953,12 @@ public class ActivityProductDetails extends AppCompatActivity {
                     product.setQuantity(1);
                     product.setStoreName(sName);
                     product.setStoreId(storeId);
+                    product.setStock(stock);
                     if (status != null) {
                         if (status.equals("accepted")) {
                             product.setBargainPrice(bargainPrice);
                         }
                     }
-                    updateStock(stock);
                     database.getReference().child("Cart").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
@@ -1020,6 +1021,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         product.setColor(color);
         product.setStoreName(sName);
         product.setStoreId(storeId);
+        product.setStock(stock);
         if (status != null) {
             if (status.equals("accepted")) {
                 product.setBargainPrice(bargainPrice);

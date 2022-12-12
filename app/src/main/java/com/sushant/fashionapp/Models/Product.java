@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class Product implements Serializable {
     private String pId, pName, maxLimit, desc, pPic, brandName, variantPId;
-    private Integer pPrice, love, quantity, productCode, variantIndex, sizeIndex, bargainPrice;
+    private Integer pPrice, love, quantity, productCode, variantIndex, sizeIndex, bargainPrice, stock;
     private ArrayList<Variants> variants;
     private ArrayList<Size> sizes;
     private ArrayList<String> photos;
@@ -297,5 +297,13 @@ public class Product implements Serializable {
 
     public void setBargainPrice(Integer bargainPrice) {
         this.bargainPrice = bargainPrice;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
     }
 }

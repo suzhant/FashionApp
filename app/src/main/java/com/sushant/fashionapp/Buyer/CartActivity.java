@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.CartAdapter;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
+import com.sushant.fashionapp.Inteface.QuantityListener;
 import com.sushant.fashionapp.Inteface.SwipeHelper;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Cart;
@@ -57,6 +58,7 @@ public class CartActivity extends AppCompatActivity {
     public boolean isActionMode = false;
     int stock;
     SwipeHelper helper;
+    QuantityListener listener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,7 @@ public class CartActivity extends AppCompatActivity {
 
 
 
+
         productClickListener = new ProductClickListener() {
             @Override
             public void onClick(Product product, boolean b) {
@@ -96,6 +99,17 @@ public class CartActivity extends AppCompatActivity {
             }
         };
 
+        listener = new QuantityListener() {
+            @Override
+            public void onClick(Cart cart, int quantity, String type) {
+                if (type.equals("plus")) {
+                    updateInventory(cart, cart.getStock() - 1, quantity + 1);
+                } else if (type.equals("minus")) {
+                    updateInventory(cart, cart.getStock() + 1, quantity - 1);
+                }
+
+            }
+        };
         helper = new SwipeHelper(this, binding.cartRecycler) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
@@ -112,8 +126,6 @@ public class CartActivity extends AppCompatActivity {
                                 Cart product = products.get(pos);
                                 showDeleteMessage(product);
                                 deleteProductFromDB(product);
-                                products.remove(pos);
-                                cartAdapter.notifyItemRemoved(pos);
                             }
                         }
                 ));
@@ -394,12 +406,12 @@ public class CartActivity extends AppCompatActivity {
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(CartActivity.this, LinearLayoutManager.VERTICAL, false);
         binding.cartRecycler.setLayoutManager(layoutManager);
-        cartAdapter = new CartAdapter(products, CartActivity.this, productClickListener);
+        cartAdapter = new CartAdapter(products, CartActivity.this, productClickListener, listener);
         binding.cartRecycler.setAdapter(cartAdapter);
     }
 
     private void refreshAdapter() {
-        cartAdapter = new CartAdapter(products, CartActivity.this, productClickListener);
+        cartAdapter = new CartAdapter(products, CartActivity.this, productClickListener, listener);
         binding.cartRecycler.setAdapter(cartAdapter);
     }
 
@@ -460,5 +472,21 @@ public class CartActivity extends AppCompatActivity {
         FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
                 .child("sizes")
                 .child(String.valueOf(product.getSizeIndex())).updateChildren(stock);
+    }
+
+    private void updateInventory(Product product, int s, int q) {
+        HashMap<String, Object> stock = new HashMap<>();
+        stock.put("stock", s);
+        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(product.getSizeIndex())).updateChildren(stock).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                HashMap<String, Object> quantity = new HashMap<>();
+                quantity.put("quantity", q);
+                FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
+                        .child(product.getVariantPId()).updateChildren(quantity);
+            }
+        });
     }
 }

@@ -16,18 +16,22 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Inteface.ProductClickListener;
+import com.sushant.fashionapp.Inteface.QuantityListener;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 
@@ -41,13 +45,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
     Context context;
     ProductClickListener productClickListener;
     private final CartActivity cartActivity;
-    int stock;
+    QuantityListener listener;
 
-    public CartAdapter(ArrayList<Cart> products, Context context, ProductClickListener productClickListener) {
+    public CartAdapter(ArrayList<Cart> products, Context context, ProductClickListener productClickListener, QuantityListener listener) {
         this.products = products;
         this.context = context;
         this.productClickListener = productClickListener;
         this.cartActivity = (CartActivity) context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -74,29 +79,51 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
         holder.txtColor.setText(MessageFormat.format("Color: {0}", product.getColor()));
 
 
-        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
-                .child("sizes")
-                .child(String.valueOf(product.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
+        Query query = FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants")
+                .orderByChild("color").equalTo(product.getColor());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    holder.txtUnavailabe.setVisibility(View.GONE);
-                    stock = snapshot.child("stock").getValue(Integer.class);
-                    if (stock < 5) {
-                        holder.txtStock.setVisibility(View.VISIBLE);
-                        holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
-                    } else {
-                        holder.txtStock.setVisibility(View.GONE);
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        product.setVariantIndex(Integer.valueOf(snapshot1.getKey()));
+                        Query query1 = FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(snapshot1.getKey())
+                                .child("sizes").orderByChild("size").equalTo(product.getSize());
+                        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    for (DataSnapshot snapshot11 : snapshot.getChildren()) {
+                                        Size size = snapshot11.getValue(Size.class);
+                                        product.setSizeIndex(Integer.valueOf(snapshot11.getKey()));
+                                        product.setStock(size.getStock());
+                                        if (product.getStock() < 5) {
+                                            holder.txtStock.setVisibility(View.VISIBLE);
+                                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", product.getStock()));
+                                        } else {
+                                            holder.txtStock.setVisibility(View.GONE);
+                                        }
+                                        if (product.getStock() == 0) {
+                                            holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+                                        }
+                                        if (product.getQuantity() < product.getStock()) {
+                                            holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
+                                        }
+                                    }
+                                    holder.txtUnavailabe.setVisibility(View.GONE);
+                                } else {
+                                    holder.txtUnavailabe.setVisibility(View.VISIBLE);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
-                    if (stock == 0) {
-                        holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
-                    }
-                    if (product.getQuantity() < stock) {
-                        holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
-                    }
-                } else {
-                    holder.txtUnavailabe.setVisibility(View.VISIBLE);
                 }
+
             }
 
             @Override
@@ -104,6 +131,34 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
 
             }
         });
+//        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
+//                .child("sizes")
+//                .child(String.valueOf(product.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    stock = snapshot.child("stock").getValue(Integer.class);
+//                    if (stock < 5) {
+//                        holder.txtStock.setVisibility(View.VISIBLE);
+//                        holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+//                    } else {
+//                        holder.txtStock.setVisibility(View.GONE);
+//                    }
+//                    if (stock == 0) {
+//                        holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+//                    }
+//                    if (product.getQuantity() < stock) {
+//                        holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+
         if (product.getQuantity() > 1) {
             holder.imgMinus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.red)));
         }
@@ -126,11 +181,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             public void onClick(View view) {
                 if (!cartActivity.isActionMode) {
                     if (holder.txtUnavailabe.getVisibility() == View.GONE) {
-                        if (stock != 0) {
+                        if (product.getStock() != 0) {
                             if (product.getQuantity() < 5) {
-                                product.setQuantity(product.getQuantity() + 1);
-                                updateCartQuantity(product);
-                                updateStock(product, stock - 1);
+                                //    product.setQuantity(product.getQuantity() + 1);
+                                //  updateStock(product, stock - 1,product.getQuantity()+1);
+                                listener.onClick(product, product.getQuantity(), "plus");
+                                //   updateCartQuantity(product);
                             } else {
                                 Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "Max limit is 5", Snackbar.LENGTH_SHORT).show();
                             }
@@ -146,9 +202,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                 if (!cartActivity.isActionMode) {
                     if (holder.txtUnavailabe.getVisibility() == View.GONE) {
                         if (product.getQuantity() > 1) {
-                            product.setQuantity(product.getQuantity() - 1);
-                            updateCartQuantity(product);
-                            updateStock(product, stock + 1);
+                            //  product.setQuantity(product.getQuantity() - 1);
+                            //    updateCartQuantity(product);
+                            listener.onClick(product, product.getQuantity(), "minus");
+                            //  updateStock(product, stock + 1,product.getQuantity()-1);
                         }
                     }
                 }
@@ -274,12 +331,20 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
 
     }
 
-    private void updateStock(Product product, int s) {
+    private void updateStock(Product product, int s, int q) {
         HashMap<String, Object> stock = new HashMap<>();
         stock.put("stock", s);
         FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
                 .child("sizes")
-                .child(String.valueOf(product.getSizeIndex())).updateChildren(stock);
+                .child(String.valueOf(product.getSizeIndex())).updateChildren(stock).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                HashMap<String, Object> quantity = new HashMap<>();
+                quantity.put("quantity", q);
+                FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
+                        .child(product.getVariantPId()).updateChildren(quantity);
+            }
+        });
     }
 
 }

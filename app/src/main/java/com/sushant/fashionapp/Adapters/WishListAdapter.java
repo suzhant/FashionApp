@@ -20,12 +20,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 
@@ -65,13 +67,105 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
         holder.txtColor.setText(MessageFormat.format("Color: {0}", product.getColor()));
 
 
+        Query query = FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants")
+                .orderByChild("color").equalTo(product.getColor());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Query query1 = FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(snapshot1.getKey())
+                                .child("sizes").orderByChild("size").equalTo(product.getSize());
+                        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    holder.txtUnavailable.setVisibility(View.GONE);
+                                    holder.btnAddToCart.setEnabled(true);
+                                } else {
+                                    holder.txtUnavailable.setVisibility(View.VISIBLE);
+                                    holder.btnAddToCart.setEnabled(false);
+                                }
+//                                for (DataSnapshot snapshot11:snapshot.getChildren()){
+//                                    Size size=snapshot11.getValue(Size.class);
+//                                    if (size.getSize().equals(product.getSize())){
+//                                        holder.txtUnavailable.setVisibility(View.GONE);
+//                                        holder.btnAddToCart.setEnabled(true);
+//                                    }else {
+//                                        holder.txtUnavailable.setVisibility(View.VISIBLE);
+//                                        holder.btnAddToCart.setEnabled(false);
+//                                    }
+//                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        holder.imgProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.txtUnavailable.getVisibility() == View.GONE) {
+                    Intent intent = new Intent(context, ActivityProductDetails.class);
+                    intent.putExtra("pPic", product.getPreviewPic());
+                    intent.putExtra("pName", product.getpName());
+                    intent.putExtra("pPrice", product.getpPrice());
+                    intent.putExtra("pId", product.getpId());
+                    intent.putExtra("storeId", product.getStoreId());
+                    intent.putExtra("sName", product.getStoreName());
+                    intent.putExtra("pDesc", product.getDesc());
+                    intent.putExtra("index", product.getVariantIndex());
+                    context.startActivity(intent);
+                }
+            }
+        });
+
+        holder.txtProductName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.txtUnavailable.getVisibility() == View.GONE) {
+                    Intent intent = new Intent(context, ActivityProductDetails.class);
+                    intent.putExtra("pPic", product.getpPic());
+                    intent.putExtra("pName", product.getpName());
+                    intent.putExtra("pPrice", product.getpPrice());
+                    intent.putExtra("pId", product.getpId());
+                    intent.putExtra("storeId", product.getStoreId());
+                    intent.putExtra("sName", product.getStoreName());
+                    intent.putExtra("index", product.getVariantIndex());
+                    context.startActivity(intent);
+                }
+            }
+        });
+
+        holder.btnDeleteFromWishList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteProductFromWishList(product);
+            }
+        });
+
         FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
                 .child("sizes")
-                .child(String.valueOf(product.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
+                .child(String.valueOf(product.getSizeIndex())).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.child("stock").exists()) {
-                    stock = snapshot.child("stock").getValue(Integer.class);
+                    Size size = snapshot.getValue(Size.class);
+                    stock = size.getStock();
+                    product.setStock(stock);
                     if (stock < 5) {
                         holder.txtStock.setVisibility(View.VISIBLE);
                         if (stock == 0) {
@@ -91,44 +185,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
             }
         });
 
-        holder.imgProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, ActivityProductDetails.class);
-                intent.putExtra("pPic", product.getPreviewPic());
-                intent.putExtra("pName", product.getpName());
-                intent.putExtra("pPrice", product.getpPrice());
-                intent.putExtra("pId", product.getpId());
-                intent.putExtra("storeId", product.getStoreId());
-                intent.putExtra("sName", product.getStoreName());
-                intent.putExtra("pDesc", product.getDesc());
-                intent.putExtra("index", product.getVariantIndex());
-                context.startActivity(intent);
-            }
-        });
-
-        holder.txtProductName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(context, ActivityProductDetails.class);
-                intent.putExtra("pPic", product.getpPic());
-                intent.putExtra("pName", product.getpName());
-                intent.putExtra("pPrice", product.getpPrice());
-                intent.putExtra("pId", product.getpId());
-                intent.putExtra("storeId", product.getStoreId());
-                intent.putExtra("sName", product.getStoreName());
-                intent.putExtra("index", product.getVariantIndex());
-                context.startActivity(intent);
-            }
-        });
-
-        holder.btnDeleteFromWishList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                deleteProductFromWishList(product);
-            }
-        });
-
         holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,13 +195,14 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                                 context.startActivity(new Intent(context, CartActivity.class));
                             }
                         });
+
                 FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid())
                         .child(product.getVariantPId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             int quantity = snapshot.child("quantity").getValue(Integer.class);
-                            if (stock != 0) {
+                            if (product.getStock() != 0) {
                                 if (quantity < 5) {
                                     updateCartQuantity(quantity, product);
                                     updateStock(product);
@@ -172,6 +229,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                             item.setQuantity(1);
                             if (stock != 0) {
                                 updateStock(product);
+                                item.setStock(stock);
                             }
                             if (product.getBargainPrice() != null) {
                                 item.setBargainPrice(product.getBargainPrice());
@@ -223,6 +281,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
         private final TextView txtSize;
         private final TextView txtColor;
         private final TextView txtStock;
+        private final TextView txtUnavailable;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
@@ -235,11 +294,12 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
             txtSize = itemView.findViewById(R.id.txtSize);
             txtColor = itemView.findViewById(R.id.txtColor);
             txtStock = itemView.findViewById(R.id.txtStock);
+            txtUnavailable = itemView.findViewById(R.id.txtUnavailable);
         }
     }
 
     private void updateStock(Product product) {
-        int s = stock - 1;
+        int s = product.getStock() - 1;
         HashMap<String, Object> stock = new HashMap<>();
         stock.put("stock", s);
         FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex())).child("sizes")
