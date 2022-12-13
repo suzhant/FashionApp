@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +68,7 @@ import com.sushant.fashionapp.databinding.ActivityEditProductDetailsBinding;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -90,6 +93,11 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     ArrayList<String> subSubCatList = new ArrayList<>();
     ArrayList<String> catList = new ArrayList<>();
     int variantIndex;
+    double sellerPrice, commission;
+    Thread t1 = null;
+    MyCalc mycalc = null;
+    String wholeSalePrice;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +139,8 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                 binding.autoCategory.setText(masterCategory);
                 binding.autoSubCategory.setText(category);
                 binding.autoSubSubCategory.setText(subcategory);
-                binding.edPrice.setText(price.toString());
+                wholeSalePrice = String.valueOf(Math.round(price * 0.7));
+                binding.edPrice.setText(wholeSalePrice);
                 binding.edDescription.setText(pDesc);
                 //season list
                 String[] seasonList = getResources().getStringArray(R.array.seasons);
@@ -148,6 +157,31 @@ public class EditProductDetailsActivity extends AppCompatActivity {
             }
         });
 
+        binding.edPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() > 0) {
+                    mycalc = new MyCalc();
+                    t1 = new Thread(mycalc);
+                    t1.start();
+                } else {
+                    binding.txtSellerPrice.setText(MessageFormat.format("Suggested Retail Price (SRP): Rs.{0}", 0));
+                    binding.txtRetailPrice.setText(MessageFormat.format("Commission: Rs.{0}", 0));
+                    binding.txtBargainLimit.setText(MessageFormat.format("Bargain Limit: Rs.{0}", 0));
+                }
+
+            }
+        });
 
 //        database.getReference().child("Products").child(pid).child("variants").addListenerForSingleValueEvent(new ValueEventListener() {
 //            @Override
@@ -287,6 +321,34 @@ public class EditProductDetailsActivity extends AppCompatActivity {
         initRecyclerView();
     }
 
+    private class MyCalc implements Runnable {
+        private volatile boolean running = true;
+
+        public MyCalc() {
+
+        }
+
+        @Override
+        public void run() {
+            //Do you math here
+            wholeSalePrice = binding.edPrice.getText().toString().trim();
+            double wholesale = Double.parseDouble(wholeSalePrice);
+            sellerPrice = wholesale / (1 - 0.3); //30% markup percentage in the wholesale price
+            commission = wholesale * 0.1; //10% added to compensate commission
+            double bargainLimit = wholesale * 1.2; //20%
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    binding.txtSellerPrice.setText(MessageFormat.format("Suggested Retail Price (SRP): Rs.{0}", Math.round(sellerPrice)));
+                    binding.txtRetailPrice.setText(MessageFormat.format("Commission: Rs.{0}", Math.round(commission)));
+                    binding.txtBargainLimit.setText(MessageFormat.format("Bargain Limit: Rs.{0}", Math.round(bargainLimit)));
+                    // text will be updated automatically
+                }
+            });
+        }
+    }
+
     private void addSubSubCat() {
         database.getReference().child("category").child(masterCategory).child(category).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -349,7 +411,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                             obj.put("season", season);
                             obj.put("category", masterCategory);
                             obj.put("subCategory", category);
-                            obj.put("pPrice", price);
+                            obj.put("pPrice", sellerPrice);
                             obj.put("desc", pDesc);
                             obj.put("variants", variants);
 
@@ -583,9 +645,25 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        Thread.currentThread().interrupt();
+        t1 = null;
         Intent intent = new Intent(EditProductDetailsActivity.this, EditProductActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Thread.currentThread().interrupt();
+        t1 = null;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Thread.currentThread().interrupt();
+        t1 = null;
     }
 }

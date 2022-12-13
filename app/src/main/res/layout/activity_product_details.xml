@@ -131,7 +131,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/gilroy_medium"
+                        android:fontFamily="sans-serif-medium"
                         android:gravity="center_vertical"
                         android:layout_marginTop="4dp"
                         android:maxLines="2"
@@ -314,11 +314,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/open_sans"
+                    android:fontFamily="sans-serif-medium"
                     android:lineSpacingExtra="4dp"
-                    android:text="Red skirt made of wool. Provide cool and elegant look. adsf
-sdaf asdf asdf asdf sadf sadf adsf adsasdf asdf asdf dasf asdf asdf dasf asdf asdf "
-                    android:textSize="14sp" />
+                    android:background="@drawable/round_corners"
+                    android:backgroundTint="@color/gray_100"
+                    android:padding="6dp"
+                    android:text="Red skirt made of wool. Provide cool and elegant look. "
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"

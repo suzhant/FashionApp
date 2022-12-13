@@ -751,6 +751,8 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String price = edPrice.getText().toString();
+                double wholesale = origPrice * (1 - 0.3); //calculating wholesale price
+                double bargainLimit = wholesale * 1.2; //calculating bargain limit
                 if (price.isEmpty()) {
                     Snackbar.make(parent, "Empty Field", Snackbar.LENGTH_SHORT).show();
                     edPrice.requestFocus();
@@ -765,7 +767,13 @@ public class ActivityProductDetails extends AppCompatActivity {
                 }
                 if (Integer.parseInt(price) > origPrice) {
                     edPrice.requestFocus();
-                    Snackbar.make(parent, "You cannot enter price higher than the original price", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parent, "Price is too high !!!", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (Integer.parseInt(price) < bargainLimit) {
+                    edPrice.requestFocus();
+                    Snackbar.make(parent, "Price is too low !!!", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 if (!isBlocked) {
@@ -827,14 +835,21 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String bargainPrice = edPrice.getText().toString();
-                if (Integer.parseInt(bargainPrice) > price) {
+                double wholesale = price * (1 - 0.3); //calculating wholesale price
+                double bargainLimit = wholesale * 1.2; //calculating bargain limit
+                if (Integer.parseInt(bargainPrice) > origPrice) {
                     edPrice.requestFocus();
-                    Snackbar.make(parent, "You cannot enter price higher than the original price", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(parent, "Your Price is too high !!", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 if (bargainPrice.isEmpty()) {
                     edPrice.requestFocus();
                     Snackbar.make(parent, "Empty field!!", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (Integer.parseInt(bargainPrice) < bargainLimit) {
+                    edPrice.requestFocus();
+                    Snackbar.make(parent, "Your Price is too low !!", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 dialog.show();

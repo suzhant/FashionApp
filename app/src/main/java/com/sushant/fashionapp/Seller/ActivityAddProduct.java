@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +74,7 @@ import com.sushant.fashionapp.databinding.ActivityAddProductBinding;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -93,7 +96,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     SizeSummaryAdapter sizeSummaryAdapter;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    String pName, cat, subCat, subSubCat, pDes, storeId, price, storeName;
+    String pName, cat, subCat, subSubCat, pDes, storeId, wholeSalePrice, storeName;
     FirebaseStorage storage;
     String size, brandName, season;
     VariantClickListener productClickListener;
@@ -105,6 +108,9 @@ public class ActivityAddProduct extends AppCompatActivity {
     VariantPhotoAdapter photoAdapter;
     ArrayList<String> upLoadPic;
     int position;
+    double sellerPrice, commission;
+    Thread t1 = null;
+    MyCalc mycalc = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +140,13 @@ public class ActivityAddProduct extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showDialog();
+            }
+        });
+
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
             }
         });
 
@@ -284,7 +297,7 @@ public class ActivityAddProduct extends AppCompatActivity {
             public void onClick(View view) {
                 pName = binding.edProductName.getText().toString();
                 pDes = binding.edDescription.getText().toString();
-                price = binding.edPrice.getText().toString();
+                wholeSalePrice = binding.edPrice.getText().toString();
                 brandName = binding.edBrandName.getText().toString();
                 season = binding.autoSeason.getText().toString();
                 cat = binding.autoCategory.getText().toString();
@@ -344,6 +357,30 @@ public class ActivityAddProduct extends AppCompatActivity {
 //
 //            }
 //        });
+        binding.edPrice.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() > 0) {
+                    mycalc = new MyCalc();
+                    t1 = new Thread(mycalc);
+                    t1.start();
+                } else {
+                    binding.txtSellerPrice.setText(MessageFormat.format("Suggested Retail Price (SRP): Rs.{0}", 0));
+                    binding.txtRetailPrice.setText(MessageFormat.format("Commission: Rs.{0}", 0));
+                    binding.txtBargainLimit.setText(MessageFormat.format("Bargain Limit: Rs.{0}", 0));
+                }
+
+            }
+        });
 
     }
 
@@ -407,6 +444,34 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
+    }
+
+    private class MyCalc implements Runnable {
+        public MyCalc() {
+
+        }
+
+        @Override
+        public void run() {
+            //Do you math here
+            wholeSalePrice = binding.edPrice.getText().toString();
+            double wholesale = Double.parseDouble(wholeSalePrice);
+            sellerPrice = wholesale / (1 - 0.3); //30% markup percentage in the wholesale price
+            commission = wholesale * 0.1; //10% added to compensate commission
+            double bargainLimit = wholesale * 1.2; //20%
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    binding.txtSellerPrice.setText(MessageFormat.format("Suggested Retail Price (SRP): Rs.{0}", Math.round(sellerPrice)));
+                    binding.txtRetailPrice.setText(MessageFormat.format("Commission: Rs.{0}", Math.round(commission)));
+                    binding.txtBargainLimit.setText(MessageFormat.format("Bargain Limit: Rs.{0}", Math.round(bargainLimit)));
+                    // text will be updated automatically
+                }
+            });
+        }
+
+        ;
     }
 
     private void updateVariant() {
@@ -540,7 +605,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
                             Product product1 = new Product(key, pName, variants.get(0).getPhotos().get(0));
                             product1.setLove(0);
-                            product1.setpPrice(Integer.valueOf(price));
+                            product1.setpPrice((int) sellerPrice);
                             product1.setCategory(cat);
                             product1.setSubCategory(subCat);
                             product1.setSubSubCategory(subSubCat);
@@ -846,5 +911,24 @@ public class ActivityAddProduct extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Thread.currentThread().interrupt();
+        t1 = null;
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Thread.currentThread().interrupt();
+        t1 = null;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Thread.currentThread().interrupt();
+        t1 = null;
+    }
 }

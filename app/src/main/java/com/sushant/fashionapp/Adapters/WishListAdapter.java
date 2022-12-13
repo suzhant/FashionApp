@@ -41,7 +41,6 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
     ArrayList<Cart> products;
     Context context;
     WishListActivity wishListActivity;
-    int stock;
 
     public WishListAdapter(ArrayList<Cart> products, Context context) {
         this.products = products;
@@ -164,14 +163,13 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.child("stock").exists()) {
                     Size size = snapshot.getValue(Size.class);
-                    stock = size.getStock();
-                    product.setStock(stock);
-                    if (stock < 5) {
+                    product.setStock(size.getStock());
+                    if (product.getStock() < 5) {
                         holder.txtStock.setVisibility(View.VISIBLE);
-                        if (stock == 0) {
+                        if (product.getStock() == 0) {
                             holder.txtStock.setText("out of stock!");
                         } else {
-                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", stock));
+                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", product.getStock()));
                         }
                     } else {
                         holder.txtStock.setVisibility(View.GONE);
@@ -227,9 +225,9 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                             item.setStoreName(product.getStoreName());
                             item.setStoreId(product.getStoreId());
                             item.setQuantity(1);
-                            if (stock != 0) {
+                            if (product.getStock() != 0) {
                                 updateStock(product);
-                                item.setStock(stock);
+                                item.setStock(product.getStock());
                             }
                             if (product.getBargainPrice() != null) {
                                 item.setBargainPrice(product.getBargainPrice());

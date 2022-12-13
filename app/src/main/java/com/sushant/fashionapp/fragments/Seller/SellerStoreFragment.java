@@ -18,6 +18,9 @@ public class SellerStoreFragment extends Fragment {
 
     FragmentSellerStoreBinding binding;
 
+    public SellerStoreFragment() {
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -105,6 +105,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                                         }
                                         if (product.getStock() == 0) {
                                             holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.hintColor)));
+                                            holder.txtStock.setText(MessageFormat.format("out of stock ", product.getStock()));
                                         }
                                         if (product.getQuantity() < product.getStock()) {
                                             holder.imgPlus.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.skyBlue)));
