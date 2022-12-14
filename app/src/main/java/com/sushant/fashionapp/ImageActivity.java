@@ -39,7 +39,7 @@ public class ImageActivity extends AppCompatActivity {
         vpAdapter = new VPAdapter(pic, this, false);
         binding.viewPager.setAdapter(vpAdapter);
 
-        binding.viewPager.setCurrentItem(pos);
+        binding.viewPager.setCurrentItem(pos, false);
 
         if (pic.size() > 1) {
             binding.txtNoOfPics.setVisibility(View.VISIBLE);

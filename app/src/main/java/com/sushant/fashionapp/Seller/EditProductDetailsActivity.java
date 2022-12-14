@@ -83,7 +83,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     String pid, pName, brandName, season, masterCategory, category, subcategory, pDesc;
     Integer price;
     ArrayList<String> tempImages = new ArrayList<>();
-    ActivityResultLauncher<Intent> imgLauncher;
+    ActivityResultLauncher<Intent> imgLauncher = null;
     SizeSummaryAdapter sizeSummaryAdapter;
     VariantPhotoAdapter photoAdapter;
     ArrayList<Variants> variants = new ArrayList<>();
@@ -508,6 +508,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 imgLauncher.launch(intent);
             }
         });
@@ -565,6 +566,12 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                 if (size == null || stock.isEmpty()) {
                     Toast.makeText(EditProductDetailsActivity.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
                     return;
+                }
+                for (Size s : sizes) {
+                    if (s.getSize().equals(size)) {
+                        Toast.makeText(EditProductDetailsActivity.this, "This size is already added !!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                 }
                 Size product = new Size();
                 product.setSize(size);

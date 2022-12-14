@@ -427,8 +427,10 @@ public class ActivityAddProduct extends AppCompatActivity {
         cardUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //ACTION_PICK WILL POP UP DIALOG AND SHOW GALLERY AND OTHERS
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 photoLauncher.launch(intent);
             }
         });
@@ -520,6 +522,7 @@ public class ActivityAddProduct extends AppCompatActivity {
         MaterialButton btnSave = bottomSheetDialog.findViewById(R.id.btnSave);
         AutoCompleteTextView autoSize = bottomSheetDialog.findViewById(R.id.autoSize);
         TextInputEditText edStock = bottomSheetDialog.findViewById(R.id.edStock);
+        LinearLayout parent = bottomSheetDialog.findViewById(R.id.nameParent);
 
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         bottomSheetDialog.show();
@@ -535,6 +538,13 @@ public class ActivityAddProduct extends AppCompatActivity {
                 Size product = new Size();
                 String size = autoSize.getText().toString();
                 String stock = edStock.getText().toString();
+                for (Size s : sizes) {
+                    if (s.getSize().equals(size)) {
+                        Snackbar.make(parent, "This size is already added !!", Snackbar.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
                 product.setSize(size);
                 product.setStock(Integer.valueOf(stock));
                 sizes.add(product);
@@ -684,8 +694,10 @@ public class ActivityAddProduct extends AppCompatActivity {
         cardUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //ACTION_PICK WILL POP UP DIALOG AND SHOW GALLERY AND OTHERS
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 imgLauncher.launch(intent);
             }
         });
@@ -747,6 +759,13 @@ public class ActivityAddProduct extends AppCompatActivity {
                     Toast.makeText(ActivityAddProduct.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                for (Size s : sizes) {
+                    if (s.getSize().equals(size)) {
+                        Toast.makeText(ActivityAddProduct.this, "This size is already added !!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
                 Size product = new Size();
                 product.setSize(size);
                 product.setStock(Integer.valueOf(stock));

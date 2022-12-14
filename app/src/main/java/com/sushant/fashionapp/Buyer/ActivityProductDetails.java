@@ -163,17 +163,10 @@ public class ActivityProductDetails extends AppCompatActivity {
                 }
 
                 //  adding pic in slider
-                list.clear();
+
                 // list.add(new SlideModel(product.getPhotos().get(i), null));
                 // binding.imgSlider.setImageList(list);
-                list.addAll(product.getPhotos());
-                vpAdapter = new VPAdapter(list, ActivityProductDetails.this, true);
-                binding.viewPager.setAdapter(vpAdapter);
-                if (list.size() > 1) {
-                    binding.txtNoOfPics.setVisibility(View.VISIBLE);
-                    binding.txtNoOfPics.setText(MessageFormat.format("{0}/" + list.size(), 1));
-                }
-
+                binding.viewPager.setCurrentItem(pos, true);
                 //resetting wish icon to normal
                 binding.imgWish.setImageResource(R.drawable.ic_love);
                 binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
@@ -216,17 +209,22 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("variantListener", "called");
                 products.clear();
+                list.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Variants product = snapshot1.getValue(Variants.class);
                     products.add(product);
                 }
-//                for (Product product:products) {
-//                    if (product.getPhotos()!=null){
-//                        for (String image:product.getPhotos()){
-//                            list.add(new SlideModel(image, null));
-//                        }
-//                    }
-//                }
+                for (Variants product : products) {
+                    if (product.getPhotos() != null) {
+                        list.addAll(product.getPhotos());
+                    }
+                }
+                vpAdapter = new VPAdapter(list, ActivityProductDetails.this, true);
+                binding.viewPager.setAdapter(vpAdapter);
+                if (list.size() > 1) {
+                    binding.txtNoOfPics.setVisibility(View.VISIBLE);
+                    binding.txtNoOfPics.setText(MessageFormat.format("{0}/" + list.size(), 1));
+                }
 
                 variantAdapter.notifyDataSetChanged();
             }
@@ -1111,16 +1109,34 @@ public class ActivityProductDetails extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (variantRef != null) {
+            variantRef.addValueEventListener(variantListener);
+        }
+        if (wishListRef != null) {
+            wishListRef.addValueEventListener(wishListListener);
+        }
         if (query != null) {
             query.addValueEventListener(valueEventListener);
+        }
+        if (ratingRef != null) {
+            ratingRef.addValueEventListener(ratingListener);
         }
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        if (variantRef != null) {
+            variantRef.addValueEventListener(variantListener);
+        }
+        if (wishListRef != null) {
+            wishListRef.addValueEventListener(wishListListener);
+        }
         if (query != null) {
             query.addValueEventListener(valueEventListener);
+        }
+        if (ratingRef != null) {
+            ratingRef.addValueEventListener(ratingListener);
         }
     }
 

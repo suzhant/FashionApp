@@ -67,7 +67,7 @@ public class EditVariantActivity extends AppCompatActivity {
     ArrayList<String> upLoadPic = new ArrayList<>();
     EditSizeAdapter adapter;
     VariantPhotoAdapter photoAdapter;
-    ActivityResultLauncher<Intent> imgLauncher;
+    ActivityResultLauncher<Intent> imgLauncher = null;
     String color;
     FirebaseStorage storage;
 
@@ -96,6 +96,7 @@ public class EditVariantActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
                 imgLauncher.launch(intent);
             }
         });
@@ -188,6 +189,16 @@ public class EditVariantActivity extends AppCompatActivity {
                 Size product = new Size();
                 String size = autoSize.getText().toString();
                 String stock = edStock.getText().toString();
+                if (size.isEmpty() || stock.isEmpty()) {
+                    Toast.makeText(EditVariantActivity.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for (Size s : sizes) {
+                    if (s.getSize().equals(size)) {
+                        Toast.makeText(EditVariantActivity.this, "This size is already added !!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
                 product.setSize(size);
                 product.setStock(Integer.valueOf(stock));
                 sizes.add(product);
