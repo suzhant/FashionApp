@@ -1,5 +1,6 @@
 package com.sushant.fashionapp.Adapters;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -12,7 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
@@ -26,6 +30,7 @@ public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.
     Context context;
     String pId;
     VariantClickListener productClickListener;
+    int i;
 
     public EditVariantAdapter(ArrayList<Variants> list, Context context, String pId, VariantClickListener productClickListener) {
         this.list = list;
@@ -71,6 +76,27 @@ public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.
         holder.btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ProgressDialog dialog = new ProgressDialog(context);
+                dialog.setTitle("Delete");
+                dialog.setMessage("Please wait..");
+                dialog.setCancelable(false);
+
+                FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+                dialog.show();
+                i = 0;
+                for (String p : product.getPhotos()) {
+                    i++;
+                    StorageReference storageReference = firebaseStorage.getReferenceFromUrl(p);
+                    storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            if (i == product.getPhotos().size()) {
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                }
+
                 list.remove(holder.getAbsoluteAdapterPosition());
                 notifyItemRemoved(holder.getAbsoluteAdapterPosition());
             }

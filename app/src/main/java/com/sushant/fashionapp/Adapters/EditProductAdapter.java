@@ -4,22 +4,29 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Seller.EditProductDetailsActivity;
 import com.sushant.fashionapp.Utils.CheckConnection;
@@ -31,7 +38,9 @@ import java.util.ArrayList;
 public class EditProductAdapter extends RecyclerView.Adapter<EditProductAdapter.viewHolder> {
 
     ArrayList<Product> list;
+    ArrayList<String> photos;
     Context context;
+    int j;
 
     public EditProductAdapter(ArrayList<Product> list, Context context) {
         this.list = list;
@@ -112,14 +121,43 @@ public class EditProductAdapter extends RecyclerView.Adapter<EditProductAdapter.
                             dialog.setCancelable(false);
                             dialog.show();
 
-                            FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            photos = new ArrayList<>();
+                            for (Variants s : product.getVariants()) {
+                                photos.addAll(s.getPhotos());
+                            }
+
+                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                                 @Override
-                                public void onSuccess(Void unused) {
-                                    list.remove(holder.getAbsoluteAdapterPosition());
-                                    notifyItemRemoved(holder.getAbsoluteAdapterPosition());
-                                    dialog.dismiss();
+                                public void run() {
+                                    FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+                                    j = 0;
+                                    for (String p : photos) {
+                                        j++;
+                                        StorageReference storageReference = firebaseStorage.getReferenceFromUrl(p);
+                                        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                if (j == photos.size()) {
+                                                    FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void unused) {
+                                                            list.remove(holder.getAbsoluteAdapterPosition());
+                                                            notifyItemRemoved(holder.getAbsoluteAdapterPosition());
+                                                            dialog.dismiss();
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(context, "Operation failed !!", Toast.LENGTH_SHORT).show();
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                    }
                                 }
-                            });
+                            }, 500);
                         }
                     }).setNegativeButton("No", new DialogInterface.OnClickListener() {
                 @Override

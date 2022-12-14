@@ -710,6 +710,12 @@ public class ActivityAddProduct extends AppCompatActivity {
                     Snackbar.make(variantDialogLayout, "Please fill all the fields", Snackbar.LENGTH_SHORT).setAnchorView(addVariant).show();
                     return;
                 }
+                for (Variants s : variants) {
+                    if (s.getColor().equals(color)) {
+                        Snackbar.make(variantDialogLayout, "This color has been already added!!", Snackbar.LENGTH_SHORT).setAnchorView(addVariant).show();
+                        return;
+                    }
+                }
                 createImageBitmap(sizes);
                 variantDialog.dismiss();
             }
