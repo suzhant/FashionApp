@@ -7,8 +7,10 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -17,11 +19,14 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.AddressAdapter;
 import com.sushant.fashionapp.Adapters.OrderSummaryAdapter;
+import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Store;
+import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityCheckOutAcitivityBinding;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,6 +45,8 @@ public class CheckOutAcitivity extends AppCompatActivity {
     ArrayList<Store> stores = new ArrayList<>();
     ArrayList<Cart> products = new ArrayList<>();
     HashSet<String> storeIdList = new HashSet<>();
+    ItemClickListener itemClickListener;
+    boolean isSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +73,19 @@ public class CheckOutAcitivity extends AppCompatActivity {
             }
         });
 
+        itemClickListener = new ItemClickListener() {
+            @Override
+            public void onClick(String item, String type) {
+
+            }
+
+            @Override
+            public void onAddressClick(Address address, boolean b) {
+                //   binding.btnPlaceOrder.setEnabled(b);
+                isSelected = b;
+            }
+        };
+
         query = database.getReference().child("Shipping Address").orderByChild("uId").equalTo(auth.getUid());
         valueEventListener = new ValueEventListener() {
             @Override
@@ -76,7 +96,9 @@ public class CheckOutAcitivity extends AppCompatActivity {
                     assert address != null;
                     addresses.add(address);
                     if (address.getDefault()) {
-                        Collections.swap(addresses, 0, addresses.indexOf(address));
+                        if (addresses.indexOf(address) != 0) {
+                            Collections.swap(addresses, 0, addresses.indexOf(address));
+                        }
                     }
                 }
 //                for (int i = 0; i < addresses.size(); i++) {
@@ -102,12 +124,25 @@ public class CheckOutAcitivity extends AppCompatActivity {
                 stores.clear();
                 storeIdList.clear();
 
+                //fetching products from cart and unique storeIds
+                int total = 0;
+                int price;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Cart cart = snapshot1.getValue(Cart.class);
                     products.add(cart);
+                    assert cart != null;
+                    if (cart.getBargainPrice() != null) {
+                        price = cart.getBargainPrice() * cart.getQuantity();
+                    } else {
+                        price = cart.getpPrice() * cart.getQuantity();
+                    }
+                    total = total + price;
                     storeIdList.add(cart.getStoreId());
                 }
+                int deliverCharge = storeIdList.size() * 70;
+                binding.txtPrice.setText(MessageFormat.format("Total: Rs. {0}", total + deliverCharge));
 
+                //grouping products by stores and adding it to list
                 for (String p : storeIdList) {
                     ArrayList<Cart> list = new ArrayList<>();
                     for (Cart product : products) {
@@ -129,6 +164,21 @@ public class CheckOutAcitivity extends AppCompatActivity {
 
             }
         });
+
+        binding.btnPlaceOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!isSelected) {
+                    Snackbar.make(findViewById(R.id.parent), "Please select delivery address", Snackbar.LENGTH_SHORT).setAnchorView(R.id.linearLayout8).show();
+                    return;
+                }
+                Snackbar.make(findViewById(R.id.parent), "Selected", Snackbar.LENGTH_SHORT).setAnchorView(R.id.linearLayout8).show();
+            }
+        });
+
+        binding.statusLyt.radio1.setImageTintList(ContextCompat.getColorStateList(this, R.color.teal_700));
+        binding.statusLyt.txt1.setTextColor(ContextCompat.getColor(this, R.color.teal_700));
+
         initOrderRecycler();
         initRecycler();
     }
@@ -136,7 +186,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
     private void initRecycler() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(CheckOutAcitivity.this, LinearLayoutManager.HORIZONTAL, false);
         binding.recyclerAddress.setLayoutManager(layoutManager);
-        adapter = new AddressAdapter(addresses, this);
+        adapter = new AddressAdapter(addresses, this, itemClickListener);
         binding.recyclerAddress.setAdapter(adapter);
     }
 

@@ -67,7 +67,7 @@ public class OrderSummaryAdapter extends RecyclerView.Adapter<OrderSummaryAdapte
             int total = price * product.getQuantity();
             sum = sum + total;
         }
-        holder.txtSubtotal.setText(MessageFormat.format("Subtotal: Rs. {0}", sum + 65));
+        holder.txtSubtotal.setText(MessageFormat.format("Subtotal: Rs. {0}", sum + 70));
         sum = 0;
 
 

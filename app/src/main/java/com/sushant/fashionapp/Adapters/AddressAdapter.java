@@ -22,6 +22,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.sushant.fashionapp.Buyer.EditAddressActivity;
+import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.R;
 
@@ -34,10 +35,12 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
     Context context;
     String extraInfo, label, landMark;
     private int mCheckedPostion = -1;
+    ItemClickListener itemClickListener;
 
-    public AddressAdapter(ArrayList<Address> list, Context context) {
+    public AddressAdapter(ArrayList<Address> list, Context context, ItemClickListener itemClickListener) {
         this.list = list;
         this.context = context;
+        this.itemClickListener = itemClickListener;
     }
 
     @NonNull
@@ -82,6 +85,7 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
         }
 
 
+
         holder.linearAddress.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,8 +93,10 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.viewHold
                     holder.imgCheck.setImageTintList(ColorStateList.valueOf(ContextCompat.getColor(context, com.khalti.R.color.material_on_background_disabled)));
                     holder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.white));
                     mCheckedPostion = -1;
+                    itemClickListener.onAddressClick(address, false);
                 } else {
                     mCheckedPostion = holder.getAbsoluteAdapterPosition();
+                    itemClickListener.onAddressClick(address, true);
                     notifyDataSetChanged();
                 }
             }

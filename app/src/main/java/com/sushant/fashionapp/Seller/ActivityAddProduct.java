@@ -375,7 +375,6 @@ public class ActivityAddProduct extends AppCompatActivity {
                     t1.start();
                 } else {
                     binding.txtSellerPrice.setText(MessageFormat.format("Suggested Retail Price (SRP): Rs.{0}", 0));
-                    binding.txtRetailPrice.setText(MessageFormat.format("Commission: Rs.{0}", 0));
                     binding.txtBargainLimit.setText(MessageFormat.format("Bargain Limit: Rs.{0}", 0));
                 }
 
@@ -459,14 +458,13 @@ public class ActivityAddProduct extends AppCompatActivity {
             wholeSalePrice = binding.edPrice.getText().toString();
             double wholesale = Double.parseDouble(wholeSalePrice);
             sellerPrice = wholesale / (1 - 0.3); //30% markup percentage in the wholesale price
-            commission = wholesale * 0.1; //10% added to compensate commission
+      //      commission = wholesale * 0.1; //10% added to compensate commission
             double bargainLimit = wholesale * 1.2; //20%
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     binding.txtSellerPrice.setText(MessageFormat.format("Suggested Retail Price (SRP): Rs.{0}", Math.round(sellerPrice)));
-                    binding.txtRetailPrice.setText(MessageFormat.format("Commission: Rs.{0}", Math.round(commission)));
                     binding.txtBargainLimit.setText(MessageFormat.format("Bargain Limit: Rs.{0}", Math.round(bargainLimit)));
                     // text will be updated automatically
                 }

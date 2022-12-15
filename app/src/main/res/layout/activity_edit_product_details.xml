@@ -266,14 +266,6 @@
                     android:text="Suggested Retail Price: " />
 
                 <TextView
-                    android:id="@+id/txtRetailPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:text="Commission: " />
-
-                <TextView
                     android:id="@+id/txtBargainLimit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

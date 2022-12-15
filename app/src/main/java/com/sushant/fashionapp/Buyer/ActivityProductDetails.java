@@ -836,14 +836,14 @@ public class ActivityProductDetails extends AppCompatActivity {
                 String bargainPrice = edPrice.getText().toString();
                 double wholesale = price * (1 - 0.3); //calculating wholesale price
                 double bargainLimit = wholesale * 1.2; //calculating bargain limit
-                if (Integer.parseInt(bargainPrice) > price) {
-                    edPrice.requestFocus();
-                    Snackbar.make(parent, "Your Price is too high !!", Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
                 if (bargainPrice.isEmpty()) {
                     edPrice.requestFocus();
                     Snackbar.make(parent, "Empty field!!", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if (Integer.parseInt(bargainPrice) > price) {
+                    edPrice.requestFocus();
+                    Snackbar.make(parent, "Your Price is too high !!", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
                 if (Integer.parseInt(bargainPrice) < bargainLimit) {
