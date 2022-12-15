@@ -412,9 +412,15 @@ public class SellerRegistration extends AppCompatActivity {
     private void createStoreAccount() {
         storeId = UUID.randomUUID();
         String sellerId = database.getReference().child("Seller").push().getKey();
-        Store store = new Store.StoreBuilder(storeName, storePhoneNum, storeEmail)
-                .storeAddress(storeAddress).storeVAT(vatNo).storeDesc(storeDesc)
-                .ownerId(sellerId).storeId(String.valueOf(storeId)).build();
+        Store store = new Store();
+        store.setStoreId(storeId.toString());
+        store.setStoreName(storeName);
+        store.setStorePhone(storePhoneNum);
+        store.setStoreEmail(storeEmail);
+        store.setStoreAddress(storeAddress);
+        store.setStoreVAT(vatNo);
+        store.setStoreDesc(storeDesc);
+        store.setSellerId(sellerId);
         database.getReference().child("Store").child(String.valueOf(storeId)).setValue(store).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {

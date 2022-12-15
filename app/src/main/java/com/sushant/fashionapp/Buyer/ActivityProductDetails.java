@@ -138,7 +138,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onClick(Variants product, int pos) {
                 Log.d("variants", "called");
-                pic = product.getPhotos().get(0);
+             //   pic = product.getPhotos().get(0);
                 color = product.getColor();
                 variantPos = pos;
                 sizes.clear();
@@ -832,10 +832,11 @@ public class ActivityProductDetails extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View view) {
+                assert edPrice != null;
                 String bargainPrice = edPrice.getText().toString();
                 double wholesale = price * (1 - 0.3); //calculating wholesale price
                 double bargainLimit = wholesale * 1.2; //calculating bargain limit
-                if (Integer.parseInt(bargainPrice) > origPrice) {
+                if (Integer.parseInt(bargainPrice) > price) {
                     edPrice.requestFocus();
                     Snackbar.make(parent, "Your Price is too high !!", Snackbar.LENGTH_SHORT).show();
                     return;

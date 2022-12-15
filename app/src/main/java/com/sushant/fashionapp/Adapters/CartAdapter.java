@@ -97,9 +97,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                                         Size size = snapshot11.getValue(Size.class);
                                         product.setSizeIndex(Integer.valueOf(snapshot11.getKey()));
                                         product.setStock(size.getStock());
-                                        if (product.getStock() < 5) {
+                                        int remainingStock = product.getStock();
+                                        if (remainingStock < 5) {
                                             holder.txtStock.setVisibility(View.VISIBLE);
-                                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", product.getStock()));
+                                            holder.txtStock.setText(MessageFormat.format("{0} item(s) left in stock", remainingStock));
                                         } else {
                                             holder.txtStock.setVisibility(View.GONE);
                                         }
@@ -186,7 +187,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                                 //    product.setQuantity(product.getQuantity() + 1);
                                 //  updateStock(product, stock - 1,product.getQuantity()+1);
                                 listener.onClick(product, product.getQuantity(), "plus");
-                                //   updateCartQuantity(product);
+                                //    updateCartQuantity(product);
                             } else {
                                 Snackbar.make(cartActivity.findViewById(R.id.cartLayout), "Max limit is 5", Snackbar.LENGTH_SHORT).show();
                             }
@@ -202,8 +203,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                 if (!cartActivity.isActionMode) {
                     if (holder.txtUnavailabe.getVisibility() == View.GONE) {
                         if (product.getQuantity() > 1) {
-                            //  product.setQuantity(product.getQuantity() - 1);
-                            //    updateCartQuantity(product);
+                            //   product.setQuantity(product.getQuantity() - 1);
+                            //  updateCartQuantity(product);
                             listener.onClick(product, product.getQuantity(), "minus");
                             //  updateStock(product, stock + 1,product.getQuantity()-1);
                         }

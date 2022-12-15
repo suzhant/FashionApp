@@ -16,11 +16,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.AddressAdapter;
+import com.sushant.fashionapp.Adapters.OrderSummaryAdapter;
 import com.sushant.fashionapp.Models.Address;
+import com.sushant.fashionapp.Models.Cart;
+import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.databinding.ActivityCheckOutAcitivityBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 
 public class CheckOutAcitivity extends AppCompatActivity {
@@ -32,6 +36,10 @@ public class CheckOutAcitivity extends AppCompatActivity {
     FirebaseDatabase database;
     Query query;
     ValueEventListener valueEventListener;
+    OrderSummaryAdapter orderSummaryAdapter;
+    ArrayList<Store> stores = new ArrayList<>();
+    ArrayList<Cart> products = new ArrayList<>();
+    HashSet<String> storeIdList = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +95,41 @@ public class CheckOutAcitivity extends AppCompatActivity {
         };
         query.addValueEventListener(valueEventListener);
 
+        database.getReference().child("Cart").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                products.clear();
+                stores.clear();
+                storeIdList.clear();
+
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Cart cart = snapshot1.getValue(Cart.class);
+                    products.add(cart);
+                    storeIdList.add(cart.getStoreId());
+                }
+
+                for (String p : storeIdList) {
+                    ArrayList<Cart> list = new ArrayList<>();
+                    for (Cart product : products) {
+                        if (p.equals(product.getStoreId())) {
+                            list.add(product);
+                        }
+                    }
+                    Store store = new Store();
+                    store.setStoreId(p);
+                    store.setProducts(list);
+                    stores.add(store);
+                }
+                orderSummaryAdapter.notifyItemInserted(stores.size());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        initOrderRecycler();
         initRecycler();
     }
 
@@ -95,6 +138,13 @@ public class CheckOutAcitivity extends AppCompatActivity {
         binding.recyclerAddress.setLayoutManager(layoutManager);
         adapter = new AddressAdapter(addresses, this);
         binding.recyclerAddress.setAdapter(adapter);
+    }
+
+    private void initOrderRecycler() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(CheckOutAcitivity.this, LinearLayoutManager.VERTICAL, false);
+        binding.recyclerOrder.setLayoutManager(layoutManager);
+        orderSummaryAdapter = new OrderSummaryAdapter(stores, this);
+        binding.recyclerOrder.setAdapter(orderSummaryAdapter);
     }
 
     @Override

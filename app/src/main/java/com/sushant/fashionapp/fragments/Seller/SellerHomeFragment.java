@@ -59,20 +59,12 @@ public class SellerHomeFragment extends Fragment {
                 if (snapshot.child("sellerId").exists()) {
                     sellerId = snapshot.child("sellerId").getValue(String.class);
                     database.getReference().child("Seller").child(sellerId)
-                            .addValueEventListener(new ValueEventListener() {
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                     if (snapshot.exists()) {
                                         sellerName = snapshot.child("userName").getValue(String.class);
                                         final String storeId = snapshot.child("storeId").getValue(String.class);
-//                                        if (snapshot.child("userPic").exists()) {
-//                                            sellerPic = snapshot.child("userPic").getValue(String.class);
-//                                            if (getActivity() != null) {
-//                                                Glide.with(SellerHomeFragment.this).load(sellerPic).placeholder(R.drawable.avatar)
-//                                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                                                        .into(binding.circleImageView);
-//                                            }
-//                                        }
                                         database.getReference().child("Store").child(storeId).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -83,7 +75,7 @@ public class SellerHomeFragment extends Fragment {
                                                     String storePic = snapshot.child("storePic").getValue(String.class);
                                                     if (getActivity() != null) {
                                                         Glide.with(SellerHomeFragment.this).load(storePic).placeholder(R.drawable.avatar)
-                                                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                                                .diskCacheStrategy(DiskCacheStrategy.ALL).onlyRetrieveFromCache(true)
                                                                 .into(binding.circleImageView);
                                                     }
                                                 }

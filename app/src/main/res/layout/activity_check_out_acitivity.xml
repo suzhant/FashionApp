@@ -83,6 +83,12 @@
             android:textStyle="bold"
             android:text="Order Summary" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp" />
+
 
     </LinearLayout>
 
