@@ -25,7 +25,6 @@ import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Adapters.CardAdapters;
 import com.sushant.fashionapp.Adapters.SearchAdapter;
 import com.sushant.fashionapp.Inteface.ItemClickListener;
-import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.databinding.ActivitySearchBinding;
 
@@ -78,7 +77,7 @@ public class SearchActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAddressClick(Address address, boolean b) {
+            public <T> void onAddressClick(T address, boolean b) {
 
             }
         };

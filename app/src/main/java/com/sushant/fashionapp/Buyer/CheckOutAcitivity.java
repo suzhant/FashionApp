@@ -49,6 +49,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
     ItemClickListener itemClickListener;
     boolean isSelected;
     Address addressInfo;
+    long totalPrice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +83,11 @@ public class CheckOutAcitivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAddressClick(Address address, boolean b) {
-                //   binding.btnPlaceOrder.setEnabled(b);
+            public <T> void onAddressClick(T address, boolean b) {
                 isSelected = b;
-                addressInfo = address;
+                addressInfo = (Address) address;
             }
+
         };
 
         query = database.getReference().child("Shipping Address").orderByChild("uId").equalTo(auth.getUid());
@@ -143,6 +144,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
                     storeIdList.add(cart.getStoreId());
                 }
                 int deliverCharge = storeIdList.size() * 70;
+                totalPrice = total + deliverCharge;
                 binding.txtPrice.setText(MessageFormat.format("Total: Rs. {0}", total + deliverCharge));
 
                 //grouping products by stores and adding it to list
@@ -179,6 +181,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), PaymentActivity.class);
                 intent.putExtra("addressInfo", addressInfo);
                 intent.putExtra("storeInfo", storeIds);
+                intent.putExtra("totalPrice", totalPrice);
                 startActivity(intent);
             }
         });

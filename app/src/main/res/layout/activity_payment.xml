@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Buyer.PaymentActivity">
@@ -28,7 +29,7 @@
         android:id="@+id/nestedScrollView4"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout8"
+        app:layout_constraintBottom_toTopOf="@+id/linear"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout8">
 
         <LinearLayout
@@ -36,6 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
 
             <include
                 android:id="@+id/status_lyt"
@@ -62,6 +64,7 @@
                 android:textStyle="bold" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_khalti"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
@@ -118,6 +121,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
                     <ImageView
+                        android:id="@+id/imgKhaltiCheck"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_check_circle_24"
@@ -133,6 +137,7 @@
 
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_cash_on_delivery"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="5dp"
@@ -190,6 +195,7 @@
                         app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
                     <ImageView
+                        android:id="@+id/imgCashCheck"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_baseline_check_circle_24"
@@ -256,11 +262,12 @@
     </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
-        android:id="@+id/linearLayout8"
+        android:id="@+id/linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="2dp"
+        android:padding="10dp"
+        android:background="@drawable/rectangle_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -294,16 +301,22 @@
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnPlaceOrder"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+        <!--        <Button-->
+        <!--            android:id="@+id/btnPay"-->
+        <!--            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="55sp"-->
+        <!--            android:layout_gravity="center"-->
+        <!--            android:layout_marginEnd="16dp"-->
+        <!--            android:gravity="center"-->
+        <!--            android:text="Pay"-->
+        <!--            android:textAllCaps="false" />-->
+
+        <com.khalti.widget.KhaltiButton
+            android:id="@+id/khalti_button"
             android:layout_width="wrap_content"
-            android:layout_height="55sp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="16dp"
-            android:gravity="center"
-            android:text="Pay"
-            android:textAllCaps="false" />
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/skyBlue" />
 
     </LinearLayout>
 

@@ -22,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.CardAdapters;
 import com.sushant.fashionapp.Adapters.SortFilterAdapter;
 import com.sushant.fashionapp.Inteface.ItemClickListener;
-import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.SortModel;
 import com.sushant.fashionapp.R;
@@ -97,7 +96,7 @@ public class ViewMoreActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAddressClick(Address address, boolean b) {
+            public <T> void onAddressClick(T address, boolean b) {
 
             }
         };
