@@ -1,6 +1,8 @@
 package com.sushant.fashionapp.Models;
 
-public class Address {
+import java.io.Serializable;
+
+public class Address implements Serializable {
     private String name, mobile, streetAddress, city, province, address, landmark, label, uId, addressId;
     private Boolean isDefault;
 

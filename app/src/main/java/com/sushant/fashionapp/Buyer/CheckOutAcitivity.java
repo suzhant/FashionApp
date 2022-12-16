@@ -45,8 +45,10 @@ public class CheckOutAcitivity extends AppCompatActivity {
     ArrayList<Store> stores = new ArrayList<>();
     ArrayList<Cart> products = new ArrayList<>();
     HashSet<String> storeIdList = new HashSet<>();
+    ArrayList<String> storeIds = new ArrayList<>();
     ItemClickListener itemClickListener;
     boolean isSelected;
+    Address addressInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +85,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
             public void onAddressClick(Address address, boolean b) {
                 //   binding.btnPlaceOrder.setEnabled(b);
                 isSelected = b;
+                addressInfo = address;
             }
         };
 
@@ -155,6 +158,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
                     store.setProducts(list);
                     stores.add(store);
                 }
+                storeIds.addAll(storeIdList);
                 orderSummaryAdapter.notifyItemInserted(stores.size());
 
             }
@@ -172,7 +176,10 @@ public class CheckOutAcitivity extends AppCompatActivity {
                     Snackbar.make(findViewById(R.id.parent), "Please select delivery address", Snackbar.LENGTH_SHORT).setAnchorView(R.id.linearLayout8).show();
                     return;
                 }
-                Snackbar.make(findViewById(R.id.parent), "Selected", Snackbar.LENGTH_SHORT).setAnchorView(R.id.linearLayout8).show();
+                Intent intent = new Intent(getApplicationContext(), PaymentActivity.class);
+                intent.putExtra("addressInfo", addressInfo);
+                intent.putExtra("storeInfo", storeIds);
+                startActivity(intent);
             }
         });
 

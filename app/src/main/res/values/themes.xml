@@ -127,5 +127,14 @@
         <item name="fontFamily">sans-serif</item>
     </style>
 
+    <style name="Theme.FashionApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.FashionApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.FashionApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 
 </resources>

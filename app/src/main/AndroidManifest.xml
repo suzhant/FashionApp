@@ -19,6 +19,9 @@
         android:theme="@style/Theme.FashionApp"
         tools:replace="android:theme">
         <activity
+            android:name=".Buyer.PaymentActivity"
+            android:exported="false" />
+        <activity
             android:name=".Buyer.EditAddressActivity"
             android:exported="false" />
         <activity
