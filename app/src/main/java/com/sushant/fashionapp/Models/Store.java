@@ -15,7 +15,6 @@ public class Store {
     private String storePic;
     private String storeSecondaryEmail;
     private Integer deliveryCharge = 70;
-    private String deliveryStatus;
     private Boolean selfPickUp;
     private ArrayList<Cart> products;
 
@@ -146,14 +145,6 @@ public class Store {
         this.deliveryCharge = deliveryCharge;
     }
 
-
-    public String getDeliveryStatus() {
-        return deliveryStatus;
-    }
-
-    public void setDeliveryStatus(String deliveryStatus) {
-        this.deliveryStatus = deliveryStatus;
-    }
 
     public Boolean getSelfPickUp() {
         return selfPickUp;

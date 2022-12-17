@@ -2,7 +2,7 @@ package com.sushant.fashionapp.Models;
 
 public class Payment {
     private String orderId, token, paymentId, buyerId;
-    private Long amount, timestamp;
+    private Long amount;
     private Boolean paid;
     private String paymentMethod;
 
@@ -53,14 +53,6 @@ public class Payment {
 
     public void setBuyerId(String buyerId) {
         this.buyerId = buyerId;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
     }
 
     public Boolean getPaid() {

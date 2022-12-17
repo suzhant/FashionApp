@@ -3,21 +3,23 @@ package com.sushant.fashionapp.Models;
 import java.util.ArrayList;
 
 public class Order extends Payment {
-   private ArrayList<Cart> products;
-   private String addressId;
-   private ArrayList<Store> stores;
-   private String orderStatus;
+    private ArrayList<Delivery> products;
+    private String addressId;
+    private ArrayList<Store> stores;
+    private String orderStatus;
+    private Long orderDate;
 
-   public Order() {
-   }
 
-   public ArrayList<Cart> getProducts() {
-      return products;
-   }
+    public Order() {
+    }
 
-   public void setProducts(ArrayList<Cart> products) {
-      this.products = products;
-   }
+    public ArrayList<Delivery> getProducts() {
+        return products;
+    }
+
+    public void setProducts(ArrayList<Delivery> products) {
+        this.products = products;
+    }
 
    public String getAddressId() {
       return addressId;
@@ -32,14 +34,22 @@ public class Order extends Payment {
    }
 
    public void setStores(ArrayList<Store> stores) {
-      this.stores = stores;
+       this.stores = stores;
    }
 
-   public String getOrderStatus() {
-      return orderStatus;
-   }
+    public String getOrderStatus() {
+        return orderStatus;
+    }
 
-   public void setOrderStatus(String orderStatus) {
-      this.orderStatus = orderStatus;
-   }
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public Long getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Long orderDate) {
+        this.orderDate = orderDate;
+    }
 }

@@ -29,6 +29,7 @@ import com.sushant.fashionapp.Adapters.ShopAdapter;
 import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.Models.Cart;
+import com.sushant.fashionapp.Models.Delivery;
 import com.sushant.fashionapp.Models.Order;
 import com.sushant.fashionapp.Models.Status;
 import com.sushant.fashionapp.Models.Store;
@@ -48,17 +49,16 @@ public class PaymentActivity extends AppCompatActivity {
     ArrayList<String> storeIdList = new ArrayList<>();
     ArrayList<Store> selectedStoreList = new ArrayList<>();
     ArrayList<Store> finalStoreList = new ArrayList<>();
-    ArrayList<Cart> products = new ArrayList<>();
+    ArrayList<Delivery> products = new ArrayList<>();
     FirebaseAuth auth;
     FirebaseDatabase database;
     boolean selectKhalti = false, selectCash = false, isSelected;
-    long totalPrice, finalPrice;
+    long totalPrice;
     private final static String pub = "test_public_key_7ad13f903bd34864b8939125903e80ed";
     ItemClickListener itemClickListener;
     Store store;
     Address address;
     ProgressDialog dialog;
-    int deliverCharge;
 
 
     @Override
@@ -83,7 +83,6 @@ public class PaymentActivity extends AppCompatActivity {
 
 
         binding.txtPrice.setText(MessageFormat.format("Total: {0}", totalPrice));
-        deliverCharge = selectedStoreList.size() * 70;
 
         itemClickListener = new ItemClickListener() {
             @Override
@@ -96,21 +95,16 @@ public class PaymentActivity extends AppCompatActivity {
                 store = (Store) Object;
                 int pos = selectedStoreList.indexOf(store);
                 if (b) {
-                    deliverCharge = deliverCharge - 70;
+                    totalPrice = totalPrice - 70;
                     finalStoreList.get(pos).setDeliveryCharge(0);
                     finalStoreList.get(pos).setSelfPickUp(true);
                 } else {
-                    deliverCharge = deliverCharge + 70;
+                    totalPrice = totalPrice + 70;
                     finalStoreList.get(pos).setDeliveryCharge(70);
                     finalStoreList.get(pos).setSelfPickUp(false);
                 }
 
-
-                finalPrice = totalPrice - deliverCharge;
-                binding.txtPrice.setText(MessageFormat.format("Total: {0}", finalPrice));
-                if (deliverCharge > 0) {
-                    isSelected = true;
-                }
+                binding.txtPrice.setText(MessageFormat.format("Total: {0}", totalPrice));
             }
 
         };
@@ -170,8 +164,8 @@ public class PaymentActivity extends AppCompatActivity {
                 products.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Cart p = snapshot1.getValue(Cart.class);
-                    
-                    Cart product = new Cart();
+
+                    Delivery product = new Delivery();
                     product.setpId(p.getpId());
                     product.setpName(p.getpName());
                     product.setDeliveryStatus(Status.PENDING.name());
@@ -259,16 +253,15 @@ public class PaymentActivity extends AppCompatActivity {
         dialog.setMessage("Please wait while we're preparing your orders.");
         dialog.setCancelable(false);
         dialog.show();
-        if (!isSelected) {
-            finalPrice = totalPrice;
-        }
-        String orderId = database.getReference().child("Order").push().getKey();
+
+        // String orderId = database.getReference().child("Order").push().getKey();
+        String orderId = String.valueOf(System.nanoTime());
         Order order = new Order();
         order.setOrderId(orderId);
         order.setBuyerId(auth.getUid());
-        order.setAmount(finalPrice);
+        order.setAmount(totalPrice);
         order.setProducts(products);
-        order.setTimestamp(new Date().getTime());
+        order.setOrderDate(new Date().getTime());
         order.setAddressId(address.getAddressId());
         order.setStores(finalStoreList);
         order.setPaid(false);
@@ -304,14 +297,10 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void integrateKhalti() {
-        String orderId = database.getReference().child("Order").push().getKey();
+        //  String orderId = database.getReference().child("Order").push().getKey();
+        String orderId = String.valueOf(System.nanoTime());
 
-        if (!isSelected) {
-            finalPrice = totalPrice;
-        }
-
-        assert orderId != null;
-        Config.Builder builder = new Config.Builder(pub, orderId, "product", finalPrice, new OnCheckOutListener() {
+        Config.Builder builder = new Config.Builder(pub, orderId, "product", totalPrice, new OnCheckOutListener() {
             @Override
             public void onError(@NonNull String action, @NonNull Map<String, String> errorMap) {
                 Log.i(action, errorMap.toString());
@@ -324,10 +313,10 @@ public class PaymentActivity extends AppCompatActivity {
                 Order order = new Order();
                 order.setOrderId(orderId);
                 order.setBuyerId(auth.getUid());
-                order.setAmount(finalPrice);
+                order.setAmount(totalPrice);
                 order.setToken(data.get("token").toString());
                 order.setProducts(products);
-                order.setTimestamp(new Date().getTime());
+                order.setOrderDate(new Date().getTime());
                 order.setAddressId(address.getAddressId());
                 order.setStores(finalStoreList);
                 order.setPaid(true);
