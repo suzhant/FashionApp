@@ -80,6 +80,7 @@ public class SearchActivity extends AppCompatActivity {
             public <T> void onAddressClick(T address, boolean b) {
 
             }
+
         };
 
         database.getReference().child("Products").addValueEventListener(new ValueEventListener() {

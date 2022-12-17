@@ -138,7 +138,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onClick(Variants product, int pos) {
                 Log.d("variants", "called");
-             //   pic = product.getPhotos().get(0);
+                pic = product.getPhotos().get(0);
                 color = product.getColor();
                 variantPos = pos;
                 sizes.clear();
@@ -584,12 +584,10 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onSuccess(@NonNull Map<String, Object> data) {
                 Log.i("success", data.toString());
                 String key = database.getReference().child("Payment").push().getKey();
-                Payment payment = new Payment(pId, pName, priceInPaisa);
-                payment.setMobileNumber(data.get("mobile").toString());
+                Payment payment = new Payment(pId, priceInPaisa);
                 payment.setPaymentId(key);
                 payment.setToken(data.get("token").toString());
-                payment.setSellerId(sellerId);
-                payment.setStoreId(storeId);
+                payment.setBuyerId(sellerId);
                 database.getReference().child("Payment").child(auth.getUid()).child(key).setValue(payment);
             }
         }).paymentPreferences(new ArrayList<PaymentPreference>() {{

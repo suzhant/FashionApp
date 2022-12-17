@@ -99,6 +99,7 @@ public class ViewMoreActivity extends AppCompatActivity {
             public <T> void onAddressClick(T address, boolean b) {
 
             }
+
         };
 
         initRecyclerView();

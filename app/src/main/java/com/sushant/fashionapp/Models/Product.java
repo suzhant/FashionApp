@@ -16,6 +16,7 @@ public class Product implements Serializable {
     private String category, subCategory, subSubCategory;
     private String season;
     private String storeId;
+    private String deliveryStatus;
 
     public Product() {
     }
@@ -305,5 +306,13 @@ public class Product implements Serializable {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public String getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(String deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
     }
 }

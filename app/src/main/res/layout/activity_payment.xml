@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navigationIcon="@drawable/ic_arrow_back_24"
-            app:title="Payment"
+            app:title="Checkout"
             app:titleTextAppearance="@style/TextAppearance.AppCompat.Title"
             app:titleTextColor="@color/black" />
     </com.google.android.material.appbar.AppBarLayout>

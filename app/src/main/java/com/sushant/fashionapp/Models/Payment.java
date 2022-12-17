@@ -1,24 +1,25 @@
 package com.sushant.fashionapp.Models;
 
 public class Payment {
-    private String pid, token, pName, paymentId, MobileNumber, sellerId, storeId;
-    private Long amount;
+    private String orderId, token, paymentId, buyerId;
+    private Long amount, timestamp;
+    private Boolean paid;
+    private String paymentMethod;
 
     public Payment() {
     }
 
-    public Payment(String pid, String pName, Long amount) {
-        this.pid = pid;
-        this.pName = pName;
+    public Payment(String orderId, Long amount) {
+        this.orderId = orderId;
         this.amount = amount;
     }
 
-    public String getPid() {
-        return pid;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setPid(String pid) {
-        this.pid = pid;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public String getToken() {
@@ -29,13 +30,6 @@ public class Payment {
         this.token = token;
     }
 
-    public String getpName() {
-        return pName;
-    }
-
-    public void setpName(String pName) {
-        this.pName = pName;
-    }
 
     public String getPaymentId() {
         return paymentId;
@@ -53,27 +47,35 @@ public class Payment {
         this.amount = amount;
     }
 
-    public String getMobileNumber() {
-        return MobileNumber;
+    public String getBuyerId() {
+        return buyerId;
     }
 
-    public void setMobileNumber(String mobileNumber) {
-        MobileNumber = mobileNumber;
+    public void setBuyerId(String buyerId) {
+        this.buyerId = buyerId;
     }
 
-    public String getSellerId() {
-        return sellerId;
+    public Long getTimestamp() {
+        return timestamp;
     }
 
-    public void setSellerId(String sellerId) {
-        this.sellerId = sellerId;
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getStoreId() {
-        return storeId;
+    public Boolean getPaid() {
+        return paid;
     }
 
-    public void setStoreId(String storeId) {
-        this.storeId = storeId;
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
