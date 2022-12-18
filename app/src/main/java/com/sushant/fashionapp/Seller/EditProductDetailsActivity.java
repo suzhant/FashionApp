@@ -253,7 +253,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                 subcategory = binding.autoSubSubCategory.getText().toString();
 
                 if (pName.isEmpty() | masterCategory.isEmpty() | category.isEmpty() | subcategory.isEmpty() | pDesc.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty()) {
-                    Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).setAnchorView(binding.linear).show();
                     return;
                 }
                 addProductToDB();

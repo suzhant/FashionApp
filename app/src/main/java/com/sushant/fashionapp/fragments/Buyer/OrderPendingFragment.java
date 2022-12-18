@@ -41,13 +41,15 @@ public class OrderPendingFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
-        database.getReference().child("Orders").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("Orders").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 orders.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Order order = dataSnapshot.getValue(Order.class);
-                    orders.add(order);
+                    if (order.getOrderStatus().equals("PENDING")) {
+                        orders.add(order);
+                    }
                 }
                 adapter.notifyItemInserted(orders.size());
             }
@@ -70,5 +72,10 @@ public class OrderPendingFragment extends Fragment {
         binding.recyclerOrderPendingFragment.setLayoutManager(layoutManager);
         adapter = new OrderAdapter(orders, getActivity());
         binding.recyclerOrderPendingFragment.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 }

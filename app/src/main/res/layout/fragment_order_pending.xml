@@ -9,6 +9,6 @@
         android:id="@+id/recycler_order_pending_fragment"
         android:layout_width="match_parent"
         android:background="@color/gray_100"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
 </FrameLayout>

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.sushant.fashionapp.Models.Order;
+import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 
 import java.text.MessageFormat;
@@ -49,7 +50,14 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.viewHolder> 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a");
         LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(order.getOrderDate()), ZoneId.systemDefault());
         holder.txtPlaceOn.setText(MessageFormat.format("Placed on {0}", formatter.format(dateTime)));
-        holder.txtTotal.setText(Html.fromHtml(MessageFormat.format("Total: <big><b><span style=color:#09AEA3>Rs. {0}</span></b></big>", order.getAmount())));
+
+        int deliverCharge = 0;
+        for (Store store : order.getStores()) {
+            deliverCharge = deliverCharge + store.getDeliveryCharge();
+        }
+
+        holder.txtTotal.setText(Html.fromHtml(MessageFormat.format("Total: <big><b><span style=color:#09AEA3>Rs. {0}</span></b></big>",
+                order.getAmount() - deliverCharge)));
 
 
         initRecycler(holder, order);

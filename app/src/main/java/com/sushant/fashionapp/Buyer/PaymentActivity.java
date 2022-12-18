@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.backendless.Backendless;
+import com.backendless.async.callback.AsyncCallback;
+import com.backendless.messaging.MessageStatus;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -28,6 +31,7 @@ import com.khalti.checkout.helper.PaymentPreference;
 import com.sushant.fashionapp.Adapters.ShopAdapter;
 import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Address;
+import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Delivery;
 import com.sushant.fashionapp.Models.Order;
@@ -40,6 +44,16 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class PaymentActivity extends AppCompatActivity {
 
@@ -55,10 +69,14 @@ public class PaymentActivity extends AppCompatActivity {
     boolean selectKhalti = false, selectCash = false, isSelected;
     long totalPrice;
     private final static String pub = "test_public_key_7ad13f903bd34864b8939125903e80ed";
+    private final static String app_id = "0A9E15DC-5813-CB09-FFAA-EA6748119A00";
+    private final static String secret_key = "AE7D6748-6D26-45D1-8402-7ED57AC0E17B";
     ItemClickListener itemClickListener;
     Store store;
     Address address;
     ProgressDialog dialog;
+    String email;
+    AsyncCallback<MessageStatus> responder;
 
 
     @Override
@@ -73,6 +91,8 @@ public class PaymentActivity extends AppCompatActivity {
         storeIdList = getIntent().getStringArrayListExtra("storeInfo");
         totalPrice = getIntent().getLongExtra("totalPrice", 0);
         address = (Address) getIntent().getSerializableExtra("addressInfo");
+
+        Backendless.initApp(this, Backendless.getApplicationIdOrDomain(), Backendless.getApiKey());
 
 
         auth = FirebaseAuth.getInstance();
@@ -188,6 +208,19 @@ public class PaymentActivity extends AppCompatActivity {
             }
         });
 
+        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Buyer buyer = snapshot.getValue(Buyer.class);
+                email = buyer.getUserEmail();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         binding.cardKhalti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -267,6 +300,8 @@ public class PaymentActivity extends AppCompatActivity {
         order.setPaid(false);
         order.setOrderStatus(Status.PENDING.name());
         order.setPaymentMethod("cash_on_delivery");
+
+
         database.getReference().child("Orders").child(auth.getUid()).child(orderId).setValue(order).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
@@ -274,6 +309,22 @@ public class PaymentActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         dialog.dismiss();
+//                        String recipient = email;
+//                        String mailBody = "Your order for has been confirmed.";
+//
+//                        Backendless.Messaging.sendHTMLEmail("Order Confirmation", mailBody, recipient, new AsyncCallback<MessageStatus>() {
+//                            @Override
+//                            public void handleResponse(MessageStatus response) {
+//                                Log.d("backendstatus",response.getStatus().name());
+//
+//                            }
+//
+//                            @Override
+//                            public void handleFault(BackendlessFault fault) {
+//                                Log.d("fault",fault.getMessage());
+//                            }
+//                        });
+                        implementJavaMail(email);
                         Intent intent = new Intent(getApplicationContext(), OrderFinalPageActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
@@ -294,6 +345,8 @@ public class PaymentActivity extends AppCompatActivity {
 
             }
         });
+
+
     }
 
     private void integrateKhalti() {
@@ -362,5 +415,49 @@ public class PaymentActivity extends AppCompatActivity {
         binding.recyclerShops.setLayoutManager(linearLayoutManager);
         adapter = new ShopAdapter(selectedStoreList, this, itemClickListener);
         binding.recyclerShops.setAdapter(adapter);
+    }
+
+    private void implementJavaMail(String receiverMail) {
+
+        try {
+            String stringSenderEmail = "sushantshrestha62@gmail.com";
+
+            String stringHost = "smtp.gmail.com";
+
+            Properties properties = System.getProperties();
+
+            properties.put("mail.smtp.host", stringHost);
+            properties.put("mail.smtp.port", "465");
+            properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.auth", "true");
+
+            javax.mail.Session session = Session.getInstance(properties, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(stringSenderEmail, getString(R.string.mail_secret));
+                }
+            });
+
+            MimeMessage mimeMessage = new MimeMessage(session);
+            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverMail));
+
+            mimeMessage.setSubject("Subject: Android App email");
+            mimeMessage.setText("Hello Programmer, \n\nProgrammer World has sent you this 2nd email. \n\n Cheers!\nProgrammer World");
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Transport.send(mimeMessage);
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 }

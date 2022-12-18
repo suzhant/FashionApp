@@ -34,6 +34,10 @@ android {
             useJUnitPlatform()
         }
     }
+    packagingOptions{
+        exclude 'META-INF/NOTICE.md'
+        exclude 'META-INF/LICENSE.md'
+    }
 }
 
 dependencies {
@@ -121,5 +125,18 @@ dependencies {
     implementation ('com.khalti:khalti-android:2.01.02') {
         transitive = true
     }
+
+    //backendless
+    implementation group: 'com.backendless', name: 'backendless', version: '6.3.6'
+
+    // required for real-time database and real-time messaging
+    implementation ('io.socket:socket.io-client:2.1.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+
+    //java mail
+    implementation 'com.sun.mail:android-mail:1.6.7'
+    implementation 'com.sun.mail:android-activation:1.6.7'
 
 }

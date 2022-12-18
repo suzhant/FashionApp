@@ -159,8 +159,8 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_custom_dialog.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_home.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_message.xml" value="0.2907225309961522" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_cancelled.xml" value="0.18298418127404875" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_completed.xml" value="0.18298418127404875" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_cancelled.xml" value="0.25" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_completed.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_pending.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_account.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_chat.xml" value="0.2907225309961522" />
@@ -209,6 +209,7 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/seller_bottom_nav_menu.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/store_menu.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/top_app_bar.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/xml/network_security_config.xml" value="0.10260795211628901" />
         <entry key="..\:/Android_SDK/platforms/android-32/data/res/layout/select_dialog_item.xml" value="0.13210773834972211" />
         <entry key="..\:/Android_SDK/platforms/android-32/data/res/layout/simple_list_item_1.xml" value="0.2907225309961522" />
       </map>

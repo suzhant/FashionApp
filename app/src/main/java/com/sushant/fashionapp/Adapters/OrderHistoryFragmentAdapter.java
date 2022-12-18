@@ -21,13 +21,13 @@ public class OrderHistoryFragmentAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 1:
-                return new OrderPendingFragment();
-            case 2:
                 return new OrderCompletedFragment();
-            case 3:
+            case 2:
                 return new OrderCancelledFragment();
+            case 0:
+            default:
+                return new OrderPendingFragment();
         }
-        return new OrderPendingFragment();
     }
 
     @Override

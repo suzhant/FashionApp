@@ -305,7 +305,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                 subSubCat = binding.autoSubSubCategory.getText().toString();
 
                 if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty()) {
-                    Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).setAnchorView(binding.linear).show();
                     return;
                 }
                 addProductToDB();
