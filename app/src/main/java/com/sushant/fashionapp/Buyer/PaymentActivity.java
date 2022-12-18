@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.backendless.Backendless;
 import com.backendless.async.callback.AsyncCallback;
+import com.backendless.exceptions.BackendlessFault;
+import com.backendless.messaging.EmailEnvelope;
 import com.backendless.messaging.MessageStatus;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,8 +45,11 @@ import com.sushant.fashionapp.databinding.ActivityPaymentBinding;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.Authenticator;
 import javax.mail.Message;
@@ -69,8 +74,6 @@ public class PaymentActivity extends AppCompatActivity {
     boolean selectKhalti = false, selectCash = false, isSelected;
     long totalPrice;
     private final static String pub = "test_public_key_7ad13f903bd34864b8939125903e80ed";
-    private final static String app_id = "0A9E15DC-5813-CB09-FFAA-EA6748119A00";
-    private final static String secret_key = "AE7D6748-6D26-45D1-8402-7ED57AC0E17B";
     ItemClickListener itemClickListener;
     Store store;
     Address address;
@@ -324,6 +327,28 @@ public class PaymentActivity extends AppCompatActivity {
 //                                Log.d("fault",fault.getMessage());
 //                            }
 //                        });
+                        Set<String> addresses = new HashSet<>();
+                        addresses.add("sushantshrestha62@gmail.com");
+                        addresses.add("xresthasushant61@gmail.com");
+
+                        Map<String, String> templateValues = new HashMap<>();
+                        templateValues.put("Users.address.country", "your country");
+                        templateValues.put("discount", "20% off");
+
+                        EmailEnvelope envelope = new EmailEnvelope();
+                        envelope.setTo(addresses);
+
+                        Backendless.Messaging.sendEmailFromTemplate("Marketing Template", envelope, templateValues, new AsyncCallback<MessageStatus>() {
+                            @Override
+                            public void handleResponse(MessageStatus response) {
+                                Log.i("template", "Email has been sent");
+                            }
+
+                            @Override
+                            public void handleFault(BackendlessFault fault) {
+                                Log.e("template", fault.getMessage());
+                            }
+                        });
                         implementJavaMail(email);
                         Intent intent = new Intent(getApplicationContext(), OrderFinalPageActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
