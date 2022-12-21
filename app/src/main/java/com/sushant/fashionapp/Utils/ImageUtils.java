@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sushant.fashionapp.BuildConfig;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Seller.SellerHomePage;
 
@@ -235,6 +236,26 @@ public class ImageUtils {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    @NonNull
+    public static byte[] getByteFromDrawable(Context context, int resourceId) {
+        Drawable drawable = ContextCompat.getDrawable(context, resourceId);
+        assert drawable != null;
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public static String getURLForResource(int resourceId) {
+        //use BuildConfig.APPLICATION_ID instead of R.class.getPackage().getName() if both are not same
+        return Uri.parse("android.resource://" + BuildConfig.APPLICATION_ID + "/" + resourceId).toString();
     }
 
 }

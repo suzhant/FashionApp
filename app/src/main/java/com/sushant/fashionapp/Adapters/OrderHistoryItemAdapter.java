@@ -40,6 +40,7 @@ public class OrderHistoryItemAdapter extends RecyclerView.Adapter<OrderHistoryIt
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Delivery product = products.get(position);
         holder.txtProductName.setText(product.getpName());
+
         Glide.with(context).load(product.getpPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL)
                 .onlyRetrieveFromCache(true).into(holder.imgProduct);
 
@@ -49,6 +50,7 @@ public class OrderHistoryItemAdapter extends RecyclerView.Adapter<OrderHistoryIt
         } else {
             holder.txtPrice.setText(MessageFormat.format("Rs. {0}", product.getpPrice()));
         }
+
 
     }
 

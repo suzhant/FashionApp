@@ -1,14 +1,20 @@
 package com.sushant.fashionapp.fragments.Buyer;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,27 +22,49 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.sushant.fashionapp.Adapters.CardAdapters;
 import com.sushant.fashionapp.Adapters.CategoryAdapter;
 import com.sushant.fashionapp.Buyer.SearchActivity;
 import com.sushant.fashionapp.Buyer.ViewMoreActivity;
+import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.Models.Category;
+import com.sushant.fashionapp.Models.Order;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Utils.PdfGenerator;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.FragmentHomeBinding;
 
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,6 +85,9 @@ public class HomeFragment extends Fragment {
     ArrayList<Category> categories = new ArrayList<>();
     CategoryAdapter categoryAdapter;
     String buyerPic;
+    Address receiverAddress = new Address();
+    Order customerOrder = new Order();
+    FirebaseStorage storage;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -71,6 +102,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        storage = FirebaseStorage.getInstance();
 
 
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -153,7 +185,107 @@ public class HomeFragment extends Fragment {
                 startActivity(new Intent(getContext(), SearchActivity.class));
             }
         });
+
+
+        database.getReference().child("Shipping Address").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Address address = snapshot1.getValue(Address.class);
+                    if (address.getDefault() && address.getuId().equals(auth.getUid())) {
+                        receiverAddress = address;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        binding.imgNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                customerOrder.setOrderDate(new Date().getTime());
+                customerOrder.setOrderId("123DF24VC");
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    try {
+                        File file = PdfGenerator.createPdf(getContext(), receiverAddress, "sushantshrestha62@gmail.com", customerOrder);
+                        uploadPdf(file);
+
+                    } catch (FileNotFoundException | MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Dexter.withContext(getContext())
+                            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            .withListener(new PermissionListener() {
+                                @Override
+                                public void onPermissionGranted(PermissionGrantedResponse response) {
+                                    try {
+                                        PdfGenerator.createPdf(getContext(), receiverAddress, "sushantshrestha62@gmail.com", customerOrder);
+                                    } catch (FileNotFoundException | MalformedURLException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionDenied(PermissionDeniedResponse response) {
+                                    Toast.makeText(getContext(), "Please accept permissions", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                            }).check();
+                }
+
+            }
+        });
         return binding.getRoot();
+    }
+
+    private void uploadPdf(File document) {
+        ProgressDialog dialog = new ProgressDialog(getContext());
+        dialog.setMessage("Please wait..");
+        dialog.setCancelable(false);
+        dialog.show();
+        Calendar calendar = Calendar.getInstance();
+        final StorageReference reference = storage.getReference().child("Invoice").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child(calendar.getTimeInMillis() + "");
+        UploadTask uploadTask = reference.putFile(Uri.fromFile(document));
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.P)
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @RequiresApi(api = Build.VERSION_CODES.P)
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String filePath = uri.toString();
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put("invoiceNo", new Date().getTime());
+                            map.put("invoiceUrl", filePath);
+                            database.getReference().child("Invoice").child(auth.getUid()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
     }
 
     private void initPopularRecyclerView() {

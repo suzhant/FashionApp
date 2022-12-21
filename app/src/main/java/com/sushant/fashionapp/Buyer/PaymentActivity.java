@@ -13,11 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.backendless.Backendless;
-import com.backendless.async.callback.AsyncCallback;
-import com.backendless.exceptions.BackendlessFault;
-import com.backendless.messaging.EmailEnvelope;
-import com.backendless.messaging.MessageStatus;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -40,25 +35,34 @@ import com.sushant.fashionapp.Models.Order;
 import com.sushant.fashionapp.Models.Status;
 import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Utils.PdfGenerator;
 import com.sushant.fashionapp.databinding.ActivityPaymentBinding;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+import javax.activation.URLDataSource;
 import javax.mail.Authenticator;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 public class PaymentActivity extends AppCompatActivity {
 
@@ -71,15 +75,13 @@ public class PaymentActivity extends AppCompatActivity {
     ArrayList<Delivery> products = new ArrayList<>();
     FirebaseAuth auth;
     FirebaseDatabase database;
-    boolean selectKhalti = false, selectCash = false, isSelected;
+    boolean selectKhalti = false, selectCash = false;
     long totalPrice;
-    private final static String pub = "test_public_key_7ad13f903bd34864b8939125903e80ed";
     ItemClickListener itemClickListener;
     Store store;
     Address address;
     ProgressDialog dialog;
-    String email;
-    AsyncCallback<MessageStatus> responder;
+    String email, name;
 
 
     @Override
@@ -95,7 +97,7 @@ public class PaymentActivity extends AppCompatActivity {
         totalPrice = getIntent().getLongExtra("totalPrice", 0);
         address = (Address) getIntent().getSerializableExtra("addressInfo");
 
-        Backendless.initApp(this, Backendless.getApplicationIdOrDomain(), Backendless.getApiKey());
+        //  Backendless.initApp(this, Backendless.getApplicationIdOrDomain(), Backendless.getApiKey());
 
 
         auth = FirebaseAuth.getInstance();
@@ -216,6 +218,7 @@ public class PaymentActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Buyer buyer = snapshot.getValue(Buyer.class);
                 email = buyer.getUserEmail();
+                name = buyer.getUserName();
             }
 
             @Override
@@ -302,7 +305,7 @@ public class PaymentActivity extends AppCompatActivity {
         order.setStores(finalStoreList);
         order.setPaid(false);
         order.setOrderStatus(Status.PENDING.name());
-        order.setPaymentMethod("cash_on_delivery");
+        order.setPaymentMethod("Cash on Delivery");
 
 
         database.getReference().child("Orders").child(auth.getUid()).child(orderId).setValue(order).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -311,6 +314,12 @@ public class PaymentActivity extends AppCompatActivity {
                 database.getReference().child("Cart").child(auth.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
+                        try {
+                            File file = PdfGenerator.createPdf(getApplicationContext(), address, email, order);
+                            implementJavaMail(email, orderId, file);
+                        } catch (FileNotFoundException | MalformedURLException e) {
+                            e.printStackTrace();
+                        }
                         dialog.dismiss();
 //                        String recipient = email;
 //                        String mailBody = "Your order for has been confirmed.";
@@ -327,29 +336,30 @@ public class PaymentActivity extends AppCompatActivity {
 //                                Log.d("fault",fault.getMessage());
 //                            }
 //                        });
-                        Set<String> addresses = new HashSet<>();
-                        addresses.add("sushantshrestha62@gmail.com");
-                        addresses.add("xresthasushant61@gmail.com");
 
-                        Map<String, String> templateValues = new HashMap<>();
-                        templateValues.put("Users.address.country", "your country");
-                        templateValues.put("discount", "20% off");
+//                        Set<String> addresses = new HashSet<>();
+//                        addresses.add(email);
+//
+//                        Map<String, String> templateValues = new HashMap<>();
+//                        templateValues.put("customerName",name );
+//                        templateValues.put("orderId", orderId);
+//
+//                        EmailEnvelope envelope = new EmailEnvelope();
+//                        envelope.setTo(addresses);
+//
+//
+//                        Backendless.Messaging.sendEmailFromTemplate("Order Confirmation", envelope, templateValues, new AsyncCallback<MessageStatus>() {
+//                            @Override
+//                            public void handleResponse(MessageStatus response) {
+//                                Log.i("template", "Email has been sent");
+//                            }
+//
+//                            @Override
+//                            public void handleFault(BackendlessFault fault) {
+//                                Log.e("template", fault.getMessage());
+//                            }
+//                        });
 
-                        EmailEnvelope envelope = new EmailEnvelope();
-                        envelope.setTo(addresses);
-
-                        Backendless.Messaging.sendEmailFromTemplate("Marketing Template", envelope, templateValues, new AsyncCallback<MessageStatus>() {
-                            @Override
-                            public void handleResponse(MessageStatus response) {
-                                Log.i("template", "Email has been sent");
-                            }
-
-                            @Override
-                            public void handleFault(BackendlessFault fault) {
-                                Log.e("template", fault.getMessage());
-                            }
-                        });
-                        implementJavaMail(email);
                         Intent intent = new Intent(getApplicationContext(), OrderFinalPageActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
@@ -378,7 +388,7 @@ public class PaymentActivity extends AppCompatActivity {
         //  String orderId = database.getReference().child("Order").push().getKey();
         String orderId = String.valueOf(System.nanoTime());
 
-        Config.Builder builder = new Config.Builder(pub, orderId, "product", totalPrice, new OnCheckOutListener() {
+        Config.Builder builder = new Config.Builder(getString(R.string.khalti_test_pub), orderId, "product", totalPrice, new OnCheckOutListener() {
             @Override
             public void onError(@NonNull String action, @NonNull Map<String, String> errorMap) {
                 Log.i(action, errorMap.toString());
@@ -399,7 +409,7 @@ public class PaymentActivity extends AppCompatActivity {
                 order.setStores(finalStoreList);
                 order.setPaid(true);
                 order.setOrderStatus(Status.PENDING.name());
-                order.setPaymentMethod("Khalti");
+                order.setPaymentMethod("Khalti Wallet");
                 database.getReference().child("Orders").child(auth.getUid()).child(orderId).setValue(order).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -442,7 +452,7 @@ public class PaymentActivity extends AppCompatActivity {
         binding.recyclerShops.setAdapter(adapter);
     }
 
-    private void implementJavaMail(String receiverMail) {
+    private void implementJavaMail(String receiverMail, String orderId, File file) {
 
         try {
             String stringSenderEmail = "sushantshrestha62@gmail.com";
@@ -464,10 +474,51 @@ public class PaymentActivity extends AppCompatActivity {
             });
 
             MimeMessage mimeMessage = new MimeMessage(session);
-            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverMail));
+            mimeMessage.setFrom(new InternetAddress(stringSenderEmail));
+            mimeMessage.setSentDate(new Date());
 
-            mimeMessage.setSubject("Subject: Android App email");
-            mimeMessage.setText("Hello Programmer, \n\nProgrammer World has sent you this 2nd email. \n\n Cheers!\nProgrammer World");
+            //single recipient
+            //    mimeMessage.addRecipient(Message.RecipientType.TO,new InternetAddress(receiverMail));
+
+            //multiple recipients
+            javax.mail.Address[] recipient = new javax.mail.Address[]{
+                    new InternetAddress("xresthasushant61@gmail.com"),
+                    new InternetAddress("sushantshrestha62@gmail.com")
+            };
+            mimeMessage.addRecipients(Message.RecipientType.TO, InternetAddress.toString(recipient));
+            mimeMessage.setSubject("Order Confirmation");
+
+
+            // Create the message part
+            BodyPart messageBodyPart = new MimeBodyPart();
+            //body
+            messageBodyPart.setText(MessageFormat.format("Dear {0},\n\n Your order for {1} has been confirmed. \n\n\nSincerely,\nFashion development Team" + "", name, orderId));
+
+            //if you want to inline image in email
+            //inlineImage(messageBodyPart);
+
+            //getting pic from internet and attaching it in mail
+//            MimeBodyPart imageBodyPart = new MimeBodyPart();
+//            String filepath="https://firebasestorage.googleapis.com/v0/b/fashionapp-3c97a.appspot.com/o/Seller%2FL7IoEjRozPXvBTyP65Y4VdSI22y1%2F1668857933292?alt=media&token=4d19747a-28c4-4dc7-9da7-4587ee164b21";
+//            URLDataSource bds = new URLDataSource(new URL(filepath));
+//            imageBodyPart.setDataHandler(new DataHandler(bds));
+//            imageBodyPart.setFileName("photo.jpg");
+
+            MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+            FileDataSource source = new FileDataSource(file);
+            attachmentBodyPart.setDataHandler(new DataHandler(source));
+            attachmentBodyPart.setFileName("invoice.pdf");
+            //       attachmentBodyPart.attachFile(file, "application/pdf", null);
+
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(messageBodyPart);
+            //    multipart.addBodyPart(imageBodyPart);
+            multipart.addBodyPart(attachmentBodyPart);
+
+            // Send the complete message parts
+            mimeMessage.setContent(multipart);
+
 
             Thread thread = new Thread(new Runnable() {
                 @Override
@@ -484,5 +535,17 @@ public class PaymentActivity extends AppCompatActivity {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+    }
+
+    private void inlineImage(BodyPart messageBodyPart) throws MessagingException, MalformedURLException {
+        String htmlText = "<H1>Hello</H1><img src=\"cid:image\">";
+        messageBodyPart.setContent(htmlText, "text/html");
+
+        MimeBodyPart imageBodyPart = new MimeBodyPart();
+        String filepath = "https://firebasestorage.googleapis.com/v0/b/fashionapp-3c97a.appspot.com/o/Seller%2FL7IoEjRozPXvBTyP65Y4VdSI22y1%2F1668857933292?alt=media&token=4d19747a-28c4-4dc7-9da7-4587ee164b21";
+        URLDataSource bds = new URLDataSource(new URL(filepath));
+        imageBodyPart.setDataHandler(new DataHandler(bds));
+        imageBodyPart.setHeader("Content-ID", "<image>");
+        imageBodyPart.setFileName("photo.jpg");
     }
 }
