@@ -41,7 +41,7 @@
                     style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Search"
+                    android:hint="Search in Store"
                     android:imeOptions="actionSearch"
                     android:importantForAutofill="no"
                     android:inputType="text"
