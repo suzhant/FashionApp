@@ -1,7 +1,7 @@
 package com.sushant.fashionapp.Models;
 
 public class Payment {
-    private String orderId, token, paymentId, buyerId;
+    private String token, paymentId, buyerId;
     private Long amount;
     private Boolean paid;
     private String paymentMethod;
@@ -9,18 +9,6 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(String orderId, Long amount) {
-        this.orderId = orderId;
-        this.amount = amount;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
 
     public String getToken() {
         return token;

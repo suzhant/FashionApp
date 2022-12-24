@@ -1,7 +1,8 @@
 package com.sushant.fashionapp.Buyer;
 
+import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.khalti.checkout.helper.Config;
 import com.khalti.checkout.helper.KhaltiCheckOut;
 import com.khalti.checkout.helper.OnCheckOutListener;
@@ -39,10 +46,15 @@ import com.sushant.fashionapp.Utils.PdfGenerator;
 import com.sushant.fashionapp.databinding.ActivityPaymentBinding;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -81,7 +93,7 @@ public class PaymentActivity extends AppCompatActivity {
     Store store;
     Address address;
     ProgressDialog dialog;
-    String email, name;
+    String email, name, invoiceNo;
 
 
     @Override
@@ -213,6 +225,7 @@ public class PaymentActivity extends AppCompatActivity {
             }
         });
 
+
         database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -272,29 +285,49 @@ public class PaymentActivity extends AppCompatActivity {
                     Snackbar.make(findViewById(R.id.parent), "Select Payment method", Snackbar.LENGTH_SHORT).setAnchorView(R.id.linear).show();
                     return;
                 }
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+                    Dexter.withContext(getApplicationContext())
+                            .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            .withListener(new PermissionListener() {
+                                @Override
+                                public void onPermissionGranted(PermissionGrantedResponse response) {
+                                    if (selectKhalti) {
+                                        //  binding.khaltiButton.setOnClickListener(this);
+                                        integrateKhalti();
+                                    }
 
+                                    if (selectCash) {
+                                        integrateCashOnDelivery();
+                                    }
+                                }
+
+                                @Override
+                                public void onPermissionDenied(PermissionDeniedResponse response) {
+                                    Toast.makeText(getApplicationContext(), "Please accept permissions", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                            }).check();
+                }
                 if (selectKhalti) {
                     //  binding.khaltiButton.setOnClickListener(this);
                     integrateKhalti();
                 }
+
                 if (selectCash) {
                     integrateCashOnDelivery();
                 }
             }
         });
 
-
         initRecycler();
     }
 
     private void integrateCashOnDelivery() {
-        ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage("Please wait while we're preparing your orders.");
-        dialog.setCancelable(false);
-        dialog.show();
-
         // String orderId = database.getReference().child("Order").push().getKey();
-        String orderId = String.valueOf(System.nanoTime());
+        dialog.show();
+        String orderId = String.valueOf(new Date().getTime());
         Order order = new Order();
         order.setOrderId(orderId);
         order.setBuyerId(auth.getUid());
@@ -314,13 +347,6 @@ public class PaymentActivity extends AppCompatActivity {
                 database.getReference().child("Cart").child(auth.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        try {
-                            File file = PdfGenerator.createPdf(getApplicationContext(), address, email, order);
-                            implementJavaMail(email, orderId, file);
-                        } catch (FileNotFoundException | MalformedURLException e) {
-                            e.printStackTrace();
-                        }
-                        dialog.dismiss();
 //                        String recipient = email;
 //                        String mailBody = "Your order for has been confirmed.";
 //
@@ -336,7 +362,7 @@ public class PaymentActivity extends AppCompatActivity {
 //                                Log.d("fault",fault.getMessage());
 //                            }
 //                        });
-
+//
 //                        Set<String> addresses = new HashSet<>();
 //                        addresses.add(email);
 //
@@ -344,9 +370,9 @@ public class PaymentActivity extends AppCompatActivity {
 //                        templateValues.put("customerName",name );
 //                        templateValues.put("orderId", orderId);
 //
+//
 //                        EmailEnvelope envelope = new EmailEnvelope();
 //                        envelope.setTo(addresses);
-//
 //
 //                        Backendless.Messaging.sendEmailFromTemplate("Order Confirmation", envelope, templateValues, new AsyncCallback<MessageStatus>() {
 //                            @Override
@@ -360,9 +386,9 @@ public class PaymentActivity extends AppCompatActivity {
 //                            }
 //                        });
 
-                        Intent intent = new Intent(getApplicationContext(), OrderFinalPageActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
+                        long date = new Date().getTime();
+                        createInvoiceNo(date, order);
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -386,7 +412,7 @@ public class PaymentActivity extends AppCompatActivity {
 
     private void integrateKhalti() {
         //  String orderId = database.getReference().child("Order").push().getKey();
-        String orderId = String.valueOf(System.nanoTime());
+        String orderId = String.valueOf(new Date().getTime());
 
         Config.Builder builder = new Config.Builder(getString(R.string.khalti_test_pub), orderId, "product", totalPrice, new OnCheckOutListener() {
             @Override
@@ -397,7 +423,7 @@ public class PaymentActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(@NonNull Map<String, Object> data) {
-                Log.i("success", data.toString());
+                dialog.show();
                 Order order = new Order();
                 order.setOrderId(orderId);
                 order.setBuyerId(auth.getUid());
@@ -416,13 +442,13 @@ public class PaymentActivity extends AppCompatActivity {
                         database.getReference().child("Cart").child(auth.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                Intent intent = new Intent(getApplicationContext(), OrderFinalPageActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
+                                long date = new Date().getTime();
+                                createInvoiceNo(date, order);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
+                                dialog.dismiss();
                                 Toast.makeText(PaymentActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                             }
                         });
@@ -430,6 +456,7 @@ public class PaymentActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        dialog.dismiss();
                         Toast.makeText(PaymentActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -462,8 +489,8 @@ public class PaymentActivity extends AppCompatActivity {
             Properties properties = System.getProperties();
 
             properties.put("mail.smtp.host", stringHost);
-            properties.put("mail.smtp.port", "465");
-            properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.port", "587");
+            properties.put("mail.smtp.starttls.enable", "true");
             properties.put("mail.smtp.auth", "true");
 
             javax.mail.Session session = Session.getInstance(properties, new Authenticator() {
@@ -474,32 +501,34 @@ public class PaymentActivity extends AppCompatActivity {
             });
 
             MimeMessage mimeMessage = new MimeMessage(session);
-            mimeMessage.setFrom(new InternetAddress(stringSenderEmail));
+            mimeMessage.setFrom(new InternetAddress("noreply@support.fashionApp.com.np", "Fashion App"));
+            mimeMessage.setHeader("Disposition-Notification-To", "noreply@support.fashionApp.com.np");
+            mimeMessage.setReplyTo(InternetAddress.parse("noreply@support.fashionApp.com.np", false));
             mimeMessage.setSentDate(new Date());
 
             //single recipient
-            //    mimeMessage.addRecipient(Message.RecipientType.TO,new InternetAddress(receiverMail));
+            mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(receiverMail));
 
             //multiple recipients
-            javax.mail.Address[] recipient = new javax.mail.Address[]{
-                    new InternetAddress("xresthasushant61@gmail.com"),
-                    new InternetAddress("sushantshrestha62@gmail.com")
-            };
-            mimeMessage.addRecipients(Message.RecipientType.TO, InternetAddress.toString(recipient));
+//            javax.mail.Address[] recipient = new javax.mail.Address[]{
+//                    new InternetAddress("xresthasushant61@gmail.com"),
+//                    new InternetAddress("sushantshrestha62@gmail.com")
+//            };
+//            mimeMessage.addRecipients(Message.RecipientType.TO, InternetAddress.toString(recipient));
             mimeMessage.setSubject("Order Confirmation");
 
 
             // Create the message part
-            BodyPart messageBodyPart = new MimeBodyPart();
+            MimeBodyPart messageBodyPart1 = new MimeBodyPart();
             //body
-            messageBodyPart.setText(MessageFormat.format("Dear {0},\n\n Your order for {1} has been confirmed. \n\n\nSincerely,\nFashion development Team" + "", name, orderId));
+            messageBodyPart1.setText(MessageFormat.format("Dear {0},\n\nYour order for #{1} has been confirmed.\n\n\n\n\n\nSincerely,\nFashion development Team", name, orderId));
 
             //if you want to inline image in email
             //inlineImage(messageBodyPart);
 
             //getting pic from internet and attaching it in mail
 //            MimeBodyPart imageBodyPart = new MimeBodyPart();
-//            String filepath="https://firebasestorage.googleapis.com/v0/b/fashionapp-3c97a.appspot.com/o/Seller%2FL7IoEjRozPXvBTyP65Y4VdSI22y1%2F1668857933292?alt=media&token=4d19747a-28c4-4dc7-9da7-4587ee164b21";
+//            String filepath="";
 //            URLDataSource bds = new URLDataSource(new URL(filepath));
 //            imageBodyPart.setDataHandler(new DataHandler(bds));
 //            imageBodyPart.setFileName("photo.jpg");
@@ -512,7 +541,7 @@ public class PaymentActivity extends AppCompatActivity {
 
 
             Multipart multipart = new MimeMultipart();
-            multipart.addBodyPart(messageBodyPart);
+            multipart.addBodyPart(messageBodyPart1);
             //    multipart.addBodyPart(imageBodyPart);
             multipart.addBodyPart(attachmentBodyPart);
 
@@ -532,20 +561,56 @@ public class PaymentActivity extends AppCompatActivity {
             });
             thread.start();
 
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
-    private void inlineImage(BodyPart messageBodyPart) throws MessagingException, MalformedURLException {
+    private void inlineImage(BodyPart messageBodyPart, String filepath) throws MessagingException, MalformedURLException {
         String htmlText = "<H1>Hello</H1><img src=\"cid:image\">";
         messageBodyPart.setContent(htmlText, "text/html");
 
         MimeBodyPart imageBodyPart = new MimeBodyPart();
-        String filepath = "https://firebasestorage.googleapis.com/v0/b/fashionapp-3c97a.appspot.com/o/Seller%2FL7IoEjRozPXvBTyP65Y4VdSI22y1%2F1668857933292?alt=media&token=4d19747a-28c4-4dc7-9da7-4587ee164b21";
         URLDataSource bds = new URLDataSource(new URL(filepath));
         imageBodyPart.setDataHandler(new DataHandler(bds));
         imageBodyPart.setHeader("Content-ID", "<image>");
         imageBodyPart.setFileName("photo.jpg");
+    }
+
+
+    public void createInvoiceNo(long date, Order order) {
+        database.getReference().child("Invoice").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DateTimeFormatter formatter;
+                LocalDateTime dateTime;
+                long count;
+                if (snapshot.exists()) {
+                    count = snapshot.getChildrenCount() + 1;
+                } else {
+                    count = 1;
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                    dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneId.systemDefault());
+                    String formattedStr = String.format("%05d", count);
+                    invoiceNo = dateTime.format(formatter) + "-" + formattedStr;
+                    try {
+                        PdfGenerator pdfGenerator = new PdfGenerator(PaymentActivity.this, order, address, email, invoiceNo, date);
+                        File file = pdfGenerator.createInvoicePdf();
+                        implementJavaMail(email, order.getOrderId(), file);
+                        pdfGenerator.uploadInvoice(file, dialog);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

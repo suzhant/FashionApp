@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FashionApp</string>
+    <string name="app_name">Pahiran</string>
 
     <string-array name="gender">
         <item>Male</item>

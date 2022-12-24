@@ -22,7 +22,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/ipSearch"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginEnd="20dp"
@@ -38,7 +38,7 @@
             app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
+                style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
                 android:id="@+id/edSearch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,23 +78,23 @@
 
 
         <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:id="@+id/btnSortFilter"
-            android:layout_width="110dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="10dp"
             android:backgroundTint="@color/gray_100"
-            android:padding="6dp"
             android:text="Sort and Filter"
             android:textColor="@color/black"
             android:textSize="11sp"
+            app:iconPadding="0dp"
+            android:letterSpacing="0"
             app:cornerRadius="5dp"
             app:icon="@drawable/ccp_ic_arrow_drop_down"
-            app:iconGravity="end"
-            app:iconPadding="0dp"
+            android:textAllCaps="false"
+            app:iconGravity="textEnd"
             app:iconSize="24dp"
-            app:iconTint="@color/black"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
+            app:iconTint="@color/black" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

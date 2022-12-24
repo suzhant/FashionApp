@@ -114,8 +114,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -132,12 +133,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="sans-serif-medium"
-                        android:gravity="center_vertical"
-                        android:layout_marginTop="4dp"
                         android:maxLines="2"
+                        android:layout_marginEnd="4dp"
                         android:ellipsize="end"
                         android:text="Red Skirt"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
 
 
                     <!--                <ImageView-->
@@ -168,12 +168,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="top"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="5dp"
+                        android:padding="2dp"
                         android:src="@drawable/ic_love"
-                        app:tint="@color/black"
-                        tools:layout_editor_absoluteX="352dp"
-                        tools:layout_editor_absoluteY="30dp" />
+                        app:tint="@color/black" />
 
                     <ProgressBar
                         android:id="@+id/progress_circular"
@@ -189,11 +186,10 @@
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:fontFamily="@font/gilroy_bold"
                     android:text="Rs. 1000"
                     android:textColor="@color/skyBlue"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -344,6 +340,7 @@
                     android:src="@drawable/avatar" />
 
                 <LinearLayout
+                    android:id="@+id/store_lyt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -364,12 +361,6 @@
                             android:maxLines="1"
                             android:text="French Store Collection" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="Follow"
-                            android:textColor="@color/skyBlue" />
                     </LinearLayout>
 
                     <TextView
@@ -379,6 +370,14 @@
                         android:layout_marginTop="4dp"
                         android:text="2.9k followers" />
                 </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="4dp"
+                        android:text="Follow"
+                        android:textColor="@color/skyBlue" />
                 </LinearLayout>
 
                 <TextView
@@ -393,8 +392,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:gravity="center"
-                    android:layout_marginTop="8dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -408,39 +407,38 @@
                             android:id="@+id/txtRating"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textAlignment="center"
                             android:text="0.0"
+                            android:textAlignment="center"
                             android:textSize="55sp" />
 
                         <RatingBar
                             android:id="@+id/ratingBar"
+                            style="?android:ratingBarStyleSmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            style="?android:ratingBarStyleSmall"
-                            android:stepSize="0.5"
-                            android:rating="0" />
+                            android:rating="0"
+                            android:stepSize="0.5" />
 
                         <TextView
                             android:id="@+id/txtUsers"
+                            style="@style/TextAppearance.AppCompat.Small"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="0"
-                            style="@style/TextAppearance.AppCompat.Small"
-                            android:textSize="13sp" />
+                            android:text="0" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginStart="20dp"
                         android:orientation="vertical">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="horizontal"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -454,18 +452,18 @@
                                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                                 android:layout_width="match_parent"
                                 android:layout_height="10dp"
-                                android:max="100"
                                 android:layout_marginStart="10dp"
-                                android:progressDrawable="@drawable/custom_progress_bg"
-                                android:progress="0" />
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/custom_progress_bg" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="horizontal"
                             android:layout_marginTop="3dp"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -479,18 +477,18 @@
                                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                                 android:layout_width="match_parent"
                                 android:layout_height="10dp"
-                                android:max="100"
                                 android:layout_marginStart="10dp"
-                                android:progressDrawable="@drawable/custom_progress_bg"
-                                android:progress="0" />
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/custom_progress_bg" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="horizontal"
                             android:layout_marginTop="3dp"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -504,18 +502,18 @@
                                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                                 android:layout_width="match_parent"
                                 android:layout_height="10dp"
-                                android:max="100"
                                 android:layout_marginStart="10dp"
-                                android:progressDrawable="@drawable/custom_progress_bg"
-                                android:progress="0" />
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/custom_progress_bg" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="horizontal"
                             android:layout_marginTop="3dp"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -529,18 +527,18 @@
                                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                                 android:layout_width="match_parent"
                                 android:layout_height="10dp"
-                                android:max="100"
                                 android:layout_marginStart="10dp"
-                                android:progressDrawable="@drawable/custom_progress_bg"
-                                android:progress="0" />
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/custom_progress_bg" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:orientation="horizontal"
                             android:layout_marginTop="3dp"
-                            android:gravity="center">
+                            android:gravity="center"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -554,10 +552,10 @@
                                 style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                                 android:layout_width="match_parent"
                                 android:layout_height="10dp"
-                                android:max="100"
                                 android:layout_marginStart="10dp"
-                                android:progressDrawable="@drawable/custom_progress_bg"
-                                android:progress="0" />
+                                android:max="100"
+                                android:progress="0"
+                                android:progressDrawable="@drawable/custom_progress_bg" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -627,21 +625,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingVertical="5dp"
                 android:gravity="center">
 
-                <com.khalti.widget.KhaltiButton
-                    android:id="@+id/khalti_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="55dp"
-                    app:text="Pay"
-                    app:khalti_button_style="basic" />
+
                 <Button
                     android:id="@+id/btnAddCart"
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="160dp"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="match_parent"
                     android:layout_height="55dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginEnd="15dp"
                     android:gravity="center"
                     android:text="Add to Cart"
                     android:textAllCaps="false" />

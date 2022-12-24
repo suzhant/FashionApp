@@ -3,6 +3,7 @@ package com.sushant.fashionapp.Models;
 import java.util.ArrayList;
 
 public class Order extends Payment {
+    private String orderId;
     private ArrayList<Delivery> products;
     private String addressId;
     private ArrayList<Store> stores;
@@ -51,5 +52,13 @@ public class Order extends Payment {
 
     public void setOrderDate(Long orderDate) {
         this.orderDate = orderDate;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }

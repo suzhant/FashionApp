@@ -171,6 +171,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
             }
         });
 
+
         binding.btnPlaceOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

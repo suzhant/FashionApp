@@ -41,16 +41,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.iarcuschin.simpleratingbar.SimpleRatingBar;
-import com.khalti.checkout.helper.Config;
-import com.khalti.checkout.helper.KhaltiCheckOut;
-import com.khalti.checkout.helper.OnCheckOutListener;
-import com.khalti.checkout.helper.PaymentPreference;
 import com.sushant.fashionapp.Adapters.VPAdapter;
 import com.sushant.fashionapp.Adapters.VariantAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Cart;
-import com.sushant.fashionapp.Models.Payment;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Rating;
 import com.sushant.fashionapp.Models.Size;
@@ -69,7 +64,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -474,6 +468,28 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        binding.imgStorePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), StorePageActivity.class);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("storePic", storePic);
+                intent.putExtra("storeName", sName);
+                startActivity(intent);
+            }
+        });
+
+        binding.storeLyt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), StorePageActivity.class);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("storePic", storePic);
+                intent.putExtra("storeName", sName);
+                startActivity(intent);
+            }
+        });
+
         database.getReference().child("Ratings").child(pId).child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -555,48 +571,6 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
-        binding.khaltiButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                integrateKhalti();
-            }
-        });
-
-
-    }
-
-    private void integrateKhalti() {
-
-        long priceInPaisa;
-        if (bargainPrice != null && status.equals("accepted")) {
-            priceInPaisa = bargainPrice;
-        } else {
-            priceInPaisa = price;
-        }
-
-        Config.Builder builder = new Config.Builder(pub, pId, pName, priceInPaisa, new OnCheckOutListener() {
-            @Override
-            public void onError(@NonNull String action, @NonNull Map<String, String> errorMap) {
-                Log.i(action, errorMap.toString());
-            }
-
-            @Override
-            public void onSuccess(@NonNull Map<String, Object> data) {
-                Log.i("success", data.toString());
-                String key = database.getReference().child("Payment").push().getKey();
-                Payment payment = new Payment(pId, priceInPaisa);
-                payment.setPaymentId(key);
-                payment.setToken(data.get("token").toString());
-                payment.setBuyerId(sellerId);
-                database.getReference().child("Payment").child(auth.getUid()).child(key).setValue(payment);
-            }
-        }).paymentPreferences(new ArrayList<PaymentPreference>() {{
-            add(PaymentPreference.KHALTI);
-        }});
-        Config config = builder.build();
-        binding.khaltiButton.setCheckOutConfig(config);
-        KhaltiCheckOut khaltiCheckOut = new KhaltiCheckOut(this, config);
-        khaltiCheckOut.show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
