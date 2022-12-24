@@ -13,13 +13,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:strokeWidth="1dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="6dp"
         app:strokeColor="@color/medium_gray">
 
         <ImageView
             android:id="@+id/imgVariant"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:padding="5dp"
+            android:padding="2dp"
             android:src="@drawable/red_dress2" />
     </com.google.android.material.card.MaterialCardView>
 

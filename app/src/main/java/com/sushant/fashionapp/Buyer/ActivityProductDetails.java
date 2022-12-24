@@ -87,7 +87,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     DatabaseReference variantRef, wishListRef, ratingRef;
     ArrayList<Size> sizes = new ArrayList<>();
     ArrayList<Product> wishList = new ArrayList<>();
-    boolean isLoved, isAccepted, isExist = false;
+    boolean isLoved, isExist = false;
     String bargainId;
     DatabaseReference reference;
     ValueEventListener valueEventListener;
@@ -163,7 +163,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                 binding.viewPager.setCurrentItem(pos, true);
                 //resetting wish icon to normal
                 binding.imgWish.setImageResource(R.drawable.ic_love);
-                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
+                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.gray_800));
             }
 
             @Override
@@ -290,7 +290,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                                 break;
                             } else {
                                 binding.imgWish.setImageResource(R.drawable.ic_love);
-                                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
+                                binding.imgWish.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.gray_800));
                                 isLoved = false;
                             }
                         }
@@ -309,21 +309,58 @@ public class ActivityProductDetails extends AppCompatActivity {
                 if (stock > 0) {
                     addProductToCart();
                 } else {
-                    Snackbar.make(findViewById(R.id.parent), "Out of stock!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
+                    Snackbar.make(findViewById(R.id.parent), "Out of stock!", Snackbar.LENGTH_SHORT).setAnchorView(binding.bottom).show();
                 }
             }
         });
 
 
-        binding.btnBack.setOnClickListener(new View.OnClickListener() {
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                startActivity(new Intent(ActivityProductDetails.this, ActivityHomePage.class));
-//                finishAfterTransition();
                 onBackPressed();
             }
         });
 
+        binding.imgStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), StorePageActivity.class);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("storePic", storePic);
+                intent.putExtra("storeName", sName);
+                startActivity(intent);
+            }
+        });
+
+        binding.cartBadge.cartLyt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), CartActivity.class));
+            }
+        });
+
+        database.getReference().child("Cart").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long count = snapshot.getChildrenCount();
+                if (count == 0) {
+                    binding.cartBadge.txtItemNumber.setVisibility(View.GONE);
+                    binding.cartBadge.imgRound.setVisibility(View.GONE);
+                } else {
+                    binding.cartBadge.txtItemNumber.setVisibility(View.VISIBLE);
+                    binding.cartBadge.imgRound.setVisibility(View.VISIBLE);
+                    binding.cartBadge.txtItemNumber.setText(String.valueOf(count));
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         binding.imgWish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -924,7 +961,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         snackbar.show();
                     } else {
                         dialog.dismiss();
-                        Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
+                        Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.bottom).show();
                     }
                 } else {
                     updateStock(stock);
@@ -972,7 +1009,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onClick(View view) {
                 startActivity(new Intent(ActivityProductDetails.this, CartActivity.class));
             }
-        }).setAnchorView(binding.cardView);
+        }).setAnchorView(binding.bottom);
         TextView snackbarActionTextView = (TextView) snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_action);
         snackbarActionTextView.setAllCaps(false);
         return snackbar;
