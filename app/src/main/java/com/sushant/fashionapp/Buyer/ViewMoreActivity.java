@@ -229,17 +229,6 @@ public class ViewMoreActivity extends AppCompatActivity {
         });
     }
 
-    private void filterSeason(String season) {
-        products.clear();
-        Predicate<Product> byBrand = product -> product.getSeason().equals(season);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Set<Product> result = unmodifiedList.stream().filter(byBrand)
-                    .collect(Collectors.toSet());
-            products.addAll(result);
-        }
-        adapters.notifyDataSetChanged();
-    }
 
     private void filterBrand(String brand) {
         products.clear();

@@ -11,7 +11,6 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -24,6 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,12 +47,6 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
     String gender;
     FirebaseAuth auth;
     FirebaseDatabase database;
-    Dialog dialog;
-    LottieAnimationView lottieAnimationView;
-    Button btnLogin;
-    ImageView imgClose;
-    TextView txtVerification;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,26 +189,6 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
                 }
             }
         });
-
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (auth.getCurrentUser() != null) {
-                    auth.signOut();
-                }
-                startActivity(new Intent(ActivityRegister.this, ActivitySignIn.class));
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-
-            }
-        });
-
-        imgClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
 
     }
 
@@ -385,10 +359,14 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
 
 
     private void showCreatingDialog() {
+        Dialog dialog;
+        MaterialButton btnLogin;
+        ImageView imgClose;
+        TextView txtVerification;
         dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.create_dialog);
-        lottieAnimationView = dialog.findViewById(R.id.lottie_create);
+        LottieAnimationView lottieAnimationView = dialog.findViewById(R.id.lottie_create);
         btnLogin = dialog.findViewById(R.id.btnLogin);
         imgClose = dialog.findViewById(R.id.imgClose);
         txtVerification = dialog.findViewById(R.id.txtVerification);
@@ -397,6 +375,26 @@ public class ActivityRegister extends AppCompatActivity implements DatePickerDia
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.CENTER);
         txtVerification.setText("Please verify your account at " + binding.edMail.getText());
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (auth.getCurrentUser() != null) {
+                    auth.signOut();
+                }
+                startActivity(new Intent(ActivityRegister.this, ActivitySignIn.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
+            }
+        });
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+
     }
 
     public void hideSoftKeyboard() {

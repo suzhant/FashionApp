@@ -87,6 +87,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     ArrayList<String> tempImages = new ArrayList<>();
     ActivityResultLauncher<Intent> imgLauncher;
     ActivityResultLauncher<Intent> photoLauncher;
+    ActivityResultLauncher<Intent> billLauncher;
     ArrayList<Variants> variants = new ArrayList<>();
     ArrayList<String> catList = new ArrayList<>();
     ArrayList<String> subCatList = new ArrayList<>();
@@ -107,8 +108,9 @@ public class ActivityAddProduct extends AppCompatActivity {
     String color;
     VariantPhotoAdapter photoAdapter;
     ArrayList<String> upLoadPic;
+    String billUrl = "";
     int position;
-    double sellerPrice, commission;
+    double sellerPrice;
     Thread t1 = null;
     MyCalc mycalc = null;
 
@@ -262,6 +264,21 @@ public class ActivityAddProduct extends AppCompatActivity {
                     }
                 });
 
+        billLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                            // There are no request codes
+                            if (result.getData().getData() != null) {
+                                Uri selectedImage = result.getData().getData();
+                                binding.imgBill.setImageURI(selectedImage);
+                                createBillBitmap(selectedImage);
+                            }
+                        }
+                    }
+                });
 
         binding.autoCategory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -304,7 +321,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                 subCat = binding.autoSubCategory.getText().toString();
                 subSubCat = binding.autoSubSubCategory.getText().toString();
 
-                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty()) {
+                if (pName.isEmpty() | cat.isEmpty() | subCat.isEmpty() | subSubCat.isEmpty() | pDes.isEmpty() | variants.isEmpty() | brandName.isEmpty() | season.isEmpty() | billUrl.isEmpty()) {
                     Snackbar.make(binding.parent, "Please complete the form", Snackbar.LENGTH_SHORT).setAnchorView(binding.linear).show();
                     return;
                 }
@@ -381,6 +398,66 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
+        binding.cardBillUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                uploadBill();
+            }
+        });
+
+    }
+
+    private void createBillBitmap(Uri selectedImage) {
+        Bitmap bitmap = null;
+        try {
+            bitmap = ImageUtils.handleSamplingAndRotationBitmap(this, selectedImage);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        assert bitmap != null;
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] bytes = baos.toByteArray();
+        uploadToFirebase(bytes);
+    }
+
+    private void uploadToFirebase(byte[] bytes) {
+        Calendar calendar = Calendar.getInstance();
+        ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage("Please wait...");
+        dialog.setCancelable(false);
+        dialog.show();
+        final StorageReference reference = storage.getReference().child("Bills").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid())).child(calendar.getTimeInMillis() + "");
+        UploadTask uploadTask = reference.putBytes(bytes);
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.P)
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()) {
+                    reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @RequiresApi(api = Build.VERSION_CODES.P)
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            billUrl = uri.toString();
+                            dialog.dismiss();
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private void uploadBill() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+        intent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+        billLauncher.launch(intent);
     }
 
     private void openDialog(Variants product) {
@@ -623,6 +700,7 @@ public class ActivityAddProduct extends AppCompatActivity {
                             product1.setVariants(variants);
                             product1.setSeason(season);
                             product1.setStoreId(storeId);
+                            product1.setBillUrl(billUrl);
 
                             dialog.show();
                             database.getReference().child("Products").child(product1.getpId()).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -761,6 +839,10 @@ public class ActivityAddProduct extends AppCompatActivity {
                 stock = input.getText().toString();
                 if (size == null || stock.isEmpty()) {
                     Toast.makeText(ActivityAddProduct.this, "Your form is incomplete", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (Integer.parseInt(stock) == 0) {
+                    Toast.makeText(ActivityAddProduct.this, "Stock can't be 0", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for (Size s : sizes) {

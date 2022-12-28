@@ -81,27 +81,45 @@
             android:textAllCaps="false"
             android:textSize="16sp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ipStreetAddress"
-            style="@style/Widget.App.TextInputLayout"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="20dp"
-            android:hint="Street Address"
-            android:textColorHint="@color/hintColor"
-            app:boxStrokeColor="@color/skyBlue"
-            app:endIconMode="clear_text">
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edStreetAddress"
-                android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/ipStreetAddress"
+                style="@style/Widget.App.TextInputLayout"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:importantForAutofill="no"
-                android:inputType="text|textCapWords"
-                android:textSize="14sp" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_weight="1"
+                android:hint="Street Address"
+                android:textColorHint="@color/hintColor"
+                app:boxStrokeColor="@color/skyBlue"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edStreetAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAutofill="no"
+                    android:inputType="text|textCapWords"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGetCurrentLocation"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="50dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="5dp"
+                app:strokeColor="@color/disabled"
+                app:iconTint="@color/royal_blue"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/ic_baseline_my_location_24" />
+        </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/ipCity"

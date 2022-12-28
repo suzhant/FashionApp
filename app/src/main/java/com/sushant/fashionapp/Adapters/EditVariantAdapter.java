@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +22,8 @@ import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Seller.EditVariantActivity;
 
 import java.util.ArrayList;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.viewHolder> {
 
@@ -111,7 +112,7 @@ public class EditVariantAdapter extends RecyclerView.Adapter<EditVariantAdapter.
 
     public static class viewHolder extends RecyclerView.ViewHolder {
 
-        private final ImageView imgProduct;
+        private final CircleImageView imgProduct;
         private final TextView txtColor;
         private final MaterialButton btnEdit;
         private final MaterialButton btnDelete;

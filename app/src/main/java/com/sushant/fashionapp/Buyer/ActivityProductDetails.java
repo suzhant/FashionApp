@@ -61,6 +61,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -146,15 +147,19 @@ public class ActivityProductDetails extends AppCompatActivity {
                     chip.setVisibility(View.GONE);
                 }
                 //showing chips associated with the sizes of colors
-                for (int i = 0; i < sizes.size(); i++) {
-                    for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
-                        Chip chip = (Chip) binding.chipGroup.getChildAt(j);
-                        if (chip.getText().toString().equals(sizes.get(i).getSize())) {
-                            chip.setVisibility(View.VISIBLE);
-                            break;
-                        }
-                    }
+//                for (int i = 0; i < sizes.size(); i++) {
+//                    for (int j = 0; j < binding.chipGroup.getChildCount(); j++) {
+//                        Chip chip = (Chip) binding.chipGroup.getChildAt(j);
+//                        if (chip.getText().toString().equals(sizes.get(i).getSize())) {
+//                            chip.setVisibility(View.VISIBLE);
+//                            break;
+//                        }
+//                    }
+//                }
+                for (Size size : sizes) {
+                    sortChips(size);
                 }
+                setHistoryChips(sizes);
 
                 //  adding pic in slider
 
@@ -1082,6 +1087,89 @@ public class ActivityProductDetails extends AppCompatActivity {
                 Snackbar.make(findViewById(R.id.parent), "Removed from wishList", Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void setHistoryChips(ArrayList<Size> sizes) {
+        binding.chipGroup.removeAllViews();
+        for (Size size : sizes) {
+            Chip mChip = (Chip) this.getLayoutInflater().inflate(R.layout.item_chip_history, binding.chipGroup, false);
+            mChip.setText(size.getSize());
+            binding.chipGroup.addView(mChip);
+        }
+    }
+
+
+    private void sortChips(Size s) {
+        //find position of s in a list
+        int index = sizes.indexOf(s);
+
+        //first look at the front
+        if (index == 0 && s.getSize().equals("L")) {
+            //look at back
+            for (Size size : sizes) {
+                if (size.getSize().equals("S") || size.getSize().equals("M")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+        } else if (index != 0 && s.getSize().equals("L")) {
+            //look at front
+            for (int i = 0; i < index; i++) {
+                Size size = sizes.get(i);
+                if (size.getSize().equals("XL")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+            //look at back
+            for (int i = index; i < sizes.size(); i++) {
+                Size size = sizes.get(i);
+                if (size.getSize().equals("S") || size.getSize().equals("M")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+        }
+
+        //first look at the front
+        if (index != 0 && s.getSize().equals("S")) {
+            //look at front
+            for (int i = 0; i < index; i++) {
+                Size size = sizes.get(i);
+                if (size.getSize().equals("M") || size.getSize().equals("L") || size.getSize().equals("XL")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+        }
+
+        //first look at the front
+        if (index == 0 && s.getSize().equals("M")) {
+            //look at back
+            for (Size size : sizes) {
+                if (size.getSize().equals("S")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+        } else if (index != 0 && s.getSize().equals("M")) {
+            //look at front
+            for (int i = 0; i < index; i++) {
+                Size size = sizes.get(i);
+                if (size.getSize().equals("L") && size.getSize().equals("XL")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+            //look at back
+            for (int i = index; i < sizes.size(); i++) {
+                Size size = sizes.get(i);
+                if (size.getSize().equals("S")) {
+                    int nextIndex = sizes.indexOf(size);
+                    Collections.swap(sizes, index, nextIndex);
+                }
+            }
+        }
     }
 
     @Override

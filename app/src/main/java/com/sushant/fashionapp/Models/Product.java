@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class Product implements Serializable {
-    private String pId, pName, maxLimit, desc, pPic, brandName, variantPId;
+    private String pId, pName, maxLimit, desc, pPic, brandName, variantPId, billUrl;
     private Integer pPrice, love, quantity, variantIndex, sizeIndex, bargainPrice, stock;
     private ArrayList<Variants> variants;
     private ArrayList<Size> sizes;
@@ -16,6 +16,7 @@ public class Product implements Serializable {
     private String category, subCategory, subSubCategory;
     private String season;
     private String storeId;
+    private Long productCode;
 
     public Product() {
     }
@@ -299,4 +300,19 @@ public class Product implements Serializable {
         this.stock = stock;
     }
 
+    public Long getProductCode() {
+        return productCode;
+    }
+
+    public void setProductCode(Long productCode) {
+        this.productCode = productCode;
+    }
+
+    public String getBillUrl() {
+        return billUrl;
+    }
+
+    public void setBillUrl(String billUrl) {
+        this.billUrl = billUrl;
+    }
 }

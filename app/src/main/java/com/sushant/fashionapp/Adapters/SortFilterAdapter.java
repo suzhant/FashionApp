@@ -17,7 +17,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sushant.fashionapp.Buyer.ViewMoreActivity;
 import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.SortModel;
@@ -34,18 +33,26 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
     HashSet<String> gender;
     HashSet<String> brand;
     HashSet<String> season;
+    HashSet<String> subSubCat;
     ItemClickListener itemClickListener;
     BottomSheetDialog bottomSheetDialog;
-    ViewMoreActivity viewMoreActivity;
     ArrayList<String> subItems;
     TextView txtClear;
+    String type;
 
     public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener) {
         this.list = list;
         this.context = context;
         this.itemClickListener = itemClickListener;
-        this.viewMoreActivity = (ViewMoreActivity) context;
     }
+
+    public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener, String type) {
+        this.list = list;
+        this.context = context;
+        this.itemClickListener = itemClickListener;
+        this.type = type;
+    }
+
 
     @NonNull
     @Override
@@ -75,11 +82,13 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
                 gender = new HashSet<>();
                 brand = new HashSet<>();
                 season = new HashSet<>();
+                subSubCat = new HashSet<>();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     for (int i = 0; i < product.getVariants().size(); i++) {
                         colors.add(product.getVariants().get(i).getColor());
                         gender.add(product.getCategory());
+                        subSubCat.add(product.getSubCategory());
                     }
                     brand.add(product.getBrandName());
                     season.add(product.getSeason());
@@ -132,7 +141,11 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
                 subItems.add("Price: high to low");
                 break;
             case "Category":
-                subItems.addAll(gender);
+                if (type != null && type.equals("shop")) {
+                    subItems.addAll(subSubCat);
+                } else {
+                    subItems.addAll(gender);
+                }
                 break;
             case "Colour":
                 subItems.addAll(colors);

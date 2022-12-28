@@ -1,18 +1,45 @@
 package com.sushant.fashionapp.Buyer;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.location.Geocoder;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -29,13 +56,17 @@ import com.sushant.fashionapp.Models.Address;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityAddressBinding;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class AddressActivity extends AppCompatActivity {
 
+    private static final int LOCATION_PERMISSION_REQUEST = 2045;
+    private static final int REQUEST_CHECK_SETTINGS = 4543;
     ActivityAddressBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
@@ -44,6 +75,8 @@ public class AddressActivity extends AppCompatActivity {
     ProgressDialog dialog;
     Boolean isDefault = false;
     String id = "";
+    FusedLocationProviderClient fusedLocationProviderClient;
+    LocationManager mLocationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +109,10 @@ public class AddressActivity extends AppCompatActivity {
             }
         });
 
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (getLocation()) {
+            binding.addressLayout.btnGetCurrentLocation.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.royal_blue)));
+        }
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,7 +171,125 @@ public class AddressActivity extends AppCompatActivity {
                 confirmDialog();
             }
         });
+
+        binding.addressLayout.btnGetCurrentLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(AddressActivity.this);
+                if (ActivityCompat.checkSelfPermission(AddressActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(AddressActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(AddressActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                            LOCATION_PERMISSION_REQUEST);
+
+                } else {
+                    displayLocationSettingsRequest();
+                }
+
+            }
+        });
     }
+
+
+    public boolean getLocation() {
+        boolean gpsEnabled = false;
+        boolean networkEnabled = false;
+
+        // exceptions will be thrown if provider is not permitted.
+        try {
+            gpsEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            networkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return gpsEnabled && networkEnabled;
+    }
+
+
+    private void displayLocationSettingsRequest() {
+        dialog.setTitle("Fetching location");
+        dialog.setMessage("Please wait...");
+        dialog.show();
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 10000)
+                .setWaitForAccurateLocation(false)
+                .setMinUpdateIntervalMillis(LocationRequest.Builder.IMPLICIT_MIN_UPDATE_INTERVAL)
+                .setMaxUpdateAgeMillis(20000)
+                .build();
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true);
+
+        Task<LocationSettingsResponse> result = LocationServices.getSettingsClient(this).checkLocationSettings(builder.build());
+        result.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+            @SuppressLint("MissingPermission")
+            @Override
+            public void onComplete(Task<LocationSettingsResponse> task) {
+                try {
+                    LocationSettingsResponse response = task.getResult(ApiException.class);
+                    // All location settings are satisfied. The client can initialize location
+//                    // requests here.
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest,
+                            locationCallback,
+                            Looper.getMainLooper());
+
+                } catch (ApiException exception) {
+                    switch (exception.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            // Location settings are not satisfied. But could be fixed by showing the
+                            // user a dialog.
+                            try {
+                                // Cast to a resolvable exception.
+                                ResolvableApiException resolvable = (ResolvableApiException) exception;
+                                // Show the dialog by calling startResolutionForResult(),
+                                // and check the result in onActivityResult().
+                                resolvable.startResolutionForResult(
+                                        AddressActivity.this,
+                                        REQUEST_CHECK_SETTINGS);
+                            } catch (IntentSender.SendIntentException e) {
+                                // Ignore the error.
+                            } catch (ClassCastException e) {
+                                // Ignore, should be an impossible error.
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                            // Location settings are not satisfied. However, we have no way to fix the
+                            // settings so we won't show the dialog.
+
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            dialog.dismiss();
+            try {
+                Geocoder geocoder = new Geocoder(AddressActivity.this, Locale.getDefault());
+                List<android.location.Address> addresses = geocoder.getFromLocation(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude(), 1);
+                String adminArea = addresses.get(0).getAdminArea();
+                String subAdminArea = addresses.get(0).getSubAdminArea();
+                String subLocality = addresses.get(0).getSubLocality();
+                String postalCode = addresses.get(0).getPostalCode();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    binding.addressLayout.edStreetAddress.setText(String.join(",", subLocality, postalCode));
+                }
+                binding.addressLayout.edCity.setText(subAdminArea);
+                binding.addressLayout.autoProvince.setText(adminArea);
+                binding.addressLayout.autoProvince.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, provinceList));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            stopLocationUpdates();
+        }
+    };
 
     private void confirmDialog() {
         new MaterialAlertDialogBuilder(this)
@@ -224,6 +379,44 @@ public class AddressActivity extends AppCompatActivity {
         ipPhone.setErrorEnabled(false);
         return true;
     }
+
+    private void stopLocationUpdates() {
+        if (fusedLocationProviderClient != null) {
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                displayLocationSettingsRequest();
+            } else {
+                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            switch (resultCode) {
+                case Activity.RESULT_OK:
+                    // All required changes were successfully made
+                    binding.addressLayout.btnGetCurrentLocation.setStrokeColor(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.royal_blue)));
+                    break;
+                case Activity.RESULT_CANCELED:
+                    // The user was asked to change settings, but chose not to
+
+                    break;
+            }
+            dialog.dismiss();
+        }
+    }
+
 
     @Override
     protected void onDestroy() {
