@@ -20,6 +20,9 @@
         android:theme="@style/Theme.FashionApp"
         tools:replace="android:theme">
         <activity
+            android:name=".Buyer.MessageActivity"
+            android:exported="false" />
+        <activity
             android:name=".Buyer.ChatActivity"
             android:exported="false" />
         <activity

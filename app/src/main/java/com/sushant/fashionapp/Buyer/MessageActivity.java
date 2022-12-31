@@ -1,14 +1,14 @@
-package com.sushant.fashionapp.fragments.Buyer;
+package com.sushant.fashionapp.Buyer;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,30 +20,28 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.databinding.FragmentMessageBinding;
+import com.sushant.fashionapp.databinding.ActivityMessage2Binding;
+import com.sushant.fashionapp.fragments.Buyer.ChatFragment;
+import com.sushant.fashionapp.fragments.Buyer.SettingFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MessageFragment extends Fragment {
+public class MessageActivity extends AppCompatActivity {
 
-
-    FragmentMessageBinding binding;
+    ActivityMessage2Binding binding;
     TextView nav_email, nav_username;
     CircleImageView nav_profilePic;
     FirebaseDatabase database;
     FirebaseAuth auth;
 
-    public MessageFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        binding = FragmentMessageBinding.inflate(inflater, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMessage2Binding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -60,21 +58,26 @@ public class MessageFragment extends Fragment {
                         replaceFragment(new ChatFragment());
                         binding.toolbar.setTitle("Chat");
                         binding.txtMessage.setVisibility(View.VISIBLE);
+                        binding.drawerLayout.closeDrawer(GravityCompat.START);
                         break;
 
                     case R.id.item_setting:
                         replaceFragment(new SettingFragment());
                         binding.toolbar.setTitle("Setting");
                         binding.txtMessage.setVisibility(View.GONE);
+                        binding.drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case R.id.item_home:
+                        startActivity(new Intent(getApplicationContext(), ActivityHomePage.class));
                         break;
 
                 }
-                binding.drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             }
         });
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(requireActivity(), binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         binding.drawerLayout.addDrawerListener(toggle);
         toggle.setDrawerIndicatorEnabled(true);
         toggle.syncState();
@@ -88,7 +91,7 @@ public class MessageFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Buyer buyer = snapshot.getValue(Buyer.class);
-                Glide.with(requireContext()).load(buyer.getUserPic()).placeholder(R.drawable.avatar).into(nav_profilePic);
+                Glide.with(getApplicationContext()).load(buyer.getUserPic()).placeholder(R.drawable.avatar).into(nav_profilePic);
                 nav_username.setText(buyer.getUserName());
                 nav_email.setText(buyer.getUserEmail());
             }
@@ -100,11 +103,10 @@ public class MessageFragment extends Fragment {
         });
 
 
-        return binding.getRoot();
     }
 
     private void replaceFragment(Fragment fragment) {
-        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(binding.fragmentContainer.getId(), fragment).setCustomAnimations(
                 R.anim.push_left_in,  // enter
                 R.anim.fade_out,  // exit
@@ -114,4 +116,12 @@ public class MessageFragment extends Fragment {
         transaction.commit();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

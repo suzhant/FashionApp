@@ -465,9 +465,7 @@ public class CartActivity extends AppCompatActivity {
         if (isActionMode) {
             disableActionMode();
         } else {
-            Intent intent = new Intent(getApplicationContext(), ActivityHomePage.class);
-            intent.putExtra("fragment", "cart");
-            startActivity(intent);
+           super.onBackPressed();
         }
     }
 

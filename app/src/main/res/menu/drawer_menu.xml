@@ -11,5 +11,10 @@
             android:icon="@drawable/ic_baseline_settings_24"
             android:title="Setting"
             android:checkable="true" />
+        <item
+            android:id="@+id/item_home"
+            android:icon="@drawable/ic_home_24"
+            android:title="Home"
+            android:checkable="true" />
     </group>
 </menu>

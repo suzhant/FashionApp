@@ -20,11 +20,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Buyer.CartActivity;
+import com.sushant.fashionapp.Buyer.MessageActivity;
 import com.sushant.fashionapp.Utils.Dialogs;
 import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
 import com.sushant.fashionapp.fragments.Buyer.AccountFragment;
 import com.sushant.fashionapp.fragments.Buyer.HomeFragment;
-import com.sushant.fashionapp.fragments.Buyer.MessageFragment;
 
 import java.util.Objects;
 
@@ -38,7 +38,6 @@ public class ActivityHomePage extends AppCompatActivity {
     ValueEventListener cartListener;
     DatabaseReference cartRef;
     SharedPreferences sharedPreferences;
-    String fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +47,6 @@ public class ActivityHomePage extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-
-        fragment = getIntent().getStringExtra("fragment");
 
 
         sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
@@ -98,7 +95,8 @@ public class ActivityHomePage extends AppCompatActivity {
                         replaceFragment(new HomeFragment());
                         break;
                     case R.id.page_2:
-                        replaceFragment(new MessageFragment());
+                        startActivity(new Intent(ActivityHomePage.this, MessageActivity.class));
+                        //   replaceFragment(new MessageFragment());
                         break;
                     case R.id.page_3:
                         startActivity(new Intent(ActivityHomePage.this, CartActivity.class));
@@ -163,16 +161,7 @@ public class ActivityHomePage extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        if (fragment != null) {
-            if (fragment.equals("chat")) {
-                binding.bottomNavigation.setSelectedItemId(R.id.page_2);
-            } else {
-                binding.bottomNavigation.setSelectedItemId(R.id.page_1);
-            }
-        } else {
-            binding.bottomNavigation.setSelectedItemId(R.id.page_1);
-        }
-
+        binding.bottomNavigation.setSelectedItemId(R.id.page_1);
         if (cartRef != null) {
             cartRef.addValueEventListener(cartListener);
         }

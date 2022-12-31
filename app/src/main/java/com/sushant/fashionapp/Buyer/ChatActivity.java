@@ -1,6 +1,5 @@
 package com.sushant.fashionapp.Buyer;
 
-import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -20,7 +19,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Models.ChatModel;
 import com.sushant.fashionapp.Models.Message;
 import com.sushant.fashionapp.Models.Store;
@@ -60,9 +58,7 @@ public class ChatActivity extends AppCompatActivity {
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), ActivityHomePage.class);
-                intent.putExtra("fragment", "chat");
-                startActivity(intent);
+              onBackPressed();
             }
         });
 
@@ -196,8 +192,6 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(getApplicationContext(), ActivityHomePage.class);
-        intent.putExtra("fragment", "chat");
-        startActivity(intent);
+        super.onBackPressed();
     }
 }
