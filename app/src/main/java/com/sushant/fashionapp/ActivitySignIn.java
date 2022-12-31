@@ -44,6 +44,7 @@ public class ActivitySignIn extends AppCompatActivity {
     private androidx.biometric.BiometricPrompt biometricPrompt;
     private androidx.biometric.BiometricPrompt.PromptInfo promptInfo;
     SharedPreferences sharedPreferences;
+    String type;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -55,6 +56,8 @@ public class ActivitySignIn extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         dialog = new ProgressDialog(this);
+
+        type = getIntent().getStringExtra("type");
 
         sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         boolean enableBiometric = sharedPreferences.getBoolean("enableBiometric", false);
@@ -157,6 +160,7 @@ public class ActivitySignIn extends AppCompatActivity {
         binding.btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), WelcomeScreen.class));
                 finishAfterTransition();
             }
         });
@@ -233,4 +237,12 @@ public class ActivitySignIn extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (type != null) {
+            startActivity(new Intent(getApplicationContext(), ActivityRegister.class));
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

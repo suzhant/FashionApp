@@ -93,27 +93,27 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/ipEmail"
-            style="@style/Widget.App.TextInputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:hint="Email Address"
-            android:textColorHint="@color/hintColor"
-            app:boxStrokeColor="@color/skyBlue"
-            app:endIconMode="clear_text">
+        <!--        <com.google.android.material.textfield.TextInputLayout-->
+        <!--            android:id="@+id/ipEmail"-->
+        <!--            style="@style/Widget.App.TextInputLayout"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_marginLeft="20dp"-->
+        <!--            android:layout_marginTop="10dp"-->
+        <!--            android:layout_marginRight="20dp"-->
+        <!--            android:hint="Email Address"-->
+        <!--            android:textColorHint="@color/hintColor"-->
+        <!--            app:boxStrokeColor="@color/skyBlue"-->
+        <!--            app:endIconMode="clear_text">-->
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edMail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:importantForAutofill="no"
-                android:inputType="textEmailAddress"
-                android:textSize="14sp" />
-        </com.google.android.material.textfield.TextInputLayout>
+        <!--            <com.google.android.material.textfield.TextInputEditText-->
+        <!--                android:id="@+id/edMail"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:importantForAutofill="no"-->
+        <!--                android:inputType="textEmailAddress"-->
+        <!--                android:textSize="14sp" />-->
+        <!--        </com.google.android.material.textfield.TextInputLayout>-->
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/ipShopAddress"

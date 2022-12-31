@@ -87,13 +87,14 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/drawable/track_bg.xml" value="0.335" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/drawable/unselected_dots.xml" value="0.2575" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_add_product.xml" value="0.5" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_address.xml" value="0.33" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_address.xml" value="0.22" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_bargain_history.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_buyer_muti_factor.xml" value="0.22" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_buyer_profile.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_buyer_security.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_buyer_setting.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_cart.xml" value="0.5" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_chat.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_check_out_acitivity.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_display_product.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_edit_address.xml" value="0.33" />
@@ -101,7 +102,7 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_edit_product_details.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_edit_variant.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_forgot_pass.xml" value="0.33" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_home_page.xml" value="0.33" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_home_page.xml" value="0.25" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_image.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_main.xml" value="0.3541666666666667" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_map.xml" value="0.2907225309961522" />
@@ -114,12 +115,14 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_payment.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_pdf_reader.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_product_details.xml" value="0.33" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_register.xml" value="0.33" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_register.xml" value="0.22" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_search.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_search_result.xml" value="0.33" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_final_register.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_home_page.xml" value="0.2907225309961522" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_main.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_main.xml" value="0.25" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_profile.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_register.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_registration.xml" value="0.25" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_seller_setting.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/activity_sign_in.xml" value="0.33" />
@@ -158,12 +161,16 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/custom_khalti_button.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/drop_down_items.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_account.xml" value="0.75" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_admin_register.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_bargain.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_buyer_register.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_cart.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_chat.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_chat2.xml" value="0.2982456140350877" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_custom_dialog.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_home.xml" value="0.33" />
-        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_message.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_message.xml" value="0.25" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_message_container.xml" value="0.2982456140350877" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_cancelled.xml" value="0.25" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_completed.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_order_pending.xml" value="0.33" />
@@ -171,12 +178,15 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_chat.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_home.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_home_stats.xml" value="0.33" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_register.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_seller_store.xml" value="0.33" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_setting.xml" value="0.2864035087719298" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/fragment_wish_list.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_address_chip.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_bargain_history_layout.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_bargain_layout.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_cart_badge.xml" value="0.75" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_chat_store.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_chip_history.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_edit_product.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_edit_size_layout.xml" value="0.67" />
@@ -194,6 +204,8 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_sort_dialog.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_user_layout.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/item_viewpager_pics.xml" value="0.25" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/nav_drawer.xml" value="0.2982456140350877" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/nav_header.xml" value="0.2982456140350877" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/order_status_layout.xml" value="0.67" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/photo_layout.xml" value="0.75" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/progress_dialog.xml" value="0.33" />
@@ -209,6 +221,7 @@
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/variant_summary_layout.xml" value="0.33" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/layout/wishlist_item_layout.xml" value="0.5" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.2907225309961522" />
+        <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/drawer_menu.xml" value="0.2982456140350877" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/message_menu.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/navigation_rail_menu.xml" value="0.2907225309961522" />
         <entry key="..\:/Andriod studio projects/FashionApp/app/src/main/res/menu/search_bar.xml" value="0.2907225309961522" />

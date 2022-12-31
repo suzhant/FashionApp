@@ -1,11 +1,20 @@
 <resources>
     <string name="app_name">Pahiran</string>
 
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+
     <string-array name="gender">
         <item>Male</item>
         <item>Female</item>
         <item>Others</item>
     </string-array>
+
+    <string-array name="account_type">
+        <item>Buyer</item>
+        <item>Seller</item>
+    </string-array>
+
 
     <string-array name="size">
         <item>S</item>

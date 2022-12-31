@@ -90,7 +90,7 @@ public class SellerRegistration extends AppCompatActivity {
                 String email = snapshot.child("userEmail").getValue(String.class);
                 binding.sellerLayout.edUserName.setText(name);
                 binding.sellerLayout.edPhone.setText(phoneNo);
-                binding.sellerLayout.edMail.setText(email);
+             //   binding.sellerLayout.edMail.setText(email);
             }
 
             @Override
@@ -282,13 +282,13 @@ public class SellerRegistration extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 boolean validDOB = TextFieldValidation.validateDOB(binding.sellerLayout.ipDOB, binding.sellerLayout.edDOB.getMasked());
-                boolean validSellerEmail = TextFieldValidation.validateEmail(binding.sellerLayout.ipEmail, binding.sellerLayout.edMail.getText().toString());
-                boolean validStoreEmail = TextFieldValidation.validateEmail(binding.storeLayout.ipEmail, binding.storeLayout.edMail.getText().toString());
+                //      boolean validSellerEmail = TextFieldValidation.validateEmail(binding.sellerLayout.ipEmail, binding.sellerLayout.edMail.getText().toString());
+                //  boolean validStoreEmail = TextFieldValidation.validateEmail(binding.storeLayout.ipEmail, binding.storeLayout.edMail.getText().toString());
                 boolean validSellerPhone = TextFieldValidation.validatePhoneNumber(binding.sellerLayout.ipPhoneNumber, binding.sellerLayout.edPhone.getText().toString(),
                         binding.sellerLayout.cpp);
                 boolean validStorePhone = TextFieldValidation.validatePhoneNumber(binding.storeLayout.ipPhoneNumber, binding.storeLayout.edPhone.getText().toString(),
                         binding.storeLayout.cpp);
-                if (isFieldEmpty() | !validStorePhone | !validStoreEmail | !validSellerPhone | !validDOB | !validSellerEmail) {
+                if (isFieldEmpty() | !validStorePhone | !validSellerPhone | !validDOB) {
                     return;
                 }
                 createStoreAccount();
@@ -434,7 +434,7 @@ public class SellerRegistration extends AppCompatActivity {
         storeName = binding.storeLayout.edStoreName.getText().toString();
         dob = binding.sellerLayout.edDOB.getMasked();
         storePhoneNum = binding.storeLayout.edPhone.getText().toString();
-        storeEmail = binding.storeLayout.edMail.getText().toString();
+        //      storeEmail = binding.storeLayout.edMail.getText().toString();
         storeAddress = binding.storeLayout.edShopAddress.getText().toString();
         vatNo = binding.storeLayout.edVatNo.getText().toString();
         panNo = binding.sellerLayout.edPanNo.getText().toString();
@@ -442,7 +442,7 @@ public class SellerRegistration extends AppCompatActivity {
         sellerPhoneNum = binding.sellerLayout.edPhone.getText().toString();
         storeDesc = binding.storeLayout.edShopDescription.getText().toString();
         sellerName = binding.sellerLayout.edUserName.getText().toString();
-        sellerEmail = binding.sellerLayout.edMail.getText().toString();
+        //    sellerEmail = binding.sellerLayout.edMail.getText().toString();
         citizenFront = binding.sellerLayout.imgCitizenFront.getDrawable();
         citizenBack = binding.sellerLayout.imgCitizenBack.getDrawable();
         panFront = binding.sellerLayout.imgPANFront.getDrawable();

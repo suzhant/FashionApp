@@ -613,6 +613,16 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+        binding.imgChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("from", "Buyer");
+                startActivity(intent);
+            }
+        });
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

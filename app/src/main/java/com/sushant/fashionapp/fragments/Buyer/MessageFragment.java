@@ -2,64 +2,116 @@ package com.sushant.fashionapp.fragments.Buyer;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.databinding.FragmentMessageBinding;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MessageFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MessageFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    FragmentMessageBinding binding;
+    TextView nav_email, nav_username;
+    CircleImageView nav_profilePic;
+    FirebaseDatabase database;
+    FirebaseAuth auth;
 
     public MessageFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment WishListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MessageFragment newInstance(String param1, String param2) {
-        MessageFragment fragment = new MessageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_message, container, false);
+        binding = FragmentMessageBinding.inflate(inflater, container, false);
+
+        auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+
+
+        replaceFragment(new ChatFragment());
+        binding.navView.setCheckedItem(R.id.item_chat);
+
+        binding.navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.item_chat:
+                        replaceFragment(new ChatFragment());
+                        binding.toolbar.setTitle("Chat");
+                        binding.txtMessage.setVisibility(View.VISIBLE);
+                        break;
+
+                    case R.id.item_setting:
+                        replaceFragment(new SettingFragment());
+                        binding.toolbar.setTitle("Setting");
+                        binding.txtMessage.setVisibility(View.GONE);
+                        break;
+
+                }
+                binding.drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(requireActivity(), binding.drawerLayout, binding.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        binding.drawerLayout.addDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
+
+        View header = binding.navView.getHeaderView(0);
+        nav_email = header.findViewById(R.id.nav_email);
+        nav_username = header.findViewById(R.id.nav_username);
+        nav_profilePic = header.findViewById(R.id.nav_profilePic);
+
+        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Buyer buyer = snapshot.getValue(Buyer.class);
+                Glide.with(requireContext()).load(buyer.getUserPic()).placeholder(R.drawable.avatar).into(nav_profilePic);
+                nav_username.setText(buyer.getUserName());
+                nav_email.setText(buyer.getUserEmail());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        return binding.getRoot();
     }
+
+    private void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+        transaction.replace(binding.fragmentContainer.getId(), fragment).setCustomAnimations(
+                R.anim.push_left_in,  // enter
+                R.anim.fade_out,  // exit
+                R.anim.fade_in,   // popEnter
+                R.anim.push_left_out  // popExit
+        );
+        transaction.commit();
+    }
+
 }

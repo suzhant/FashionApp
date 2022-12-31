@@ -47,7 +47,7 @@ public class CheckOutAcitivity extends AppCompatActivity {
     HashSet<String> storeIdList = new HashSet<>();
     ArrayList<String> storeIds = new ArrayList<>();
     ItemClickListener itemClickListener;
-    boolean isSelected;
+    boolean isSelected = false;
     Address addressInfo;
     long totalPrice;
 

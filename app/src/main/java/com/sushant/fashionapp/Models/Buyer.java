@@ -11,6 +11,10 @@ public class Buyer extends Users {
         super(userName, userEmail, userPhone);
     }
 
+    public Buyer(String userName, String userEmail) {
+        super(userName, userEmail);
+    }
+
 
     public String getUserId() {
         return userId;

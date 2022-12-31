@@ -20,6 +20,11 @@ public class Users {
         this.userPhone = userPhone;
     }
 
+    public Users(String userName, String userEmail) {
+        this.userName = userName;
+        this.userEmail = userEmail;
+    }
+
     public String getUserName() {
         return userName;
     }

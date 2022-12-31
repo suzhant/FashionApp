@@ -19,7 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FashionApp"
         tools:replace="android:theme">
-
+        <activity
+            android:name=".Buyer.ChatActivity"
+            android:exported="false" />
         <activity
             android:name=".Buyer.StorePageActivity"
             android:exported="false" />
@@ -85,9 +87,6 @@
             android:exported="true" />
         <activity
             android:name=".Buyer.BuyerSettingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ActivitySellerMain"
             android:exported="false" />
         <activity
             android:name=".Buyer.ViewMoreActivity"

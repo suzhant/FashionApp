@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ActivityRegisterParent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context=".ActivityRegister">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,11 +50,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
             android:orientation="vertical"
+            android:layout_marginTop="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -100,10 +101,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:visibility="gone"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="20dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/ipGender"
@@ -152,31 +153,31 @@
 
             </RelativeLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/ipPhoneNumber"
-                style="@style/Widget.App.TextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Phone Number"
-                android:textColorHint="@color/hintColor"
-                app:boxStrokeColor="@color/skyBlue"
-                app:counterEnabled="false"
-                app:counterMaxLength="10"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="20dp"
-                app:counterTextColor="@color/design_default_color_error"
-                app:endIconMode="clear_text"
-                app:prefixTextAppearance="@style/prefix">
+            <!--            <com.google.android.material.textfield.TextInputLayout-->
+            <!--                android:id="@+id/ipPhoneNumber"-->
+            <!--                style="@style/Widget.App.TextInputLayout"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginLeft="20dp"-->
+            <!--                android:layout_marginTop="10dp"-->
+            <!--                android:layout_marginRight="20dp"-->
+            <!--                android:hint="Phone Number"-->
+            <!--                android:textColorHint="@color/hintColor"-->
+            <!--                app:boxStrokeColor="@color/skyBlue"-->
+            <!--                app:counterEnabled="false"-->
+            <!--                app:counterMaxLength="10"-->
+            <!--                app:counterTextColor="@color/design_default_color_error"-->
+            <!--                app:endIconMode="clear_text"-->
+            <!--                app:prefixTextAppearance="@style/prefix">-->
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edPhone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="phone"
-                    android:importantForAutofill="no"
-                    android:textSize="14sp" />
-                </com.google.android.material.textfield.TextInputLayout>
+            <!--                <com.google.android.material.textfield.TextInputEditText-->
+            <!--                    android:id="@+id/edPhone"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:importantForAutofill="no"-->
+            <!--                    android:inputType="phone"-->
+            <!--                    android:textSize="14sp" />-->
+            <!--            </com.google.android.material.textfield.TextInputLayout>-->
 
 
             <com.google.android.material.textfield.TextInputLayout
@@ -212,8 +213,8 @@
                 android:hint="Password"
                 android:textColorHint="@color/hintColor"
                 app:boxStrokeColor="@color/skyBlue"
-                app:errorIconDrawable="@null"
-                app:endIconMode="password_toggle">
+                app:endIconMode="password_toggle"
+                app:errorIconDrawable="@null">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edPass"
@@ -234,8 +235,8 @@
                 android:hint="Confirm Password"
                 android:textColorHint="@color/hintColor"
                 app:boxStrokeColor="@color/skyBlue"
-                app:errorIconDrawable="@null"
-                app:endIconMode="password_toggle">
+                app:endIconMode="password_toggle"
+                app:errorIconDrawable="@null">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edRePass"
@@ -311,21 +312,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:textSize="14sp"
-                android:layout_marginTop="20dp"
                 android:layout_gravity="center"
-                android:text="Already have an account?" />
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="Already have an account?"
+                android:textSize="14sp" />
 
             <Button
                 android:id="@+id/btnLogin"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:text="login"
                 android:layout_gravity="center"
+                android:text="login"
                 android:textColor="@color/skyBlue" />
         </LinearLayout>
+
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline5"

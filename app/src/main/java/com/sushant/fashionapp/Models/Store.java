@@ -14,7 +14,7 @@ public class Store {
     private String sellerId;
     private String storePic;
     private String storeSecondaryEmail;
-    private Integer deliveryCharge = 70;
+    private Integer deliveryCharge;
     private Boolean selfPickUp;
     private ArrayList<Cart> products;
 

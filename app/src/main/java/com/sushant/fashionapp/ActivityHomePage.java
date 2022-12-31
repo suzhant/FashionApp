@@ -38,6 +38,7 @@ public class ActivityHomePage extends AppCompatActivity {
     ValueEventListener cartListener;
     DatabaseReference cartRef;
     SharedPreferences sharedPreferences;
+    String fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,9 @@ public class ActivityHomePage extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+        fragment = getIntent().getStringExtra("fragment");
+
 
         sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         String authId = sharedPreferences.getString("authId", "");
@@ -62,7 +66,7 @@ public class ActivityHomePage extends AppCompatActivity {
         editor.putBoolean("isSeller", false);
         editor.apply();
 
-        replaceFragment(new HomeFragment());
+
 
 //        binding.bottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
 //            @Override
@@ -159,7 +163,16 @@ public class ActivityHomePage extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+        if (fragment != null) {
+            if (fragment.equals("chat")) {
+                binding.bottomNavigation.setSelectedItemId(R.id.page_2);
+            } else {
+                binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+            }
+        } else {
+            binding.bottomNavigation.setSelectedItemId(R.id.page_1);
+        }
+
         if (cartRef != null) {
             cartRef.addValueEventListener(cartListener);
         }
