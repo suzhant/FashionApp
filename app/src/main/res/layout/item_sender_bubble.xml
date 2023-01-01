@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="6dp"
+    android:gravity="end"
+    android:orientation="horizontal">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginEnd="10dp"
+        android:orientation="vertical">
+
+
+        <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sender_bubble_bg"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/txtSenderMsg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto"
+                android:maxWidth="250dp"
+                android:text="Hello"
+                android:textColor="@color/white" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/imgSender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="250dp"
+            android:maxHeight="200dp"
+            android:visibility="gone"
+            android:src="@drawable/avatar" />
+
+        <TextView
+            android:id="@+id/txtSenderTime"
+            style="@style/TextAppearance.AppCompat.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="10:30 pm"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -6,6 +6,7 @@ public class Seller extends Users {
     private String imgCitizenFront, imgCitizenBack, imgPanFront, imgPanBack;
     private String sellerId;
     private String storeId;
+    private String buyerId;
 
     public Seller() {
     }
@@ -76,5 +77,13 @@ public class Seller extends Users {
 
     public void setStoreId(String storeId) {
         this.storeId = storeId;
+    }
+
+    public String getBuyerId() {
+        return buyerId;
+    }
+
+    public void setBuyerId(String buyerId) {
+        this.buyerId = buyerId;
     }
 }

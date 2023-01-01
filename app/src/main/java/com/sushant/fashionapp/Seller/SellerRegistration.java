@@ -389,6 +389,7 @@ public class SellerRegistration extends AppCompatActivity {
         users.setCitizenNo(citizenNo);
         users.setSellerId(sellerId);
         users.setStoreId(storeId);
+        users.setBuyerId(auth.getUid());
         database.getReference().child("Seller").child(sellerId).setValue(users).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
@@ -421,6 +422,7 @@ public class SellerRegistration extends AppCompatActivity {
         store.setStoreVAT(vatNo);
         store.setStoreDesc(storeDesc);
         store.setSellerId(sellerId);
+        store.setBuyerId(auth.getUid());
         database.getReference().child("Store").child(String.valueOf(storeId)).setValue(store).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {

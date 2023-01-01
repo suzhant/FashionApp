@@ -17,6 +17,7 @@ public class Store {
     private Integer deliveryCharge;
     private Boolean selfPickUp;
     private ArrayList<Cart> products;
+    private String buyerId;
 
 
     public Store() {
@@ -152,5 +153,13 @@ public class Store {
 
     public void setSelfPickUp(Boolean selfPickUp) {
         this.selfPickUp = selfPickUp;
+    }
+
+    public String getBuyerId() {
+        return buyerId;
+    }
+
+    public void setBuyerId(String buyerId) {
+        this.buyerId = buyerId;
     }
 }

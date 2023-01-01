@@ -67,7 +67,7 @@ public class ChatFragment extends Fragment {
     private void initRecycler() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         binding.recyclerChat.setLayoutManager(layoutManager);
-        adapter = new ChatAdapter(requireContext(), chatModels);
+        adapter = new ChatAdapter(requireContext(), chatModels, auth.getUid(), "Buyer");
         binding.recyclerChat.setAdapter(adapter);
     }
 }

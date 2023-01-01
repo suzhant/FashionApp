@@ -617,7 +617,10 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
-                intent.putExtra("storeId", storeId);
+                intent.putExtra("receiverId", storeId);
+                intent.putExtra("senderId", auth.getUid());
+                intent.putExtra("pic", storePic);
+                intent.putExtra("receiverName", sName);
                 intent.putExtra("from", "Buyer");
                 startActivity(intent);
             }

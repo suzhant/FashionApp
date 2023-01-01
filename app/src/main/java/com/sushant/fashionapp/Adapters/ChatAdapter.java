@@ -23,10 +23,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder> {
 
     Context context;
     ArrayList<ChatModel> chatModels;
+    String senderId, from, to;
 
-    public ChatAdapter(Context context, ArrayList<ChatModel> chatModels) {
+    public ChatAdapter(Context context, ArrayList<ChatModel> chatModels, String senderId, String from) {
         this.context = context;
         this.chatModels = chatModels;
+        this.senderId = senderId;
+        this.from = from;
     }
 
     @NonNull
@@ -39,15 +42,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.viewHolder> {
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         ChatModel chat = chatModels.get(position);
-        Glide.with(context).load(chat.getStorePic()).placeholder(R.drawable.avatar).into(holder.imgStore);
-        holder.txtStoreName.setText(chat.getStoreName());
+
+        Glide.with(context).load(chat.getPic()).placeholder(R.drawable.avatar).into(holder.imgStore);
+        holder.txtStoreName.setText(chat.getName());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ChatActivity.class);
-                intent.putExtra("storeId", chat.getStoreId());
-                intent.putExtra("from", "Buyer");
+                intent.putExtra("senderId", senderId);
+                intent.putExtra("receiverId", chat.getId());
+                intent.putExtra("receiverName", chat.getName());
+                intent.putExtra("from", from);
+                intent.putExtra("pic", chat.getPic());
                 context.startActivity(intent);
             }
         });

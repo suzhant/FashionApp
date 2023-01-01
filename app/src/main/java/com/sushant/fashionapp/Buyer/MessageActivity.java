@@ -23,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivityHomePage;
 import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.R;
-import com.sushant.fashionapp.databinding.ActivityMessage2Binding;
+import com.sushant.fashionapp.databinding.ActivityBuyerMessageBinding;
 import com.sushant.fashionapp.fragments.Buyer.ChatFragment;
 import com.sushant.fashionapp.fragments.Buyer.SettingFragment;
 
@@ -31,7 +31,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MessageActivity extends AppCompatActivity {
 
-    ActivityMessage2Binding binding;
+    ActivityBuyerMessageBinding binding;
     TextView nav_email, nav_username;
     CircleImageView nav_profilePic;
     FirebaseDatabase database;
@@ -40,7 +40,7 @@ public class MessageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMessage2Binding.inflate(getLayoutInflater());
+        binding = ActivityBuyerMessageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         auth = FirebaseAuth.getInstance();

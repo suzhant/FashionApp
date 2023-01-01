@@ -85,7 +85,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialDivider4" />
+        app:layout_constraintTop_toBottomOf="@+id/materialDivider4"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        style="@style/Widget.MaterialComponents.FloatingActionButton"
+        android:id="@+id/fabChat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:elevation="4dp"
+        app:fabCustomSize="40dp"
+        android:visibility="gone"
+        android:backgroundTint="@color/skyBlue"
+        app:layout_constraintBottom_toBottomOf="@+id/recycler_message"
+        app:layout_constraintEnd_toEndOf="@+id/recycler_message"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_baseline_arrow_downward_24"
+        app:tint="@color/white" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout10"
