@@ -1,6 +1,9 @@
 package com.sushant.fashionapp.fragments.Buyer;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.ActivitySignIn;
 import com.sushant.fashionapp.Buyer.BargainHistoryActivity;
@@ -23,6 +27,7 @@ import com.sushant.fashionapp.Buyer.BuyerSettingActivity;
 import com.sushant.fashionapp.Buyer.OrderHistoryActivity;
 import com.sushant.fashionapp.Buyer.WishListActivity;
 import com.sushant.fashionapp.Models.Seller;
+import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Seller.SellerHomePage;
 import com.sushant.fashionapp.Seller.SellerRegistration;
@@ -37,6 +42,7 @@ public class AccountFragment extends Fragment {
     FirebaseAuth auth;
     FirebaseDatabase database;
     boolean isSeller = false;
+    String storeId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -67,9 +73,6 @@ public class AccountFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Seller buyer = snapshot.getValue(Seller.class);
                 assert buyer != null;
-                if (snapshot.child("sellerId").exists()) {
-                    isSeller = true;
-                }
 
                 if (snapshot.child("userName").exists()) {
                     String buyerName = buyer.getUserName();
@@ -105,6 +108,26 @@ public class AccountFragment extends Fragment {
                                 .into(binding.imgPic);
                     }
 
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        Query query = database.getReference().child("Store").orderByChild("buyerId").equalTo(auth.getUid());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Store store = snapshot1.getValue(Store.class);
+                    storeId = store.getStoreId();
+                    isSeller = true;
+                    SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", MODE_PRIVATE).edit();
+                    editor.putString("storeId", storeId);
+                    editor.apply();
                 }
             }
 

@@ -3,14 +3,18 @@ package com.sushant.fashionapp.Buyer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.MessageAdapter;
 import com.sushant.fashionapp.Models.Buyer;
@@ -30,20 +35,26 @@ import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityChatBinding;
 
+import java.text.MessageFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements DefaultLifecycleObserver {
 
     ActivityChatBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
-    String senderId, receiverId, senderRoom, receiverRoom, receiverPic, receiverName;
+    String senderId, receiverId, senderRoom, receiverRoom, receiverPic, receiverName, senderName, senderPic;
     ArrayList<Message> messages = new ArrayList<>();
     String from;
-    ValueEventListener messageListener;
-    DatabaseReference messageRef;
+    ValueEventListener messageListener, eventListener;
+    DatabaseReference messageRef, statusRef, infoConnected;
     int pos, numItems;
     LinearLayoutManager layoutManager;
     String userPic, userName;
@@ -68,8 +79,18 @@ public class ChatActivity extends AppCompatActivity {
         senderRoom = senderId + receiverId;
         receiverRoom = receiverId + senderId;
 
+        String to;
+        if (from.equals("Buyer")) {
+            to = "Users";
+        } else {
+            to = "Store";
+        }
+        statusRef = database.getReference().child(to).child(senderId).child("Connection");
+        manageConnection();
+
         binding.txtStoreName.setText(receiverName);
         Glide.with(getApplicationContext()).load(receiverPic).placeholder(R.drawable.ic_clarity_store_line).into(binding.imgStore);
+
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,12 +196,69 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        String destination;
+        if (from.equals("Buyer")) {
+            destination = "Store";
+        } else {
+            destination = "Users";
+        }
+        DatabaseReference ref = database.getReference().child(destination).child(receiverId).child("Connection");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Long lastActive = snapshot.child("lastOnline").getValue(Long.class);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+                LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastActive), ZoneId.systemDefault());
+                binding.txtLastMessage.setText(MessageFormat.format("Last Active: {0}", formatter.format(dateTime)));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        String buyer;
+        if (from.equals("Buyer")) {
+            buyer = "Users";
+            database.getReference().child(buyer).child(senderId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Buyer buyer1 = snapshot.getValue(Buyer.class);
+                    senderName = buyer1.getUserName();
+                    senderPic = buyer1.getUserPic();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        } else {
+            buyer = "Store";
+            database.getReference().child(buyer).child(senderId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Store store = snapshot.getValue(Store.class);
+                    senderName = store.getStoreName();
+                    senderPic = store.getStorePic();
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
+
         binding.imgSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendMessage();
                 createBuyer();
                 createSeller();
+                sendMessage();
             }
         });
 
@@ -188,31 +266,13 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void createSeller() {
-        database.getReference().child("Chats").child("Buyer").child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("Chats").child(from).child(senderId).child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    database.getReference().child("Store").child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            Store store = snapshot.getValue(Store.class);
-                            ChatModel chatModel = new ChatModel();
-                            chatModel.setId(receiverId);
-                            chatModel.setTimestamp(new Date().getTime());
-                            chatModel.setName(store.getStoreName());
-                            if (receiverPic != null) {
-                                chatModel.setPic(receiverPic);
-                            }
-                            database.getReference().child("Chats").child("Buyer").child(senderId).child(receiverId).setValue(chatModel);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-
-
+                    ChatModel chatModel = new ChatModel();
+                    chatModel.setId(receiverId);
+                    database.getReference().child("Chats").child(from).child(senderId).child(receiverId).setValue(chatModel);
                 }
             }
 
@@ -225,18 +285,19 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void createBuyer() {
-        database.getReference().child("Chats").child("Store").child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
+        String to;
+        if (from.equals("Buyer")) {
+            to = "Store";
+        } else {
+            to = "Buyer";
+        }
+        database.getReference().child("Chats").child(to).child(receiverId).child(senderId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
                     ChatModel buyer = new ChatModel();
-                    buyer.setId(auth.getUid());
-                    buyer.setTimestamp(new Date().getTime());
-                    buyer.setName(userName);
-                    if (userPic != null) {
-                        buyer.setPic(userPic);
-                    }
-                    database.getReference().child("Chats").child("Store").child(receiverId).child(auth.getUid()).setValue(buyer);
+                    buyer.setId(senderId);
+                    database.getReference().child("Chats").child(to).child(receiverId).child(senderId).setValue(buyer);
                 }
             }
 
@@ -282,6 +343,32 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void manageConnection() {
+        final DatabaseReference status = statusRef.child("Status");
+        final DatabaseReference lastOnlineRef = statusRef.child("lastOnline");
+        infoConnected = database.getReference(".info/connected");
+
+        eventListener = infoConnected.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean connected = snapshot.getValue(Boolean.class);
+                assert connected != null;
+                if (connected) {
+                    status.setValue("online");
+                    lastOnlineRef.setValue(ServerValue.TIMESTAMP);
+                } else {
+                    status.onDisconnect().setValue("offline");
+                    lastOnlineRef.onDisconnect().setValue(ServerValue.TIMESTAMP);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -293,5 +380,30 @@ public class ChatActivity extends AppCompatActivity {
             messageRef.removeEventListener(messageListener);
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onStart(owner);
+        // app moved to foreground
+        if (auth.getCurrentUser() != null) {
+            updateStatus("online");
+
+        }
+    }
+
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onStop(owner);
+        // app moved to background
+        if (auth.getCurrentUser() != null) {
+            updateStatus("offline");
+        }
+    }
+
+    void updateStatus(String status) {
+        HashMap<String, Object> obj = new HashMap<>();
+        obj.put("Status", status);
+        statusRef.updateChildren(obj);
     }
 }

@@ -10,10 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.Dialogs;
 import com.sushant.fashionapp.databinding.ActivitySellerHomePageBinding;
@@ -21,11 +28,16 @@ import com.sushant.fashionapp.fragments.Seller.SellerAccountFragment;
 import com.sushant.fashionapp.fragments.Seller.SellerHomeFragment;
 import com.sushant.fashionapp.fragments.Seller.SellerStoreFragment;
 
-public class SellerHomePage extends AppCompatActivity {
+import java.util.HashMap;
+
+public class SellerHomePage extends AppCompatActivity implements DefaultLifecycleObserver {
 
     ActivitySellerHomePageBinding binding;
     FirebaseDatabase database;
     FirebaseAuth auth;
+    DatabaseReference statusRef, infoConnected;
+    ValueEventListener eventListener;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +47,13 @@ public class SellerHomePage extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+
+        sharedPreferences = getSharedPreferences("store", MODE_PRIVATE);
+        String storeId = sharedPreferences.getString("storeId", "");
+        statusRef = database.getReference().child("Store").child(storeId);
+
+        manageConnection();
+
         replaceFragment(new SellerHomeFragment());
         SharedPreferences.Editor editor = getSharedPreferences("userData", MODE_PRIVATE).edit();
         editor.putBoolean("isSeller", true);
@@ -100,7 +119,63 @@ public class SellerHomePage extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (infoConnected != null) {
+            infoConnected.removeEventListener(eventListener);
+        }
     }
+
+
+    private void manageConnection() {
+        final DatabaseReference status = statusRef.child("Connection").child("Status");
+        final DatabaseReference lastOnlineRef = statusRef.child("Connection").child("lastOnline");
+        infoConnected = database.getReference(".info/connected");
+
+        eventListener = infoConnected.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Boolean connected = snapshot.getValue(Boolean.class);
+                assert connected != null;
+                if (connected) {
+                    status.setValue("online");
+                    lastOnlineRef.setValue(ServerValue.TIMESTAMP);
+                } else {
+                    status.onDisconnect().setValue("offline");
+                    lastOnlineRef.onDisconnect().setValue(ServerValue.TIMESTAMP);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onStart(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onStart(owner);
+        // app moved to foreground
+        if (auth.getCurrentUser() != null) {
+            updateStatus("online");
+
+        }
+    }
+
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
+        DefaultLifecycleObserver.super.onStop(owner);
+        // app moved to background
+        if (auth.getCurrentUser() != null) {
+            updateStatus("offline");
+        }
+    }
+
+    void updateStatus(String status) {
+        HashMap<String, Object> obj = new HashMap<>();
+        obj.put("Status", status);
+        statusRef.child("Connection").updateChildren(obj);
+    }
+
 
     //    private void logoutDialog() {
 //        if (CheckConnection.isOnline(ActivityHomePage.this)) {

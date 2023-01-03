@@ -86,9 +86,11 @@ public class ChatFragment extends Fragment {
     }
 
     private void initRecycler() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
-        binding.recyclerChat.setLayoutManager(layoutManager);
-        adapter = new ChatAdapter(requireContext(), chatModels, storeId, "Store");
-        binding.recyclerChat.setAdapter(adapter);
+        if (getContext() != null) {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+            binding.recyclerChat.setLayoutManager(layoutManager);
+            adapter = new ChatAdapter(requireContext(), chatModels, storeId, "Store");
+            binding.recyclerChat.setAdapter(adapter);
+        }
     }
 }
