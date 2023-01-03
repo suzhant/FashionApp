@@ -1,18 +1,10 @@
 package com.sushant.fashionapp.Models;
 
 public class Message {
-    private String uId, message, messageId, profilePic, type, imageUrl;
+    private String message, messageId, profilePic, type, imageUrl, senderId, receiverId;
     private Long timestamp;
 
     public Message() {
-    }
-
-    public String getuId() {
-        return uId;
-    }
-
-    public void setuId(String uId) {
-        this.uId = uId;
     }
 
     public String getMessage() {
@@ -61,5 +53,21 @@ public class Message {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(String senderId) {
+        this.senderId = senderId;
+    }
+
+    public String getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(String receiverId) {
+        this.receiverId = receiverId;
     }
 }

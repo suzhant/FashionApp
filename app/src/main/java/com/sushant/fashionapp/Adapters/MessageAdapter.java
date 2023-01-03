@@ -32,13 +32,12 @@ public class MessageAdapter extends RecyclerView.Adapter {
     ArrayList<Message> messages;
     int SENDER_VIEW_TYPE = 1;
     int RECEIVER_VIEW_TYPE = 2;
-    String pic, senderId;
+    String senderId;
 
 
-    public MessageAdapter(Context context, ArrayList<Message> messages, String pic, String senderId) {
+    public MessageAdapter(Context context, ArrayList<Message> messages, String senderId) {
         this.context = context;
         this.messages = messages;
-        this.pic = pic;
         this.senderId = senderId;
     }
 
@@ -82,13 +81,13 @@ public class MessageAdapter extends RecyclerView.Adapter {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
             LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(message.getTimestamp()), ZoneId.systemDefault());
             receiverViewHolder.txtReceiverTime.setText(formatter.format(dateTime));
-            Glide.with(context).load(pic).placeholder(R.drawable.avatar).into(receiverViewHolder.imgUser);
+            Glide.with(context).load(message.getProfilePic()).placeholder(R.drawable.avatar).into(receiverViewHolder.imgUser);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (Objects.equals(senderId, messages.get(position).getuId())) {
+        if (Objects.equals(senderId, messages.get(position).getSenderId())) {
             return SENDER_VIEW_TYPE;
         } else {
             return RECEIVER_VIEW_TYPE;

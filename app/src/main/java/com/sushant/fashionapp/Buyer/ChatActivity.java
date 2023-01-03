@@ -1,5 +1,6 @@
 package com.sushant.fashionapp.Buyer;
 
+import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -57,7 +58,6 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
     DatabaseReference messageRef, statusRef, infoConnected;
     int pos, numItems;
     LinearLayoutManager layoutManager;
-    String userPic, userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,11 +74,21 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
 
         senderId = getIntent().getStringExtra("senderId");
         receiverId = getIntent().getStringExtra("receiverId");
-        receiverPic = getIntent().getStringExtra("pic");
-        receiverName = getIntent().getStringExtra("receiverName");
         senderRoom = senderId + receiverId;
         receiverRoom = receiverId + senderId;
 
+        binding.imgStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (from.equals("Buyer")) {
+                    Intent intent = new Intent(getApplicationContext(), StorePageActivity.class);
+                    intent.putExtra("storeId", receiverId);
+                    intent.putExtra("storePic", receiverPic);
+                    intent.putExtra("storeName", receiverName);
+                    startActivity(intent);
+                }
+            }
+        });
         String to;
         if (from.equals("Buyer")) {
             to = "Users";
@@ -88,8 +98,39 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
         statusRef = database.getReference().child(to).child(senderId).child("Connection");
         manageConnection();
 
-        binding.txtStoreName.setText(receiverName);
-        Glide.with(getApplicationContext()).load(receiverPic).placeholder(R.drawable.ic_clarity_store_line).into(binding.imgStore);
+        if (from.equals("Buyer")) {
+            database.getReference().child("Store").child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Store store = snapshot.getValue(Store.class);
+                    receiverName = store.getStoreName();
+                    receiverPic = store.getStorePic();
+                    binding.txtStoreName.setText(receiverName);
+                    Glide.with(getApplicationContext()).load(receiverPic).placeholder(R.drawable.ic_clarity_store_line).into(binding.imgStore);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        } else {
+            database.getReference().child("Users").child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Buyer buyer1 = snapshot.getValue(Buyer.class);
+                    receiverName = buyer1.getUserName();
+                    receiverPic = buyer1.getUserPic();
+                    binding.txtStoreName.setText(receiverName);
+                    Glide.with(getApplicationContext()).load(receiverPic).placeholder(R.drawable.ic_clarity_store_line).into(binding.imgStore);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
 
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -125,7 +166,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         binding.recyclerMessage.setLayoutManager(layoutManager);
         layoutManager.setStackFromEnd(true);
-        final MessageAdapter adapter = new MessageAdapter(this, messages, receiverPic, senderId);
+        final MessageAdapter adapter = new MessageAdapter(this, messages, senderId);
         binding.recyclerMessage.setAdapter(adapter);
 
         messageRef = database.getReference().child("Messages").child(senderRoom);
@@ -135,6 +176,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                 messages.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Message message = snapshot1.getValue(Message.class);
+                    message.setProfilePic(receiverPic);
                     messages.add(message);
                 }
                 int count = messages.size();
@@ -157,22 +199,6 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
         };
         messageRef.addValueEventListener(messageListener);
 
-
-        database.getReference().child("Users").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Buyer buyer = snapshot.getValue(Buyer.class);
-                userName = buyer.getUserName();
-                if (buyer.getUserPic() != null) {
-                    userPic = buyer.getUserPic();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
         binding.editMessage.addTextChangedListener(new TextWatcher() {
             @Override
@@ -208,7 +234,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Long lastActive = snapshot.child("lastOnline").getValue(Long.class);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a");
                 LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastActive), ZoneId.systemDefault());
                 binding.txtLastMessage.setText(MessageFormat.format("Last Active: {0}", formatter.format(dateTime)));
             }
@@ -321,7 +347,8 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
             model.setTimestamp(date.getTime());
             model.setType("text");
             model.setMessageId(key);
-            model.setuId(senderId);
+            model.setSenderId(senderId);
+            model.setReceiverId(receiverId);
             binding.editMessage.getText().clear();
 
             database.getReference().child("Messages").child(senderRoom).child(key).setValue(model)

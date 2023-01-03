@@ -60,6 +60,7 @@
                         android:text="Last active: "
                         android:maxLines="1"
                         android:ellipsize="end"
+                        android:textSize="13sp"
                         style="@style/TextAppearance.AppCompat.Small" />
                 </LinearLayout>
 
