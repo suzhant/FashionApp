@@ -1,5 +1,6 @@
 package com.sushant.fashionapp.Buyer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -8,11 +9,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
@@ -58,6 +63,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
     DatabaseReference messageRef, statusRef, infoConnected;
     int pos, numItems;
     LinearLayoutManager layoutManager;
+    boolean isExplored = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,11 +95,46 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                 }
             }
         });
+
+        binding.toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == R.id.item_store) {
+                    Intent intent = new Intent(getApplicationContext(), StorePageActivity.class);
+                    intent.putExtra("storeId", receiverId);
+                    intent.putExtra("storePic", receiverPic);
+                    intent.putExtra("storeName", receiverName);
+                    startActivity(intent);
+                }
+                return false;
+            }
+        });
+
+
+        binding.imgExplore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isExplored = !isExplored;
+                binding.editMessage.requestFocus();
+                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+                if (isExplored) {
+                    hideSoftKeyboard();
+                    binding.imgExplore.animate().rotationBy(225f).start();
+                    binding.hiddenLayout.setVisibility(View.VISIBLE);
+                } else {
+                    showSoftKeyboard();
+                    binding.imgExplore.animate().rotationBy(-225f).start();
+                    //  binding.hiddenLayout.setVisibility(View.GONE);
+                }
+            }
+        });
+
         String to;
         if (from.equals("Buyer")) {
             to = "Users";
         } else {
             to = "Store";
+            binding.toolbar.getMenu().removeItem(R.id.item_store);
         }
         statusRef = database.getReference().child(to).child(senderId).child("Connection");
         manageConnection();
@@ -217,6 +258,26 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                     binding.imgSend.setVisibility(View.VISIBLE);
                 } else {
                     binding.imgSend.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+        binding.editMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isExplored) {
+                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                    isExplored = false;
+                    binding.imgExplore.animate().rotationBy(-225f).start();
+                    binding.editMessage.requestFocus();
+                } else {
+                    if (binding.hiddenLayout.getVisibility() == View.VISIBLE) {
+                        binding.hiddenLayout.setVisibility(View.GONE);
+                        binding.imgExplore.animate().rotationBy(225f).start();
+                        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+                        isExplored = true;
+                    }
                 }
 
             }
@@ -398,7 +459,16 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (binding.hiddenLayout.getVisibility() == View.VISIBLE) {
+            if (isExplored) {
+                binding.imgExplore.animate().rotationBy(-225f).start();
+            }
+            binding.hiddenLayout.setVisibility(View.GONE);
+            isExplored = false;
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -433,4 +503,22 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
         obj.put("Status", status);
         statusRef.updateChildren(obj);
     }
+
+
+    public void hideSoftKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public void showSoftKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.toggleSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+        }
+    }
+
 }
