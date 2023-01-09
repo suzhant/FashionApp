@@ -11,7 +11,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
@@ -63,7 +62,6 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
     DatabaseReference messageRef, statusRef, infoConnected;
     int pos, numItems;
     LinearLayoutManager layoutManager;
-    boolean isExplored = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,24 +108,6 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
             }
         });
 
-
-        binding.imgExplore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                isExplored = !isExplored;
-                binding.editMessage.requestFocus();
-                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-                if (isExplored) {
-                    hideSoftKeyboard();
-                    binding.imgExplore.animate().rotationBy(225f).start();
-                    binding.hiddenLayout.setVisibility(View.VISIBLE);
-                } else {
-                    showSoftKeyboard();
-                    binding.imgExplore.animate().rotationBy(-225f).start();
-                    //  binding.hiddenLayout.setVisibility(View.GONE);
-                }
-            }
-        });
 
         String to;
         if (from.equals("Buyer")) {
@@ -222,14 +202,16 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                 }
                 int count = messages.size();
                 if (count > 0) {
-                    adapter.notifyDataSetChanged();
-                } else {
-                    pos = layoutManager.findLastCompletelyVisibleItemPosition();
-                    numItems = Objects.requireNonNull(binding.recyclerMessage.getAdapter()).getItemCount();
-                    if (pos >= numItems - 2) {
-                        binding.recyclerMessage.smoothScrollToPosition(messages.size());
-                    }
+                    adapter.notifyItemInserted(count);
+                    binding.recyclerMessage.smoothScrollToPosition(messages.size());
                 }
+//                else {
+//                    pos = layoutManager.findLastCompletelyVisibleItemPosition();
+//                    numItems = Objects.requireNonNull(binding.recyclerMessage.getAdapter()).getItemCount();
+//                    if (pos >= numItems - 1) {
+//                        binding.recyclerMessage.smoothScrollToPosition(messages.size());
+//                    }
+//                }
 
             }
 
@@ -256,32 +238,15 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
             public void afterTextChanged(Editable editable) {
                 if (editable.length() > 0) {
                     binding.imgSend.setVisibility(View.VISIBLE);
+                    binding.linearInterface.setVisibility(View.GONE);
                 } else {
                     binding.imgSend.setVisibility(View.GONE);
+                    binding.linearInterface.setVisibility(View.VISIBLE);
                 }
 
             }
         });
 
-        binding.editMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isExplored) {
-                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-                    isExplored = false;
-                    binding.imgExplore.animate().rotationBy(-225f).start();
-                    binding.editMessage.requestFocus();
-                } else {
-                    if (binding.hiddenLayout.getVisibility() == View.VISIBLE) {
-                        binding.hiddenLayout.setVisibility(View.GONE);
-                        binding.imgExplore.animate().rotationBy(225f).start();
-                        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-                        isExplored = true;
-                    }
-                }
-
-            }
-        });
 
         String destination;
         if (from.equals("Buyer")) {
@@ -459,16 +424,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
 
     @Override
     public void onBackPressed() {
-        if (binding.hiddenLayout.getVisibility() == View.VISIBLE) {
-            if (isExplored) {
-                binding.imgExplore.animate().rotationBy(-225f).start();
-            }
-            binding.hiddenLayout.setVisibility(View.GONE);
-            isExplored = false;
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        } else {
-            super.onBackPressed();
-        }
+        super.onBackPressed();
     }
 
     @Override
