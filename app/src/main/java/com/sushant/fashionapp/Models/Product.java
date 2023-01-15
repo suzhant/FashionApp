@@ -13,7 +13,7 @@ public class Product implements Serializable {
     private ArrayList<String> photos;
     private Long timeStamp;
     private String previewPic;
-    private String category, subCategory, subSubCategory;
+    private String masterCategory, category, articleType;
     private String season;
     private String storeId;
     private Long productCode;
@@ -136,20 +136,20 @@ public class Product implements Serializable {
         this.previewPic = previewPic;
     }
 
+    public String getMasterCategory() {
+        return masterCategory;
+    }
+
+    public void setMasterCategory(String masterCategory) {
+        this.masterCategory = masterCategory;
+    }
+
     public String getCategory() {
         return category;
     }
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public String getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(String subCategory) {
-        this.subCategory = subCategory;
     }
 
     public String getDesc() {
@@ -260,12 +260,12 @@ public class Product implements Serializable {
         this.timeStamp = timeStamp;
     }
 
-    public String getSubSubCategory() {
-        return subSubCategory;
+    public String getArticleType() {
+        return articleType;
     }
 
-    public void setSubSubCategory(String subSubCategory) {
-        this.subSubCategory = subSubCategory;
+    public void setArticleType(String articleType) {
+        this.articleType = articleType;
     }
 
     public String getSeason() {

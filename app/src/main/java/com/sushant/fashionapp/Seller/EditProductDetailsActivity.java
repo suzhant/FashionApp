@@ -128,9 +128,9 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                 pName = product.getpName();
                 brandName = product.getBrandName();
                 season = product.getSeason();
-                masterCategory = product.getCategory();
-                category = product.getSubCategory();
-                subcategory = product.getSubSubCategory();
+                masterCategory = product.getMasterCategory();
+                category = product.getCategory();
+                subcategory = product.getArticleType();
                 pDesc = product.getDesc();
                 price = product.getpPrice();
                 binding.edProductName.setText(pName);
@@ -148,7 +148,6 @@ public class EditProductDetailsActivity extends AppCompatActivity {
 
                 addSubCategory();
                 addSubSubCat();
-
             }
 
             @Override
@@ -332,9 +331,9 @@ public class EditProductDetailsActivity extends AppCompatActivity {
             //Do you math here
             wholeSalePrice = binding.edPrice.getText().toString().trim();
             double wholesale = Double.parseDouble(wholeSalePrice);
-            sellerPrice = wholesale / (1 - 0.3); //30% markup percentage in the wholesale price
+            sellerPrice = wholesale / (1 - 0.5); //50% markup percentage in the wholesale price
          //   commission = wholesale * 0.1; //10% added to compensate commission
-            double bargainLimit = wholesale * 1.2; //20%
+            double bargainLimit = wholesale * 1.3; //30%
 
             runOnUiThread(new Runnable() {
                 @Override

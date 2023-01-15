@@ -54,6 +54,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -113,6 +114,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     double sellerPrice;
     Thread t1 = null;
     MyCalc mycalc = null;
+    String newId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -405,6 +407,22 @@ public class ActivityAddProduct extends AppCompatActivity {
             }
         });
 
+        Query query = database.getReference().child("Products").limitToLast(1);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    newId = snapshot1.getKey();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
     }
 
     private void createBillBitmap(Uri selectedImage) {
@@ -534,9 +552,9 @@ public class ActivityAddProduct extends AppCompatActivity {
             //Do you math here
             wholeSalePrice = binding.edPrice.getText().toString();
             double wholesale = Double.parseDouble(wholeSalePrice);
-            sellerPrice = wholesale / (1 - 0.3); //30% markup percentage in the wholesale price
+            sellerPrice = wholesale / (1 - 0.5); //50% markup percentage in the wholesale price
       //      commission = wholesale * 0.1; //10% added to compensate commission
-            double bargainLimit = wholesale * 1.2; //20%
+            double bargainLimit = wholesale * 1.3; //30%
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -688,12 +706,12 @@ public class ActivityAddProduct extends AppCompatActivity {
                             dialog.setMessage("Please wait while we are adding your product");
                             dialog.setCancelable(false);
 
-                            Product product1 = new Product(key, pName, variants.get(0).getPhotos().get(0));
+                            Product product1 = new Product(newId, pName, variants.get(0).getPhotos().get(0));
                             product1.setLove(0);
                             product1.setpPrice((int) sellerPrice);
-                            product1.setCategory(cat);
-                            product1.setSubCategory(subCat);
-                            product1.setSubSubCategory(subSubCat);
+                            product1.setMasterCategory(cat);
+                            product1.setCategory(subCat);
+                            product1.setArticleType(subSubCat);
                             product1.setDesc(pDes);
                             product1.setTimeStamp(new Date().getTime());
                             product1.setBrandName(brandName);
@@ -703,7 +721,8 @@ public class ActivityAddProduct extends AppCompatActivity {
                             product1.setBillUrl(billUrl);
 
                             dialog.show();
-                            database.getReference().child("Products").child(product1.getpId()).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                            database.getReference().child("Products").child(newId).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     resetAllFields();

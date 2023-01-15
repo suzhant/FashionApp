@@ -16,6 +16,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Inteface.ItemClickListener;
 import com.sushant.fashionapp.Models.Product;
@@ -30,15 +31,15 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
     ArrayList<SortModel> list;
     Context context;
     HashSet<String> colors;
-    HashSet<String> gender;
+    HashSet<String> masterCategory;
     HashSet<String> brand;
     HashSet<String> season;
-    HashSet<String> subSubCat;
+    HashSet<String> category;
     ItemClickListener itemClickListener;
     BottomSheetDialog bottomSheetDialog;
     ArrayList<String> subItems;
     TextView txtClear;
-    String type;
+    String type, storeId;
 
     public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener) {
         this.list = list;
@@ -46,11 +47,12 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
         this.itemClickListener = itemClickListener;
     }
 
-    public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener, String type) {
+    public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener, String storeId, String type) {
         this.list = list;
         this.context = context;
         this.itemClickListener = itemClickListener;
         this.type = type;
+        this.storeId = storeId;
     }
 
 
@@ -74,21 +76,21 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
             }
         });
 
-
-        FirebaseDatabase.getInstance().getReference().child("Products").addValueEventListener(new ValueEventListener() {
+        Query query = FirebaseDatabase.getInstance().getReference().child("Products").orderByChild("storeId").equalTo(storeId);
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 colors = new HashSet<>();
-                gender = new HashSet<>();
+                masterCategory = new HashSet<>();
                 brand = new HashSet<>();
                 season = new HashSet<>();
-                subSubCat = new HashSet<>();
+                category = new HashSet<>();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     for (int i = 0; i < product.getVariants().size(); i++) {
                         colors.add(product.getVariants().get(i).getColor());
-                        gender.add(product.getCategory());
-                        subSubCat.add(product.getSubCategory());
+                        masterCategory.add(product.getMasterCategory());
+                        category.add(product.getCategory());
                     }
                     brand.add(product.getBrandName());
                     season.add(product.getSeason());
@@ -142,9 +144,9 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
                 break;
             case "Category":
                 if (type != null && type.equals("shop")) {
-                    subItems.addAll(subSubCat);
+                    subItems.addAll(category);
                 } else {
-                    subItems.addAll(gender);
+                    subItems.addAll(masterCategory);
                 }
                 break;
             case "Colour":

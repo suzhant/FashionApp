@@ -236,6 +236,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         };
         variantRef.addValueEventListener(variantListener);
 
+
         //fetching wishlist items
         wishListRef = database.getReference().child("WishList").child(auth.getUid());
         wishListListener = new ValueEventListener() {
@@ -405,7 +406,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                             if (bargain.getCountered() != null) {
                                 isCountered = bargain.getCountered();
                             }
-
+                            binding.btnBargain.setText(MessageFormat.format("Bargain Request : {0}", captializeAllFirstLetter(status)));
 
                             if (isBlocked) {
                                 cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(1, TimeUnit.MINUTES); //1 day old
@@ -416,6 +417,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                                     database.getReference().child("Bargain").child(bargainId).updateChildren(map);
                                 }
                             }
+
                             if (status.equals("accepted")) {
                                 Long cutoff = new Date().getTime() - TimeUnit.MILLISECONDS.convert(2, TimeUnit.DAYS); //2 day old
                                 if (timestamp < cutoff) {
@@ -646,8 +648,8 @@ public class ActivityProductDetails extends AppCompatActivity {
         // long longDate = (timestamp + TimeUnit.DAYS.toMillis(2));
         txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Approved Date:&nbsp; {0}", dateTime.format(formatter))));
         txtValidity.setText(Html.fromHtml(MessageFormat.format("Validity:&nbsp; {0}", afterDate.format(formatter))));
-        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price:&nbsp; Rs. {0}", origPrice)));
-        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price:&nbsp; Rs. {0}", bargainPrice)));
+        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Seller Price:&nbsp; <b>Rs. {0}</b>", origPrice)));
+        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price:&nbsp; <b>Rs. {0}</b>", bargainPrice)));
         txtStatus.setText(Html.fromHtml(MessageFormat.format("Status:&nbsp; <b><span style=color:#09AEA3>{0}</span></b>", captializeAllFirstLetter(status))));
 
         assert imgClose != null;
@@ -679,15 +681,18 @@ public class ActivityProductDetails extends AppCompatActivity {
         EditText edPrice = bottomSheetDialog.findViewById(R.id.edPrice);
         LinearLayout parent = bottomSheetDialog.findViewById(R.id.bargainParent);
         LinearLayout linearOffer = bottomSheetDialog.findViewById(R.id.linearOffer);
+        ImageView imgProduct = bottomSheetDialog.findViewById(R.id.imgProduct);
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd hh:mm a");
         LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
-        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  <big>{0}</big>", dateTime.format(formatter))));
-        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Original Price: &nbsp; <big> Rs.{0}</big>", origPrice)));
-        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <big>Rs.{0}</big>", bargainPrice)));
+        txtBargainDate.setText(Html.fromHtml(MessageFormat.format("Bargain Date:&nbsp;  {0}", dateTime.format(formatter))));
+        txtOriginalPrice.setText(Html.fromHtml(MessageFormat.format("Original Price: &nbsp;  <b>Rs.{0}</b>", origPrice)));
+        txtBargainPrice.setText(Html.fromHtml(MessageFormat.format("Bargain Price: &nbsp; <b>Rs.{0}</b>", bargainPrice)));
         txtRemainingTries.setText(MessageFormat.format("Remaining Tries: {0}", noOfTries));
+
+        Glide.with(this).load(pic).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(imgProduct);
 
         if (isCountered) {
             linearOffer.setVisibility(View.VISIBLE);
@@ -776,15 +781,15 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String price = edPrice.getText().toString();
-                double wholesale = origPrice * (1 - 0.3); //calculating wholesale price
-                double bargainLimit = wholesale * 1.2; //calculating bargain limit
+                double wholesale = origPrice * (1 - 0.5); //calculating wholesale price
+                double bargainLimit = wholesale * 1.3; //calculating bargain limit
                 if (price.isEmpty()) {
                     Snackbar.make(parent, "Empty Field", Snackbar.LENGTH_SHORT).show();
                     edPrice.requestFocus();
                     return;
                 }
                 if (status.equals("rejected")) {
-                    if (Integer.parseInt(price) < bargainPrice) {
+                    if (Integer.parseInt(price) <= bargainPrice) {
                         Snackbar.make(parent, "You cannot enter price lower than previous bargain rate!!", Snackbar.LENGTH_SHORT).show();
                         edPrice.requestFocus();
                         return;
@@ -861,8 +866,8 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onClick(View view) {
                 assert edPrice != null;
                 String bargainPrice = edPrice.getText().toString();
-                double wholesale = price * (1 - 0.3); //calculating wholesale price
-                double bargainLimit = wholesale * 1.2; //calculating bargain limit
+                double wholesale = price * (1 - 0.5); //calculating wholesale price
+                double bargainLimit = wholesale * 1.3; //calculating bargain limit
                 if (bargainPrice.isEmpty()) {
                     edPrice.requestFocus();
                     Snackbar.make(parent, "Empty field!!", Snackbar.LENGTH_SHORT).show();
@@ -873,7 +878,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     Snackbar.make(parent, "Your Price is too high !!", Snackbar.LENGTH_SHORT).show();
                     return;
                 }
-                if (Integer.parseInt(bargainPrice) < bargainLimit) {
+                if (Integer.parseInt(bargainPrice) <= bargainLimit) {
                     edPrice.requestFocus();
                     Snackbar.make(parent, "Your Price is too low !!", Snackbar.LENGTH_SHORT).show();
                     return;
@@ -982,7 +987,6 @@ public class ActivityProductDetails extends AppCompatActivity {
                         Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.bottom).show();
                     }
                 } else {
-                    updateStock(stock);
                     Cart product = new Cart(pId, pName, pic, price);
                     product.setVariantPId(actualProductId);
                     product.setVariantIndex(variantPos);
@@ -1005,6 +1009,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         public void onSuccess(Void unused) {
                             dialog.dismiss();
                             snackbar.show();
+                            updateStock(stock);
                         }
                     });
                 }

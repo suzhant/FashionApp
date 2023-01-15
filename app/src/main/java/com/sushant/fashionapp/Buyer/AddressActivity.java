@@ -89,7 +89,6 @@ public class AddressActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
         dialog = new ProgressDialog(this);
-        dialog.setMessage("Please wait...");
         dialog.setCancelable(false);
 
         database.getReference().child("Area").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -328,6 +327,7 @@ public class AddressActivity extends AppCompatActivity {
                                     address1.setLabel(label);
                                 }
                                 dialog.show();
+                                dialog.setMessage("Saving Address. Please wait..");
 
                                 if (!isDefault || id.isEmpty()) {
                                     database.getReference().child("Shipping Address").child(key).setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {

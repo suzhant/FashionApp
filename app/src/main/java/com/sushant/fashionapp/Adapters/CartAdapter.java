@@ -89,7 +89,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         product.setVariantIndex(Integer.valueOf(snapshot1.getKey()));
                         Query query1 = FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(snapshot1.getKey())
                                 .child("sizes").orderByChild("size").equalTo(product.getSize());
-                        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        query1.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (snapshot.exists()) {

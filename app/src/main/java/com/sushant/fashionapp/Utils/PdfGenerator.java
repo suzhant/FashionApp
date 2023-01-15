@@ -186,7 +186,7 @@ public class PdfGenerator {
 
 
         //2nd table
-        float[] columnWidth1 = {50f, 250f, 70f, 70f, 90f};
+        float[] columnWidth1 = {50f, 250f, 50f, 70f, 70f, 90f};
         Table table1 = new Table(columnWidth1);
 
         DeviceRgb skyBlue = new DeviceRgb(0, 174, 163);
@@ -197,11 +197,13 @@ public class PdfGenerator {
         column1.setFontColor(ColorConstants.WHITE);
         Text column2 = new Text("Item Description");
         column2.setFontColor(ColorConstants.WHITE);
-        Text column3 = new Text("Quantity");
+        Text column3 = new Text("Size");
+        column2.setFontColor(ColorConstants.WHITE);
+        Text column4 = new Text("Quantity");
         column3.setFontColor(ColorConstants.WHITE);
-        Text column4 = new Text("Unit price");
+        Text column5 = new Text("Unit price");
         column4.setFontColor(ColorConstants.WHITE);
-        Text column5 = new Text("Amount");
+        Text column6 = new Text("Amount");
         column5.setFontColor(ColorConstants.WHITE);
 
         table1.addCell(new Cell().add(new Paragraph(column1)).setBackgroundColor(skyBlue));
@@ -209,6 +211,7 @@ public class PdfGenerator {
         table1.addCell(new Cell().add(new Paragraph(column3)).setBackgroundColor(skyBlue));
         table1.addCell(new Cell().add(new Paragraph(column4)).setBackgroundColor(skyBlue));
         table1.addCell(new Cell().add(new Paragraph(column5)).setBackgroundColor(skyBlue));
+        table1.addCell(new Cell().add(new Paragraph(column6)).setBackgroundColor(skyBlue));
 
 
         int i = 1;
@@ -216,6 +219,7 @@ public class PdfGenerator {
         for (Cart product : order.getProducts()) {
             table1.addCell(new Cell().add(new Paragraph(String.valueOf(i))).setBackgroundColor(grey));
             table1.addCell(new Cell().add(new Paragraph(product.getpName())).setBackgroundColor(grey));
+            table1.addCell(new Cell().add(new Paragraph(product.getSize())).setBackgroundColor(grey));
             table1.addCell(new Cell().add(new Paragraph(product.getQuantity().toString())).setBackgroundColor(grey));
             int price;
             if (product.getBargainPrice() != null) {

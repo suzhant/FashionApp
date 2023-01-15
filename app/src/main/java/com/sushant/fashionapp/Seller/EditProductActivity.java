@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.EditProductAdapter;
 import com.sushant.fashionapp.Models.Product;
@@ -43,30 +44,20 @@ public class EditProductActivity extends AppCompatActivity {
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                sellerId = snapshot.child("sellerId").getValue(String.class);
-                database.getReference().child("Seller").child(sellerId).addListenerForSingleValueEvent(new ValueEventListener() {
+                storeId = snapshot.child("storeId").getValue(String.class);
+                Query query = database.getReference().child("Products").orderByChild("storeId").equalTo(storeId).limitToFirst(15);
+                query.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        storeId = snapshot.child("storeId").getValue(String.class);
-                        database.getReference().child("Products").addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                products.clear();
-                                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                    Product product = snapshot1.getValue(Product.class);
-                                    assert product != null;
-                                    if (product.getStoreId().equals(storeId)) {
-                                        products.add(product);
-                                    }
-                                }
-                                adapters.notifyDataSetChanged();
+                        products.clear();
+                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                            Product product = snapshot1.getValue(Product.class);
+                            assert product != null;
+                            if (product.getStoreId().equals(storeId)) {
+                                products.add(product);
                             }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
+                        }
+                        adapters.notifyDataSetChanged();
                     }
 
                     @Override

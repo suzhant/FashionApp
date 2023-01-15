@@ -75,7 +75,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                     for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                         Query query1 = FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(snapshot1.getKey())
                                 .child("sizes").orderByChild("size").equalTo(product.getSize());
-                        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        query1.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (snapshot.exists()) {
@@ -113,6 +113,32 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
             }
         });
 
+        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
+                .child("sizes")
+                .child(String.valueOf(product.getSizeIndex())).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.child("stock").exists()) {
+                    Size size = snapshot.getValue(Size.class);
+                    product.setStock(size.getStock());
+                    if (product.getStock() < 5) {
+                        holder.txtStock.setVisibility(View.VISIBLE);
+                        if (product.getStock() == 0) {
+                            holder.txtStock.setText("out of stock!");
+                        } else {
+                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", product.getStock()));
+                        }
+                    } else {
+                        holder.txtStock.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         holder.imgProduct.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,32 +182,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
             }
         });
 
-        FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
-                .child("sizes")
-                .child(String.valueOf(product.getSizeIndex())).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.child("stock").exists()) {
-                    Size size = snapshot.getValue(Size.class);
-                    product.setStock(size.getStock());
-                    if (product.getStock() < 5) {
-                        holder.txtStock.setVisibility(View.VISIBLE);
-                        if (product.getStock() == 0) {
-                            holder.txtStock.setText("out of stock!");
-                        } else {
-                            holder.txtStock.setText(MessageFormat.format("only {0} item(s) in stock", product.getStock()));
-                        }
-                    } else {
-                        holder.txtStock.setVisibility(View.GONE);
-                    }
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
         holder.btnAddToCart.setOnClickListener(new View.OnClickListener() {
             @Override

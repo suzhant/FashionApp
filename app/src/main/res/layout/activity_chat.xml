@@ -97,6 +97,7 @@
         android:layout_marginBottom="20dp"
         android:elevation="4dp"
         app:fabCustomSize="35dp"
+        android:visibility="gone"
         android:backgroundTint="@color/skyBlue"
         app:layout_constraintBottom_toBottomOf="@+id/recycler_message"
         app:layout_constraintEnd_toEndOf="@+id/recycler_message"

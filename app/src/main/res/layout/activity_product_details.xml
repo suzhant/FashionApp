@@ -207,36 +207,19 @@
                     android:textColor="@color/skyBlue"
                     android:textSize="18sp" />
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnBargain"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="Init Bargain Request"
+                    android:textAllCaps="false"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/skyBlue"
+                    android:textSize="16sp"
+                    app:cornerRadius="3dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/rectangle_bg"
-                    android:backgroundTint="@color/gray_100"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="4dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="15dp"
-                        android:text="Do you want to negotiate price?"
-                        android:textSize="15sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnBargain"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bargain"
-                        android:textAllCaps="false"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        app:cornerRadius="3dp"
-                        app:strokeColor="@color/teal_700" />
-                </LinearLayout>
+                    app:strokeColor="@color/teal_700" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -272,72 +255,6 @@
                     app:selectionRequired="true"
                     app:singleSelection="true">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipXSml"
-                        android:layout_width="45dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="10dp"
-                        android:fontFamily="@font/gilroy_bold"
-                        android:text="XS"
-                        android:textAlignment="center"
-                        app:chipCornerRadius="4dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipSml"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="10dp"
-                        android:fontFamily="@font/gilroy_bold"
-                        android:text="S"
-                        android:textAlignment="center"
-                        app:chipCornerRadius="4dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipMed"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="M"
-                        android:textAlignment="center"
-                        app:chipCornerRadius="4dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipLrg"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="L"
-                        android:textAlignment="center"
-                        app:chipCornerRadius="4dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipXl"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginEnd="10dp"
-                        android:text="XL"
-                        android:textAlignment="center"
-                        app:chipCornerRadius="4dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStrokeWidth="1dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipXXl"
-                        android:layout_width="50dp"
-                        android:layout_height="40dp"
-                        android:text="XXL"
-                        android:textAlignment="center"
-                        app:chipCornerRadius="4dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStrokeWidth="1dp" />
                 </com.google.android.material.chip.ChipGroup>
 
                 <TextView
@@ -361,7 +278,7 @@
                     android:fontFamily="sans-serif-medium"
                     android:lineSpacingExtra="4dp"
                     android:padding="6dp"
-                    android:text="Red skirt made of wool. Provide cool and elegant look. "
+                    android:text=""
                     android:textSize="15sp" />
 
                 <TextView

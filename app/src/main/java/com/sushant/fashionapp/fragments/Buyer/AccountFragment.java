@@ -125,9 +125,11 @@ public class AccountFragment extends Fragment {
                     Store store = snapshot1.getValue(Store.class);
                     storeId = store.getStoreId();
                     isSeller = true;
-                    SharedPreferences.Editor editor = requireActivity().getSharedPreferences("store", MODE_PRIVATE).edit();
-                    editor.putString("storeId", storeId);
-                    editor.apply();
+                    if (getActivity() != null) {
+                        SharedPreferences.Editor editor = getActivity().getSharedPreferences("store", MODE_PRIVATE).edit();
+                        editor.putString("storeId", storeId);
+                        editor.apply();
+                    }
                 }
             }
 

@@ -284,7 +284,7 @@ public class CartActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         startActivity(new Intent(getApplicationContext(), WishListActivity.class));
                     }
-                }).show();
+                }).setAnchorView(binding.cardView).show();
             }
         });
     }
@@ -311,7 +311,7 @@ public class CartActivity extends AppCompatActivity {
                 }
 
             }
-        });
+        }).setAnchorView(binding.cardView);
         snackbar.show();
         snackbar.addCallback(new Snackbar.Callback() {
             @Override

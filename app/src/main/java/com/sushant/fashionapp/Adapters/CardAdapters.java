@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +47,7 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
-        Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.productImg);
+        Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.productImg);
         holder.productName.setText(product.getpName());
         holder.productPrice.setText(MessageFormat.format("Rs. {0}", product.getpPrice()));
 

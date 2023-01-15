@@ -168,8 +168,8 @@ public class SearchActivity extends AppCompatActivity {
                 searchQuery.clear();
                 for (Product p : products) {
                     if (p.getpName().toLowerCase().contains(charSequence.toString().toLowerCase()) || p.getDesc().toLowerCase().contains(charSequence.toString().toLowerCase())
-                            || p.getSubCategory().toLowerCase().contains(charSequence.toString().toLowerCase()) ||
-                            p.getSubSubCategory().toLowerCase().contains(charSequence.toString().toLowerCase())) {
+                            || p.getCategory().toLowerCase().contains(charSequence.toString().toLowerCase()) ||
+                            p.getArticleType().toLowerCase().contains(charSequence.toString().toLowerCase())) {
                         searchQuery.add(p.getpName());
 //                        searchQuery.add(p.getSubCategory());
 //                        searchQuery.add(p.getSubSubCategory());
@@ -258,10 +258,10 @@ public class SearchActivity extends AppCompatActivity {
     private void search(String toString) {
         searchList.clear();
         for (Product p : products) {
-            String subsubcat = removeSpecialChar(p.getSubSubCategory());
+            String subsubcat = removeSpecialChar(p.getArticleType());
             if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())
-                    || p.getCategory().toLowerCase().contains(toString) || p.getSubCategory().toLowerCase().contains(toString)
-                    || subsubcat.toLowerCase().contains(toString) || toString.contains(p.getSeason().toLowerCase())) {
+                    || p.getMasterCategory().toLowerCase().contains(toString) || p.getCategory().toLowerCase().contains(toString)
+                    || subsubcat.toLowerCase().contains(toString)) {
                 searchList.add(p);
             }
         }

@@ -6,7 +6,6 @@ public class Bargain {
     private Long timestamp;
     private Boolean isBlocked, isCountered;
 
-
     public Bargain() {
     }
 

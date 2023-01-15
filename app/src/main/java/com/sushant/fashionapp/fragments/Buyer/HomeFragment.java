@@ -34,7 +34,6 @@ import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.FragmentHomeBinding;
 
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
-import org.tensorflow.lite.InterpreterApi;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ import okhttp3.Response;
 
 public class HomeFragment extends Fragment {
 
-    private static final String LIST_STATE_KEY = "abc";
     FragmentHomeBinding binding;
     FirebaseAuth auth;
     CardAdapters popularAdapters;
@@ -60,7 +58,6 @@ public class HomeFragment extends Fragment {
     CategoryAdapter categoryAdapter;
     String buyerPic;
     FirebaseStorage storage;
-    private InterpreterApi interpreter;
 
 
     public HomeFragment() {
@@ -96,6 +93,7 @@ public class HomeFragment extends Fragment {
 //        }
 
 
+
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -112,7 +110,9 @@ public class HomeFragment extends Fragment {
                     if (getActivity() != null) {
                         Glide.with(getActivity()).load(buyerPic).placeholder(R.drawable.avatar).diskCacheStrategy(DiskCacheStrategy.ALL)
                                 .into(binding.circleImageView);
+
                     }
+
                 }
             }
 
@@ -132,7 +132,7 @@ public class HomeFragment extends Fragment {
         list.add(new CarouselItem(R.drawable.banner_3));
         binding.imgBanner.setData(list);
 
-        Query query = database.getReference().child("Products").limitToLast(5);
+        Query query = database.getReference().child("Products").limitToFirst(5);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -154,7 +154,6 @@ public class HomeFragment extends Fragment {
         initPopularRecyclerView();
         initCategoryRecycler();
         initRecentRecycler();
-
 
 //        binding.appBarLayout2.addOnOffsetChangedListener(new AppBarLayout.BaseOnOffsetChangedListener() {
 //            @Override
