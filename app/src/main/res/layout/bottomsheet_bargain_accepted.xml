@@ -112,6 +112,17 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp" />
 
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:id="@+id/btnProductPage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:text="Go to Product page" />
+
+
     <!--    <TextView-->
     <!--        android:id="@+id/txtMessage1"-->
     <!--        android:layout_width="match_parent"-->
@@ -186,6 +197,7 @@
         </LinearLayout>
 
         <ImageButton
+            android:id="@+id/imgChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/message_icon"
@@ -195,6 +207,7 @@
             android:padding="5dp" />
 
         <ImageButton
+            android:id="@+id/imgCall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_phone_24"

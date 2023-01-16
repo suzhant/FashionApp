@@ -4,6 +4,7 @@ import static com.sushant.fashionapp.Utils.TextUtils.captializeAllFirstLetter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -32,7 +33,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.sushant.fashionapp.Buyer.ActivityProductDetails;
 import com.sushant.fashionapp.Buyer.BargainHistoryActivity;
+import com.sushant.fashionapp.Buyer.ChatActivity;
+import com.sushant.fashionapp.Buyer.StorePageActivity;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.Models.Product;
@@ -57,6 +61,9 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
     Context context;
     int color;
     BargainHistoryActivity activity;
+    String storeId, storeName, storePic;
+    String previewPic, pName, pId, pDesc;
+    Integer variantIndex, pPrice;
 
     public BuyerBargainAdapter(ArrayList<Bargain> list, Context context) {
         this.list = list;
@@ -155,6 +162,8 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
         TextView txtRequest = bottomSheetDialog.findViewById(R.id.txtRequest_to);
         CircleImageView imgStore = bottomSheetDialog.findViewById(R.id.imgStore);
         TextView txtStoreName = bottomSheetDialog.findViewById(R.id.txtStoreName);
+        MaterialButton btnProductPage = bottomSheetDialog.findViewById(R.id.btnProductPage);
+        ImageView imgChat = bottomSheetDialog.findViewById(R.id.imgChat);
 
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
@@ -167,10 +176,11 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
                     Store store = snapshot.getValue(Store.class);
                     assert store != null;
                     if (snapshot.child("storePic").exists()) {
-                        String userPic = store.getStorePic();
-                        Glide.with(context).load(userPic).placeholder(R.drawable.avatar).into(imgStore);
+                        storePic = store.getStorePic();
+                        Glide.with(context).load(storePic).placeholder(R.drawable.avatar).into(imgStore);
                     }
-                    String storeName = store.getStoreName();
+                    storeName = store.getStoreName();
+                    storeId = store.getStoreId();
                     txtStoreName.setText(storeName);
                 }
 
@@ -179,6 +189,63 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        imgStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, StorePageActivity.class);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("storePic", storePic);
+                intent.putExtra("storeName", storeName);
+                context.startActivity(intent);
+            }
+        });
+
+        FirebaseDatabase.getInstance().getReference().child("Products").child(bargain.getProductId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Product product = snapshot.getValue(Product.class);
+                previewPic = product.getPreviewPic();
+                pName = product.getpName();
+                pPrice = product.getpPrice();
+                pId = product.getpId();
+                pDesc = product.getDesc();
+                variantIndex = product.getVariantIndex();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        btnProductPage.setVisibility(View.VISIBLE);
+
+        btnProductPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ActivityProductDetails.class);
+                intent.putExtra("pPic", previewPic);
+                intent.putExtra("pName", pName);
+                intent.putExtra("pPrice", pPrice);
+                intent.putExtra("pId", pId);
+                intent.putExtra("pDesc", pDesc);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("index", variantIndex);
+                context.startActivity(intent);
+            }
+        });
+
+        imgChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("senderId", FirebaseAuth.getInstance().getUid());
+                intent.putExtra("receiverId", storeId);
+                intent.putExtra("from", "Buyer");
+                context.startActivity(intent);
             }
         });
 
@@ -227,6 +294,7 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
         TextView txtRequest = bottomSheetDialog.findViewById(R.id.txtRequest_to);
         CircleImageView imgStore = bottomSheetDialog.findViewById(R.id.imgStore);
         TextView txtStoreName = bottomSheetDialog.findViewById(R.id.txtStoreName);
+        ImageView imgChat = bottomSheetDialog.findViewById(R.id.imgChat);
 
         Objects.requireNonNull(bottomSheetDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
@@ -239,10 +307,11 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
                     Store store = snapshot.getValue(Store.class);
                     assert store != null;
                     if (snapshot.child("storePic").exists()) {
-                        String userPic = store.getStorePic();
-                        Glide.with(context).load(userPic).placeholder(R.drawable.avatar).into(imgStore);
+                        storePic = store.getStorePic();
+                        Glide.with(context).load(storePic).placeholder(R.drawable.avatar).into(imgStore);
                     }
-                    String storeName = store.getStoreName();
+                    storeId = store.getStoreId();
+                    storeName = store.getStoreName();
                     txtStoreName.setText(storeName);
                 }
 
@@ -251,6 +320,28 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        imgStore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, StorePageActivity.class);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("storePic", storePic);
+                intent.putExtra("storeName", storeName);
+                context.startActivity(intent);
+            }
+        });
+
+        imgChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("senderId", FirebaseAuth.getInstance().getUid());
+                intent.putExtra("receiverId", storeId);
+                intent.putExtra("from", "Buyer");
+                context.startActivity(intent);
             }
         });
 
@@ -266,12 +357,33 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Product product = snapshot.getValue(Product.class);
+                previewPic = product.getPreviewPic();
+                pName = product.getpName();
+                pPrice = product.getpPrice();
+                pId = product.getpId();
+                pDesc = product.getDesc();
+                variantIndex = product.getVariantIndex();
                 Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(imgProduct);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
+            }
+        });
+
+        imgProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ActivityProductDetails.class);
+                intent.putExtra("pPic", previewPic);
+                intent.putExtra("pName", pName);
+                intent.putExtra("pPrice", pPrice);
+                intent.putExtra("pId", pId);
+                intent.putExtra("pDesc", pDesc);
+                intent.putExtra("storeId", storeId);
+                intent.putExtra("index", variantIndex);
+                context.startActivity(intent);
             }
         });
 

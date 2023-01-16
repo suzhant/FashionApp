@@ -71,11 +71,10 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
 
         getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.gray_100));
 
-        from = getIntent().getStringExtra("from");
-
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
 
+        from = getIntent().getStringExtra("from");
         senderId = getIntent().getStringExtra("senderId");
         receiverId = getIntent().getStringExtra("receiverId");
         senderRoom = senderId + receiverId;
