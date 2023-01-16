@@ -105,7 +105,7 @@ public class ViewMoreActivity extends AppCompatActivity {
 
         initRecyclerView();
 
-        Query query = database.getReference().child("Products").limitToFirst(20);
+        Query query = database.getReference().child("Products");
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -201,7 +201,7 @@ public class ViewMoreActivity extends AppCompatActivity {
                     filterBrand(brand);
                 }
                 if (!category.equals("All")) {
-                    filterGender(category);
+                    filterCategory(category);
                 }
                 if (!sortBy.equals("All")) {
                     performSort(sortBy);
@@ -262,10 +262,11 @@ public class ViewMoreActivity extends AppCompatActivity {
         initSortFilterRecycler(recyclerView);
     }
 
-    private void filterGender(String gender) {
-        category = gender;
+
+    private void filterCategory(String cat) {
+        category = cat;
         products.clear();
-        Predicate<Product> byFemale = product -> product.getMasterCategory().equals(gender);
+        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             Set<Product> result = unmodifiedList.stream().filter(byFemale)
@@ -331,7 +332,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     private void initSortFilterRecycler(RecyclerView recyclerView) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener);
+        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, category);
         recyclerView.setAdapter(sortFilterAdapter);
     }
 

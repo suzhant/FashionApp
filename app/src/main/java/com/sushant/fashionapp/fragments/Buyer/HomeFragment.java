@@ -132,7 +132,7 @@ public class HomeFragment extends Fragment {
         list.add(new CarouselItem(R.drawable.banner_3));
         binding.imgBanner.setData(list);
 
-        Query query = database.getReference().child("Products").limitToFirst(5);
+        Query query = database.getReference().child("Products").limitToFirst(10);
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -182,7 +182,7 @@ public class HomeFragment extends Fragment {
 
 
     private void initPopularRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.HORIZONTAL, false);
         binding.popularRecycler.setLayoutManager(layoutManager);
         popularAdapters = new CardAdapters(products, getActivity());
         popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);

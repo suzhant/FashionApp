@@ -52,141 +52,166 @@
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout9">
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/materialCardView3"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="4dp"
+            app:strokeColor="@color/white">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/materialCardView3"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="4dp"
-                app:strokeColor="@color/white">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="15dp"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="20dp"
-                        android:layout_marginEnd="15dp"
-                        android:orientation="horizontal">
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/imgStorePic"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:src="@drawable/avatar" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/txtStoreName"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="sans-serif-medium"
-                                android:text="Fashino"
-                                android:textSize="18sp" />
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                                <TextView
-                                    style="@style/TextAppearance.AppCompat.Small"
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_weight="1"
-                                    android:gravity="center_vertical"
-                                    android:text="12.5k"
-                                    app:drawableStartCompat="@drawable/ic_person_24"
-                                    app:drawableTint="@color/black" />
-
-                                <com.google.android.material.button.MaterialButton
-                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="match_parent"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:insetTop="0dp"
-                                    android:insetBottom="0dp"
-                                    android:letterSpacing="0"
-                                    android:padding="0dp"
-                                    android:text="Follow"
-                                    android:textAllCaps="false"
-                                    android:textColor="@color/skyBlue"
-                                    android:visibility="gone" />
-                            </LinearLayout>
-                        </LinearLayout>
-
-                    </LinearLayout>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/imgStorePic"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/avatar" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="4dp"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                        android:layout_marginStart="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnBrowse"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="160dp"
+                        <TextView
+                            android:id="@+id/txtStoreName"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="10dp"
-                            android:text="Browse"
-                            android:textAllCaps="false"
-                            android:textColor="@color/black"
-                            app:icon="@drawable/ccp_ic_arrow_drop_down"
-                            app:iconGravity="textEnd"
-                            app:iconSize="24dp"
-                            app:iconTint="@color/black" />
+                            android:fontFamily="sans-serif-medium"
+                            android:text="Fashino"
+                            android:textSize="18sp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="160dp"
+                        <TextView
+                            style="@style/TextAppearance.AppCompat.Small"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Chat"
-                            android:textAllCaps="false"
-                            android:textColor="@color/black"
-                            app:icon="@drawable/message_icon"
-                            app:iconGravity="textEnd"
-                            app:iconTint="@color/black" />
+                            android:gravity="center_vertical"
+                            android:text="12.5k followers"
+                            app:drawableTint="@color/black" />
                     </LinearLayout>
+
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:dividerColor="@color/medium_gray"
-                android:layout_marginTop="10dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_store_products"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp" />
-        </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Follow"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        app:cornerRadius="4dp" />
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        app:cardCornerRadius="4dp"
+                        app:strokeColor="@color/medium_gray">
+
+                        <ImageView
+                            android:id="@+id/imgChat"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="7dp"
+                            android:src="@drawable/message_icon"
+                            app:tint="@color/black" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        app:cardCornerRadius="4dp"
+                        app:strokeColor="@color/medium_gray">
+
+                        <ImageView
+                            android:id="@+id/imgFilter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="7dp"
+                            android:src="@drawable/ic_baseline_filter_alt_off_24"
+                            app:tint="@color/black" />
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
 
 
-    </androidx.core.widget.NestedScrollView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBrowse"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:text="Browse"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        app:icon="@drawable/ccp_ic_arrow_drop_down"
+                        app:iconGravity="textEnd"
+                        app:iconSize="24dp"
+                        app:iconTint="@color/black" />
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:text="Chat"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        app:icon="@drawable/message_icon"
+                        app:iconGravity="textEnd"
+                        app:iconTint="@color/black" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            app:dividerColor="@color/medium_gray" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_store_products"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp" />
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

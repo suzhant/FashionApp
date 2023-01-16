@@ -2,6 +2,7 @@ package com.sushant.fashionapp.Buyer;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.text.Editable;
@@ -85,6 +86,7 @@ public class StorePageActivity extends AppCompatActivity {
                         break;
                     case "Category":
                         category = item;
+                        colour = "All";
                         break;
                     case "Colour":
                         colour = item;
@@ -203,10 +205,21 @@ public class StorePageActivity extends AppCompatActivity {
             }
         });
 
-        binding.btnBrowse.setOnClickListener(new View.OnClickListener() {
+        binding.imgFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showBottomSheetDialog();
+            }
+        });
+
+        binding.imgChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+                intent.putExtra("senderId", auth.getUid());
+                intent.putExtra("receiverId", storeId);
+                intent.putExtra("from", "Buyer");
+                startActivity(intent);
             }
         });
 
@@ -303,13 +316,17 @@ public class StorePageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isSorted) {
-                    binding.btnBrowse.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue));
-                    binding.btnBrowse.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-                    binding.btnBrowse.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.white)));
+//                    binding.btnBrowse.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue));
+//                    binding.btnBrowse.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+//                    binding.btnBrowse.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.white)));
+                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_24);
+                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
                 } else {
-                    binding.btnBrowse.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-                    binding.btnBrowse.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-                    binding.btnBrowse.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.black)));
+//                    binding.btnBrowse.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
+//                    binding.btnBrowse.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+//                    binding.btnBrowse.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.black)));
+                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_off_24);
+                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
                 }
 
 
@@ -413,7 +430,6 @@ public class StorePageActivity extends AppCompatActivity {
                     products.add(p);
                 }
             }
-
         }
 
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -455,7 +471,7 @@ public class StorePageActivity extends AppCompatActivity {
     private void initSortFilterRecycler(RecyclerView recyclerView) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, storeId, "shop");
+        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, storeId, "shop", category);
         recyclerView.setAdapter(sortFilterAdapter);
     }
 

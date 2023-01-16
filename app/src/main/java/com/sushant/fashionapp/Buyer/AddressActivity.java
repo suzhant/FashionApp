@@ -326,8 +326,10 @@ public class AddressActivity extends AppCompatActivity {
                                 if (!label.isEmpty()) {
                                     address1.setLabel(label);
                                 }
+
+                                dialog.setTitle("Saving Address");
+                                dialog.setMessage("Please wait...");
                                 dialog.show();
-                                dialog.setMessage("Saving Address. Please wait..");
 
                                 if (!isDefault || id.isEmpty()) {
                                     database.getReference().child("Shipping Address").child(key).setValue(address1).addOnSuccessListener(new OnSuccessListener<Void>() {
