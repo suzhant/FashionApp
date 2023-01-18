@@ -132,6 +132,7 @@ public class HomeFragment extends Fragment {
         list.add(new CarouselItem(R.drawable.banner_3));
         binding.imgBanner.setData(list);
 
+
         Query query = database.getReference().child("Products").limitToFirst(10);
         query.addValueEventListener(new ValueEventListener() {
             @Override
