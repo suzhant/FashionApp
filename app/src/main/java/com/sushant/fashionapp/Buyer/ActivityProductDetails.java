@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -51,6 +52,7 @@ import com.sushant.fashionapp.Models.Rating;
 import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.Models.Variants;
 import com.sushant.fashionapp.R;
+import com.sushant.fashionapp.Utils.ProductRecommendation;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.ActivityProductDetailsBinding;
 
@@ -99,6 +101,8 @@ public class ActivityProductDetails extends AppCompatActivity {
     ProgressDialog dialog;
     VPAdapter vpAdapter;
     Query query;
+    String from;
+
 
     int index;
 
@@ -123,6 +127,11 @@ public class ActivityProductDetails extends AppCompatActivity {
         pDesc = getIntent().getStringExtra("pDesc");
         pName = getIntent().getStringExtra("pName");
         index = getIntent().getIntExtra("index", 0);
+        from = getIntent().getStringExtra("from");
+
+        if (from != null && from.equals("search")) {
+            addProductToDB();
+        }
 
 
         binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Rs. <big>{0}<big>", price)));
@@ -970,13 +979,21 @@ public class ActivityProductDetails extends AppCompatActivity {
     }
 
     private void addProductToCart() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                addProductToDB();
+            }
+        }, 100);
+
         Snackbar snackbar = getSnackbar();
         dialog.show();
         database.getReference().child("Cart").child(auth.getUid()).child(actualProductId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    quantity = snapshot.child("quantity").getValue(Integer.class);
+                    Cart product = snapshot.getValue(Cart.class);
+                    quantity = product.getQuantity();
                     if (quantity < 5) {
                         updateCartQuantity(quantity);
                         updateStock(stock);
@@ -1007,9 +1024,9 @@ public class ActivityProductDetails extends AppCompatActivity {
                     database.getReference().child("Cart").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
+                            updateStock(stock);
                             dialog.dismiss();
                             snackbar.show();
-                            updateStock(stock);
                         }
                     });
                 }
@@ -1021,6 +1038,25 @@ public class ActivityProductDetails extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void addProductToDB() {
+        database.getReference().child("Products").orderByChild("pId").equalTo(pId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Product product = dataSnapshot.getValue(Product.class);
+                    ProductRecommendation productRecommendation = new ProductRecommendation(product.getPreviewPic(), ActivityProductDetails.this);
+                    productRecommendation.recommend();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
     }
 

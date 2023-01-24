@@ -83,7 +83,7 @@ public class SearchResultActivity extends AppCompatActivity {
     private void initRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         binding.recyclerSearchView.setLayoutManager(layoutManager);
-        adapters = new CardAdapters(searchList, this);
+        adapters = new CardAdapters(searchList, this, "search");
         binding.recyclerSearchView.setAdapter(adapters);
     }
 

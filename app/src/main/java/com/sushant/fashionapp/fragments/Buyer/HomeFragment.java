@@ -51,14 +51,16 @@ public class HomeFragment extends Fragment {
     FragmentHomeBinding binding;
     FirebaseAuth auth;
     CardAdapters popularAdapters;
-    ArrayList<Product> products = new ArrayList<>();
     FirebaseDatabase database;
     public GridLayoutManager layoutManager;
     ArrayList<Category> categories = new ArrayList<>();
     CategoryAdapter categoryAdapter;
     String buyerPic;
     FirebaseStorage storage;
-
+    ArrayList<String> urls = new ArrayList<>();
+    ArrayList<Product> smallList = new ArrayList<>();
+    ArrayList<Product> recommend_list = new ArrayList<>();
+    CardAdapters recentAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -75,23 +77,129 @@ public class HomeFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
 
-//        if (getContext()!=null){
-//            Task<Void> initializeTask = TfLite.initialize(getContext());
-//            initializeTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-//                @Override
-//                public void onSuccess(Void unused) {
-//                    interpreter = InterpreterApi.create(,
-//                            new InterpreterApi.Options().setRuntime(InterpreterApi.Options.TfLiteRuntime.FROM_SYSTEM_ONLY));
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception e) {
-//                    Log.e("Interpreter", String.format("Cannot initialize interpreter: %s",
-//                            e.getMessage()));
-//                }
-//            });
-//        }
 
+        database.getReference().child("Action History").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    urls.clear();
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        String url = snapshot1.child("imgUrl").getValue(String.class);
+                        urls.add(url);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        Query query = database.getReference().child("Products").limitToFirst(10);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                smallList.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Product product = snapshot1.getValue(Product.class);
+                    smallList.add(product);
+                }
+                recentAdapter.notifyItemInserted(smallList.size());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        database.getReference().child("Recommended Products").child(auth.getUid()).limitToLast(12).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    recommend_list.clear();
+                    for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                        Product product = snapshot1.getValue(Product.class);
+                        recommend_list.add(product);
+                    }
+                } else {
+                    recommend_list.addAll(smallList);
+                }
+                Collections.shuffle(recommend_list);
+                popularAdapters.notifyItemInserted(recommend_list.size());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        // Instantiate the RequestQueue.
+//        if (getContext()!=null){
+//            RequestQueue queue = Volley.newRequestQueue(getContext());
+//            String url = "http://suzhant.pythonanywhere.com/predict";
+//
+//            // Request a string response from the provided URL.
+//            StringRequest stringRequest=new StringRequest(com.android.volley.Request.Method.POST, url,
+//                    new com.android.volley.Response.Listener<String>() {
+//                        @Override
+//                        public void onResponse(String response) {
+//                            try {
+//                                JSONObject jsonObject=new JSONObject(response);
+//                                JSONArray colArray = jsonObject.getJSONArray("result");
+//                                results.clear();
+//                                for(int i=0; i<colArray.length(); i++){
+//                                    String id=colArray.getString(i);
+//                                    results.add(id);
+//                                }
+//
+//
+//                                if (!recommended_list.isEmpty()){
+//                                    for (Product product:recommended_list){
+//                                            if (!results.contains(product.getpId())) {
+//                                                database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
+//                                            }
+//                                    }
+//
+//                                }else {
+//                                    for (Product product : products) {
+//                                        if (results.contains(product.getpId())) {
+//                                            database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
+//                                        }
+//                                    }
+//
+//                                }
+//
+//
+//
+//                                Log.d("list",recommend_list.toString());
+//                                Log.d("ids",results.toString());
+//
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//                        }
+//                    }, new com.android.volley.Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+//                    Log.d("error",error.getMessage());
+//                }
+//            }){
+//                @Nullable
+//                @Override
+//                protected Map<String, String> getParams() throws AuthFailureError {
+//                    Map<String,String> params=new HashMap<>();
+//                    params.put("url",link);
+//                    return params;
+//                }
+//            };
+//
+//            queue.add(stringRequest);
+//        }
 
 
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -133,24 +241,7 @@ public class HomeFragment extends Fragment {
         binding.imgBanner.setData(list);
 
 
-        Query query = database.getReference().child("Products").limitToFirst(10);
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                products.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
-                    products.add(product);
-                }
-                Collections.reverse(products);
-                popularAdapters.notifyItemInserted(products.size());
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
 
         initPopularRecyclerView();
         initCategoryRecycler();
@@ -166,7 +257,9 @@ public class HomeFragment extends Fragment {
         binding.txtPopularViewMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), ViewMoreActivity.class));
+                Intent intent = new Intent(getContext(), ViewMoreActivity.class);
+                intent.putExtra("from", "recommend");
+                startActivity(intent);
             }
         });
 
@@ -174,6 +267,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getContext(), SearchActivity.class));
+            }
+        });
+
+        binding.txtRecentViewMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ViewMoreActivity.class);
+                intent.putExtra("from", "recent");
+                startActivity(intent);
             }
         });
 
@@ -185,7 +287,7 @@ public class HomeFragment extends Fragment {
     private void initPopularRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.HORIZONTAL, false);
         binding.popularRecycler.setLayoutManager(layoutManager);
-        popularAdapters = new CardAdapters(products, getActivity());
+        popularAdapters = new CardAdapters(recommend_list, getActivity());
         popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         binding.popularRecycler.setAdapter(popularAdapters);
 
@@ -205,12 +307,11 @@ public class HomeFragment extends Fragment {
     }
 
     private void initRecentRecycler() {
-        CardAdapters popularAdapters;
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.recentRecycler.setLayoutManager(layoutManager);
-        popularAdapters = new CardAdapters(products, getActivity());
-        popularAdapters.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
-        binding.recentRecycler.setAdapter(popularAdapters);
+        recentAdapter = new CardAdapters(smallList, getActivity());
+        recentAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
+        binding.recentRecycler.setAdapter(recentAdapter);
     }
 
 

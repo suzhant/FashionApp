@@ -136,23 +136,23 @@ public class StorePageActivity extends AppCompatActivity {
         };
         query1.addValueEventListener(valueEventListener1);
 
-        query2 = database.getReference().child("Products").orderByChild("storeId").equalTo(storeId);
-        valueEventListener2 = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                unmodifiedList.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
-                    unmodifiedList.add(product);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        query2.addValueEventListener(valueEventListener2);
+//        query2 = database.getReference().child("Products").orderByChild("storeId").equalTo(storeId);
+//        valueEventListener2 = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                unmodifiedList.clear();
+//                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+//                    Product product = snapshot1.getValue(Product.class);
+//                    unmodifiedList.add(product);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        };
+//        query2.addValueEventListener(valueEventListener2);
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -406,14 +406,31 @@ public class StorePageActivity extends AppCompatActivity {
     private void filterCategory(String cat) {
         category = cat;
         products.clear();
-        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
+//        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
+//
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//            Set<Product> result = unmodifiedList.stream().filter(byFemale)
+//                    .collect(Collectors.toSet());
+//            products.addAll(result);
+//        }
+//        adapters.notifyDataSetChanged();
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Set<Product> result = unmodifiedList.stream().filter(byFemale)
-                    .collect(Collectors.toSet());
-            products.addAll(result);
-        }
-        adapters.notifyDataSetChanged();
+        database.getReference().child("Products").orderByChild("category").equalTo(cat).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                products.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Product product = snapshot1.getValue(Product.class);
+                    products.add(product);
+                }
+                adapters.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 

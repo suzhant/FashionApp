@@ -31,10 +31,17 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
 
     ArrayList<Product> products;
     Context context;
+    String from;
 
     public CardAdapters(ArrayList<Product> products, Context context) {
         this.products = products;
         this.context = context;
+    }
+
+    public CardAdapters(ArrayList<Product> products, Context context, String from) {
+        this.products = products;
+        this.context = context;
+        this.from = from;
     }
 
     @NonNull
@@ -47,7 +54,7 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Product product = products.get(position);
-        Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL).thumbnail(0.5f).into(holder.productImg);
+        Glide.with(context).load(product.getPreviewPic()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.productImg);
         holder.productName.setText(product.getpName());
         holder.productPrice.setText(MessageFormat.format("Rs. {0}", product.getpPrice()));
 
@@ -107,6 +114,9 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
                 intent.putExtra("pDesc", product.getDesc());
                 intent.putExtra("storeId", product.getStoreId());
                 intent.putExtra("index", product.getVariantIndex());
+                if (from != null && from.equals("search")) {
+                    intent.putExtra("from", "search");
+                }
                 context.startActivity(intent);
             }
         });

@@ -62,15 +62,12 @@ public class Product implements Serializable {
     }
 
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return pPrice == product.pPrice && pPic == product.pPic && love == product.love
-                && Objects.equals(pId, product.pId) && Objects.equals(pName, product.pName)
-                && quantity == product.quantity;
+        return Objects.equals(pId, product.pId) && Objects.equals(pName, product.pName) && Objects.equals(maxLimit, product.maxLimit) && Objects.equals(desc, product.desc) && Objects.equals(pPic, product.pPic) && Objects.equals(brandName, product.brandName) && Objects.equals(variantPId, product.variantPId) && Objects.equals(billUrl, product.billUrl) && Objects.equals(pPrice, product.pPrice) && Objects.equals(love, product.love) && Objects.equals(quantity, product.quantity) && Objects.equals(variantIndex, product.variantIndex) && Objects.equals(sizeIndex, product.sizeIndex) && Objects.equals(bargainPrice, product.bargainPrice) && Objects.equals(stock, product.stock) && Objects.equals(variants, product.variants) && Objects.equals(sizes, product.sizes) && Objects.equals(photos, product.photos) && Objects.equals(timeStamp, product.timeStamp) && Objects.equals(previewPic, product.previewPic) && Objects.equals(masterCategory, product.masterCategory) && Objects.equals(category, product.category) && Objects.equals(articleType, product.articleType) && Objects.equals(season, product.season) && Objects.equals(storeId, product.storeId) && Objects.equals(productCode, product.productCode);
     }
 
     @Override

@@ -30,8 +30,6 @@ import com.sushant.fashionapp.databinding.ActivityHomePageBinding;
 import com.sushant.fashionapp.fragments.Buyer.AccountFragment;
 import com.sushant.fashionapp.fragments.Buyer.HomeFragment;
 
-import org.tensorflow.lite.Interpreter;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
@@ -49,8 +47,6 @@ public class ActivityHomePage extends AppCompatActivity implements DefaultLifecy
     ValueEventListener cartListener, eventListener;
     DatabaseReference cartRef, statusRef, infoConnected;
     SharedPreferences sharedPreferences;
-    Interpreter tflite;
-    String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,76 +61,6 @@ public class ActivityHomePage extends AppCompatActivity implements DefaultLifecy
         statusRef = database.getReference().child("Users").child(auth.getUid());
         manageConnection();
 
-//        database.getReference().child("Images").child("0").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                imageUrl=snapshot.child("link").getValue(String.class);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//
-//        try
-//        {
-//            tflite = new Interpreter(loadModelFile());
-//            Bitmap bit = MediaStore.Images.Media.getBitmap(this.getContentResolver() , Uri.parse(imageUrl));
-//            Bitmap bitmap = Bitmap.createScaledBitmap(bit, 224, 224, true);
-//            ByteBuffer input = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder());
-//
-//            for (int y = 0; y < 224; y++) {
-//                for (int x = 0; x < 224; x++) {
-//                    int px = bitmap.getPixel(x, y);
-//
-//                    // Get channel values from the pixel value.
-//                    int r = Color.red(px);
-//                    int g = Color.green(px);
-//                    int b = Color.blue(px);
-//
-//                    // Normalize channel values to [-1.0, 1.0]. This requirement depends
-//                    // on the model. For example, some models might require values to be
-//                    // normalized to the range [0.0, 1.0] instead.
-//                    float rf = (r - 127) / 255.0f;
-//                    float gf = (g - 127) / 255.0f;
-//                    float bf = (b - 127) / 255.0f;
-//
-//                    input.putFloat(rf);
-//                    input.putFloat(gf);
-//                    input.putFloat(bf);
-//                }
-//            }
-//
-//            AssetManager assetManager = getAssets();
-//            InputStream inputStream = assetManager.open("embeddings.pkl");
-//            Unpickler unpickler = new Unpickler();
-//            Map<String, Object> data = (Map<String, Object>) unpickler.load(inputStream);
-//
-//
-//
-//            int bufferSize = 1000 * java.lang.Float.SIZE / java.lang.Byte.SIZE;
-//            ByteBuffer modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder());
-//            tflite.run(input, modelOutput);
-//
-//
-//            modelOutput.rewind();
-//            FloatBuffer probabilities = modelOutput.asFloatBuffer();
-//            //            BufferedReader reader = new BufferedReader(
-////                    new InputStreamReader(getAssets().open("custom_labels.txt")));
-//            for (int i = 0; i < 6; i++) {
-//                //  String label = reader.readLine();
-//                float probability = probabilities.get(i);
-//                Log.i("output", String.valueOf(probability));
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            Log.d("exception",e.getMessage());
-//            //handle exception
-//        }
-//
-//
 
         sharedPreferences = getSharedPreferences("data", MODE_PRIVATE);
         String authId = sharedPreferences.getString("authId", "");

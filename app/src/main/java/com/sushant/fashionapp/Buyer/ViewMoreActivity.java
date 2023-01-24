@@ -49,6 +49,8 @@ public class ViewMoreActivity extends AppCompatActivity {
     String sortBy = "All", category = "All", colour = "All", brand = "All", season = "All";
     public boolean isSorted = false;
     TextView txtClear;
+    String from;
+    Query query;
 
 
     @Override
@@ -59,6 +61,8 @@ public class ViewMoreActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         auth = FirebaseAuth.getInstance();
+
+        from = getIntent().getStringExtra("from");
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +109,12 @@ public class ViewMoreActivity extends AppCompatActivity {
 
         initRecyclerView();
 
-        Query query = database.getReference().child("Products");
+        if (from.equals("recommend")) {
+            query = database.getReference().child("Recommended Products").child(auth.getUid());
+        } else if (from.equals("recent")) {
+            query = database.getReference().child("Products").limitToFirst(100);
+        }
+
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -266,14 +275,31 @@ public class ViewMoreActivity extends AppCompatActivity {
     private void filterCategory(String cat) {
         category = cat;
         products.clear();
-        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
+//        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
+//
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+//            Set<Product> result = unmodifiedList.stream().filter(byFemale)
+//                    .collect(Collectors.toSet());
+//            products.addAll(result);
+//        }
+//        adapters.notifyDataSetChanged();
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Set<Product> result = unmodifiedList.stream().filter(byFemale)
-                    .collect(Collectors.toSet());
-            products.addAll(result);
-        }
-        adapters.notifyDataSetChanged();
+        database.getReference().child("Products").orderByChild("category").equalTo(cat).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                products.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Product product = snapshot1.getValue(Product.class);
+                    products.add(product);
+                }
+                adapters.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
