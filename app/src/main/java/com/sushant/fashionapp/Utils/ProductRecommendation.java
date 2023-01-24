@@ -44,8 +44,6 @@ public class ProductRecommendation {
     }
 
     public void recommend() {
-
-
         RequestQueue queue = Volley.newRequestQueue(context);
 
         // Request a string response from the provided URL.
@@ -107,12 +105,6 @@ public class ProductRecommendation {
                 return params;
             }
         };
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                queue.add(stringRequest);
-            }
-        }, 500);
-
+        queue.add(stringRequest);
     }
 }

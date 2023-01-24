@@ -25,10 +25,35 @@
     </string-array>
 
     <string-array name="category">
-        <item>Women"'"s Fashion</item>
-        <item>Men"'"s Fashion</item>
-        <item>Babies &amp; Toys</item>
-        <item>Sports Outdoor</item>
+        <item>Mufflers</item>
+        <item>Shoes</item>
+        <item>Flip Flops</item>
+        <item>Dress</item>
+        <item>Umbrellas</item>
+        <item>Apparel Set</item>
+        <item>Cufflinks</item>
+        <item>Eyewear</item>
+        <item>Headwear</item>
+        <item> Watches</item>
+        <item>Socks</item>
+        <item>Saree</item>
+        <item>Shoe Accessories</item>
+        <item>Jewellery</item>
+        <item>Innerwear</item>
+        <item>Wallets</item>
+        <item>Bags</item>
+        <item>Topwear</item>
+        <item>Water Bottle</item>
+        <item>Ties</item>
+        <item>Accessories</item>
+        <item>Sports Equipment</item>
+        <item>Bottomwear</item>
+        <item>Sandal</item>
+        <item>Stoles</item>
+        <item>Scarves</item>
+        <item>Loungewear and Nightwear</item>
+        <item>Free Gifts</item>
+        <item>Belts</item>
     </string-array>
 
     <string-array name="seasons">

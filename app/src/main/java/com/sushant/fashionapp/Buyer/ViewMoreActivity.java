@@ -46,7 +46,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     SortFilterAdapter sortFilterAdapter;
     ArrayList<SortModel> list = new ArrayList<>();
     ItemClickListener itemClickListener;
-    String sortBy = "All", category = "All", colour = "All", brand = "All", season = "All";
+    String sortBy = "All", category = "All", season = "All";
     public boolean isSorted = false;
     TextView txtClear;
     String from;
@@ -81,19 +81,13 @@ public class ViewMoreActivity extends AppCompatActivity {
                     case "Category":
                         category = item;
                         break;
-                    case "Colour":
-                        colour = item;
-                        break;
-                    case "Brand":
-                        brand = item;
-                        break;
                     case "Season":
                         season = item;
                         break;
                 }
 
                 txtClear.setVisibility(View.VISIBLE);
-                isSorted = !sortBy.equals("All") || !category.equals("All") || !colour.equals("All") || !brand.equals("All");
+                isSorted = !sortBy.equals("All") || !category.equals("All") || !season.equals("All");
                 if (!isSorted) {
                     txtClear.setVisibility(View.GONE);
 
@@ -154,8 +148,7 @@ public class ViewMoreActivity extends AppCompatActivity {
         assert recyclerView != null;
         list.add(new SortModel("Sort by", sortBy));
         list.add(new SortModel("Category", category));
-        list.add(new SortModel("Colour", colour));
-        list.add(new SortModel("Brand", brand));
+        list.add(new SortModel("Season", season));
         //      list.add(new SortModel("Season", season));
 //        list.add(new SortModel("Size", "All"));
 //        list.add(new SortModel("In stock", "on stock"));
@@ -198,7 +191,7 @@ public class ViewMoreActivity extends AppCompatActivity {
                 }
 
 
-                if (category.equals("All") || sortBy.equals("All") || colour.equals("All") || brand.equals("All")) {
+                if (category.equals("All") || sortBy.equals("All") || season.equals("All")) {
                     products.clear();
                     products.addAll(unmodifiedList);
                 }
@@ -206,17 +199,15 @@ public class ViewMoreActivity extends AppCompatActivity {
 //                if (!season.equals("All")){
 //                    filterSeason(season);
 //                }
-                if (!brand.equals("All")) {
-                    filterBrand(brand);
-                }
+
                 if (!category.equals("All")) {
                     filterCategory(category);
                 }
                 if (!sortBy.equals("All")) {
                     performSort(sortBy);
                 }
-                if (!colour.equals("All")) {
-                    filterColor(colour);
+                if (!season.equals("All")) {
+                    filterSeason();
                 }
 
 
@@ -240,6 +231,18 @@ public class ViewMoreActivity extends AppCompatActivity {
         });
     }
 
+    private void filterSeason() {
+        products.clear();
+        Predicate<Product> byBrand = product -> product.getSeason().equals(season);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Set<Product> result = unmodifiedList.stream().filter(byBrand)
+                    .collect(Collectors.toSet());
+            products.addAll(result);
+        }
+        adapters.notifyDataSetChanged();
+    }
+
 
     private void filterBrand(String brand) {
         products.clear();
@@ -257,14 +260,11 @@ public class ViewMoreActivity extends AppCompatActivity {
         list.clear();
         sortBy = "All";
         category = "All";
-        colour = "All";
         season = "All";
-        brand = "All";
         isSorted = false;
         list.add(new SortModel("Sort by", sortBy));
         list.add(new SortModel("Category", category));
-        list.add(new SortModel("Colour", colour));
-        list.add(new SortModel("Brand", brand));
+        list.add(new SortModel("Season", season));
         //     list.add(new SortModel("Season", season));
 //        list.add(new SortModel("Size", "All"));
 //        list.add(new SortModel("In stock", "on stock"));
@@ -275,57 +275,16 @@ public class ViewMoreActivity extends AppCompatActivity {
     private void filterCategory(String cat) {
         category = cat;
         products.clear();
-//        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
-//
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//            Set<Product> result = unmodifiedList.stream().filter(byFemale)
-//                    .collect(Collectors.toSet());
-//            products.addAll(result);
-//        }
-//        adapters.notifyDataSetChanged();
+        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
 
-        database.getReference().child("Products").orderByChild("category").equalTo(cat).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                products.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
-                    products.add(product);
-                }
-                adapters.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-
-    private void filterColor(String color) {
-        colour = color;
-
-        ArrayList<Product> list = new ArrayList<>(products);
-        products.clear();
-        for (Product p : list) {
-            for (int i = 0; i < p.getVariants().size(); i++) {
-                if (p.getVariants().get(i).getColor().equals(color)) {
-                    p.setPreviewPic(p.getVariants().get(i).getPhotos().get(0));
-                    p.setVariantIndex(i);
-                    products.add(p);
-                }
-            }
-
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Set<Product> result = unmodifiedList.stream().filter(byFemale)
+                    .collect(Collectors.toSet());
+            products.addAll(result);
         }
-
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//            List<Product> result = unmodifiedList.stream().filter(byColor)
-//                    .collect(Collectors.toList());
-//            products.addAll(result);
-//        }
         adapters.notifyDataSetChanged();
     }
+
 
     private void performSort(String sort) {
         sortBy = sort;
@@ -358,7 +317,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     private void initSortFilterRecycler(RecyclerView recyclerView) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, category);
+        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener);
         recyclerView.setAdapter(sortFilterAdapter);
     }
 

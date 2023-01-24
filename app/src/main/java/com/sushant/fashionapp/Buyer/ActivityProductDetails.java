@@ -81,7 +81,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     FirebaseDatabase database;
     String pName, sName, pId, color, pDesc, storeId, storePic;
     String sizeId, actualProductId;
-    ArrayList<Variants> products = new ArrayList<>();
+    ArrayList<Variants> variants = new ArrayList<>();
     VariantAdapter variantAdapter;
     //  List<SlideModel> list = new ArrayList<>();
     ArrayList<String> list = new ArrayList<>();
@@ -216,13 +216,13 @@ public class ActivityProductDetails extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Log.d("variantListener", "called");
-                products.clear();
+                variants.clear();
                 list.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Variants product = snapshot1.getValue(Variants.class);
-                    products.add(product);
+                    variants.add(product);
                 }
-                for (Variants product : products) {
+                for (Variants product : variants) {
                     if (product.getPhotos() != null) {
                         list.addAll(product.getPhotos());
                     }
@@ -974,7 +974,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         Log.d("variantAdapter", "created");
         LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.variantRecycler.setLayoutManager(layoutManager);
-        variantAdapter = new VariantAdapter(products, this, variantClickListener, index);
+        variantAdapter = new VariantAdapter(variants, this, variantClickListener, index);
         binding.variantRecycler.setAdapter(variantAdapter);
     }
 
@@ -1292,4 +1292,20 @@ public class ActivityProductDetails extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (variantRef != null) {
+            variantRef.removeEventListener(variantListener);
+        }
+        if (wishListRef != null) {
+            wishListRef.removeEventListener(wishListListener);
+        }
+        if (query != null) {
+            query.removeEventListener(valueEventListener);
+        }
+        if (ratingRef != null) {
+            ratingRef.removeEventListener(ratingListener);
+        }
+    }
 }

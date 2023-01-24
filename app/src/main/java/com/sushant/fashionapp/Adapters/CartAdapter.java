@@ -270,17 +270,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                if (!cartActivity.isActionMode) {
-                    productClickListener.onClick(product, true);
-                    holder.cardView.setStrokeWidth(5);
-                    cartActivity.selectedItem();
-                }
-                return false;
-            }
-        });
+//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                if (!cartActivity.isActionMode) {
+//                    productClickListener.onClick(product, true);
+//                    holder.cardView.setStrokeWidth(5);
+//                    cartActivity.selectedItem();
+//                }
+//                return false;
+//            }
+//        });
 
     }
 

@@ -123,8 +123,8 @@ public class CartActivity extends AppCompatActivity {
                             @Override
                             public void onClick(int pos) {
                                 // TODO: onDelete
-                                Cart product = products.get(pos);
-                                showDeleteMessage(product);
+                                Product product = products.get(pos);
+                                //        showDeleteMessage(product);
                                 deleteProductFromDB(product);
                             }
                         }
@@ -140,7 +140,7 @@ public class CartActivity extends AppCompatActivity {
                             public void onClick(int pos) {
                                 // TODO: onWishList
                                 Product product = products.get(pos);
-                                addToWishList(product, pos);
+                                addToWishList(product);
                             }
                         }
                 ));
@@ -240,7 +240,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (size > 0) {
-                    deleteProductFromCart();
+                    //     deleteProductFromCart();
                     refreshAdapter();
                     size = 0;
                     updateToolbarText(size);
@@ -274,7 +274,7 @@ public class CartActivity extends AppCompatActivity {
 
     }
 
-    private void addToWishList(Product product, int pos) {
+    private void addToWishList(Product product) {
         deleteProductFromDB(product);
         database.getReference().child("WishList").child(Objects.requireNonNull(auth.getUid())).child(product.getVariantPId()).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -343,11 +343,6 @@ public class CartActivity extends AppCompatActivity {
     private void undoDeleteActionFromCart() {
         for (Product p : checkedProducts) {
             undoDeleteFromDB(p);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         checkedProducts.clear();
     }
@@ -372,17 +367,11 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
-    private void deleteProductFromCart() {
-        for (Product p : checkedProducts) {
-            deleteProductFromDB(p);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
+//    private void deleteProductFromCart() {
+//        for (Product p : checkedProducts) {
+//            deleteProductFromDB(p);
+//        }
+//    }
 
     private void deleteProductFromDB(Product p) {
         FirebaseDatabase.getInstance().getReference().child("Products").child(p.getpId()).child("variants").child(String.valueOf(p.getVariantIndex()))
@@ -396,7 +385,12 @@ public class CartActivity extends AppCompatActivity {
                 }
                 HashMap<String, Object> map = new HashMap<>();
                 map.put(p.getVariantPId(), null);
-                database.getReference().child("Cart").child(auth.getUid()).updateChildren(map);
+                database.getReference().child("Cart").child(auth.getUid()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Snackbar.make(findViewById(R.id.cartLayout), "Item deleted", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
+                    }
+                });
             }
 
             @Override

@@ -57,7 +57,7 @@ public class StorePageActivity extends AppCompatActivity {
     SortFilterAdapter sortFilterAdapter;
     ArrayList<SortModel> list = new ArrayList<>();
     ItemClickListener itemClickListener;
-    String sortBy = "All", category = "All", colour = "All", brand = "All", season = "All";
+    String sortBy = "All", category = "All", season = "All";
     public boolean isSorted = false;
     TextView txtClear;
     Query query1, query2;
@@ -86,20 +86,13 @@ public class StorePageActivity extends AppCompatActivity {
                         break;
                     case "Category":
                         category = item;
-                        colour = "All";
-                        break;
-                    case "Colour":
-                        colour = item;
-                        break;
-                    case "Brand":
-                        brand = item;
                         break;
                     case "Season":
                         season = item;
                         break;
                 }
                 txtClear.setVisibility(View.VISIBLE);
-                isSorted = !sortBy.equals("All") || !category.equals("All") || !colour.equals("All") || !brand.equals("All");
+                isSorted = !sortBy.equals("All") || !category.equals("All") || !season.equals("All");
                 if (!isSorted) {
                     txtClear.setVisibility(View.GONE);
 
@@ -136,23 +129,23 @@ public class StorePageActivity extends AppCompatActivity {
         };
         query1.addValueEventListener(valueEventListener1);
 
-//        query2 = database.getReference().child("Products").orderByChild("storeId").equalTo(storeId);
-//        valueEventListener2 = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                unmodifiedList.clear();
-//                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-//                    Product product = snapshot1.getValue(Product.class);
-//                    unmodifiedList.add(product);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        };
-//        query2.addValueEventListener(valueEventListener2);
+        query2 = database.getReference().child("Products").orderByChild("storeId").equalTo(storeId);
+        valueEventListener2 = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                unmodifiedList.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Product product = snapshot1.getValue(Product.class);
+                    unmodifiedList.add(product);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        query2.addValueEventListener(valueEventListener2);
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,7 +229,7 @@ public class StorePageActivity extends AppCompatActivity {
 
     private void search(String toString) {
         searchList.clear();
-        for (Product p : products) {
+        for (Product p : unmodifiedList) {
             String subsubcat = removeSpecialChar(p.getArticleType());
             if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())
                     || p.getMasterCategory().toLowerCase().contains(toString) || p.getCategory().toLowerCase().contains(toString)
@@ -282,9 +275,7 @@ public class StorePageActivity extends AppCompatActivity {
         assert recyclerView != null;
         list.add(new SortModel("Sort by", sortBy));
         list.add(new SortModel("Category", category));
-        list.add(new SortModel("Colour", colour));
-        list.add(new SortModel("Brand", brand));
-        //      list.add(new SortModel("Season", season));
+        list.add(new SortModel("Season", season));
 //        list.add(new SortModel("Size", "All"));
 //        list.add(new SortModel("In stock", "on stock"));
         initSortFilterRecycler(recyclerView);
@@ -330,26 +321,22 @@ public class StorePageActivity extends AppCompatActivity {
                 }
 
 
-                if (category.equals("All") || sortBy.equals("All") || colour.equals("All") || brand.equals("All")) {
+                if (category.equals("All") || sortBy.equals("All") || season.equals("All")) {
                     products.clear();
                     products.addAll(unmodifiedList);
                 }
 
-//                if (!season.equals("All")){
-//                    filterSeason(season);
-//                }
-                if (!brand.equals("All")) {
-                    filterBrand(brand);
+                if (!season.equals("All")) {
+                    filterSeason(season);
                 }
+
                 if (!category.equals("All")) {
                     filterCategory(category);
                 }
                 if (!sortBy.equals("All")) {
                     performSort(sortBy);
                 }
-                if (!colour.equals("All")) {
-                    filterColor(colour);
-                }
+
 
 
                 bottomSheetDialog.dismiss();
@@ -372,6 +359,18 @@ public class StorePageActivity extends AppCompatActivity {
         });
     }
 
+    private void filterSeason(String season) {
+        products.clear();
+        Predicate<Product> byBrand = product -> product.getSeason().equals(season);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Set<Product> result = unmodifiedList.stream().filter(byBrand)
+                    .collect(Collectors.toSet());
+            products.addAll(result);
+        }
+        adapters.notifyDataSetChanged();
+    }
+
 
     private void filterBrand(String brand) {
         products.clear();
@@ -389,54 +388,29 @@ public class StorePageActivity extends AppCompatActivity {
         list.clear();
         sortBy = "All";
         category = "All";
-        colour = "All";
         season = "All";
-        brand = "All";
         isSorted = false;
         list.add(new SortModel("Sort by", sortBy));
         list.add(new SortModel("Category", category));
-        list.add(new SortModel("Colour", colour));
-        list.add(new SortModel("Brand", brand));
-        //     list.add(new SortModel("Season", season));
-//        list.add(new SortModel("Size", "All"));
-//        list.add(new SortModel("In stock", "on stock"));
+        list.add(new SortModel("Season", season));
         initSortFilterRecycler(recyclerView);
     }
 
     private void filterCategory(String cat) {
         category = cat;
         products.clear();
-//        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
-//
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-//            Set<Product> result = unmodifiedList.stream().filter(byFemale)
-//                    .collect(Collectors.toSet());
-//            products.addAll(result);
-//        }
-//        adapters.notifyDataSetChanged();
+        Predicate<Product> byFemale = product -> product.getCategory().equals(category);
 
-        database.getReference().child("Products").orderByChild("category").equalTo(cat).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                products.clear();
-                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    Product product = snapshot1.getValue(Product.class);
-                    products.add(product);
-                }
-                adapters.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Set<Product> result = unmodifiedList.stream().filter(byFemale)
+                    .collect(Collectors.toSet());
+            products.addAll(result);
+        }
+        adapters.notifyDataSetChanged();
     }
 
 
     private void filterColor(String color) {
-        colour = color;
-
         ArrayList<Product> list = new ArrayList<>(products);
         products.clear();
         for (Product p : list) {
@@ -488,7 +462,7 @@ public class StorePageActivity extends AppCompatActivity {
     private void initSortFilterRecycler(RecyclerView recyclerView) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, storeId, "shop", category);
+        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, storeId, "shop");
         recyclerView.setAdapter(sortFilterAdapter);
     }
 
