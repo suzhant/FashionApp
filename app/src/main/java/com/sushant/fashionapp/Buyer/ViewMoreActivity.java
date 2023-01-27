@@ -2,11 +2,13 @@ package com.sushant.fashionapp.Buyer;
 
 import android.content.DialogInterface;
 import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,6 +33,8 @@ import com.sushant.fashionapp.databinding.ActivityViewMoreBinding;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -42,7 +46,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     FirebaseDatabase database;
     FirebaseAuth auth;
     ArrayList<Product> products = new ArrayList<>();
-    ArrayList<Product> unmodifiedList = new ArrayList<>();
+    HashSet<Product> unmodifiedList = new LinkedHashSet<>();
     SortFilterAdapter sortFilterAdapter;
     ArrayList<SortModel> list = new ArrayList<>();
     ItemClickListener itemClickListener;
@@ -50,7 +54,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     public boolean isSorted = false;
     TextView txtClear;
     String from;
-    Query query;
+    Query query1;
 
 
     @Override
@@ -104,20 +108,30 @@ public class ViewMoreActivity extends AppCompatActivity {
         initRecyclerView();
 
         if (from.equals("recommend")) {
-            query = database.getReference().child("Recommended Products").child(auth.getUid());
+            query1 = database.getReference().child("Recommended Products").child(auth.getUid());
+            binding.toolbar.setTitle("Recommended Products");
         } else if (from.equals("recent")) {
-            query = database.getReference().child("Products").limitToFirst(100);
+            query1 = database.getReference().child("Products");
+            binding.toolbar.setTitle("Recent Products");
         }
 
-        query.addValueEventListener(new ValueEventListener() {
+        query1.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
                 unmodifiedList.clear();
+                int i = 0;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
-                    products.add(product);
+                    if (i < 100) {
+                        products.add(product);
+                    }
                     unmodifiedList.add(product);
+                    i++;
+                }
+                if (from.equals("recommend")) {
+                    Collections.sort(products, Product.getLatestTime);
                 }
                 adapters.notifyItemInserted(products.size());
             }

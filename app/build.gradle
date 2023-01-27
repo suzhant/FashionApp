@@ -15,31 +15,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-//        ndk {
-//            abiFilters "armeabi-v7a"
-//        }
-//
-//        python {
-//            buildPython "C:/Users/user/AppData/Local/Programs/Python/Python37/python.exe"
-//        }
 
-//        python {
-//            pip {
-//                // A requirement specifier, with or without a version number:
-//                install "Pillow"
-//                install "opencv-python"
-//                install "tensorflow"
-//                install "numpy"
-//                install "scikit-learn"
-//                install "requests==2.24.0"
-//            }
-//        }
     }
-//    sourceSets {
-//        main {
-//            python.srcDir "some/main/python"
-//        }
-//    }
 
     buildTypes {
         release {
@@ -176,5 +153,7 @@ dependencies {
     implementation('com.itextpdf:itext7-core:7.2.4')
 
     implementation "com.android.volley:volley:1.2.1"
+
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.1'
 
 }

@@ -1047,7 +1047,7 @@ public class ActivityProductDetails extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Product product = dataSnapshot.getValue(Product.class);
-                    ProductRecommendation productRecommendation = new ProductRecommendation(product.getPreviewPic(), ActivityProductDetails.this);
+                    ProductRecommendation productRecommendation = new ProductRecommendation(product.getPreviewPic(), product.getArticleType(), product.getGender(), ActivityProductDetails.this);
                     productRecommendation.recommend();
                 }
             }

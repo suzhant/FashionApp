@@ -218,7 +218,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="@font/gilroy_bold"
-                android:text="Most Popular"
+                android:text="You might like"
                 android:textSize="20sp" />
 
             <com.google.android.material.button.MaterialButton

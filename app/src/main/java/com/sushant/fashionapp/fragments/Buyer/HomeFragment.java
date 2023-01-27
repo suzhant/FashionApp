@@ -114,11 +114,11 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        database.getReference().child("Recommended Products").child(auth.getUid()).limitToLast(12).addValueEventListener(new ValueEventListener() {
+        database.getReference().child("Recommended Products").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                recommend_list.clear();
                 if (snapshot.exists()) {
-                    recommend_list.clear();
                     for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                         Product product = snapshot1.getValue(Product.class);
                         recommend_list.add(product);
@@ -126,7 +126,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     recommend_list.addAll(smallList);
                 }
-                Collections.shuffle(recommend_list);
+                Collections.sort(recommend_list, Product.getLatestTime);
                 popularAdapters.notifyItemInserted(recommend_list.size());
             }
 

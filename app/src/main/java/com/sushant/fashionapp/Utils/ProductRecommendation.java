@@ -25,21 +25,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProductRecommendation {
 
     private static final String url = "http://suzhant.pythonanywhere.com/predict";
-    String imgUrl;
+    String imgUrl, category, gender;
     Context context;
     ArrayList<String> results = new ArrayList<>();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
-    public ProductRecommendation(String imgUrl, Context context) {
+    public ProductRecommendation(String imgUrl, String category, String gender, Context context) {
         this.imgUrl = imgUrl;
+        this.category = category;
+        this.gender = gender;
         this.context = context;
     }
 
@@ -70,7 +73,11 @@ public class ProductRecommendation {
                                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                                                     Product product = snapshot1.getValue(Product.class);
-                                                    database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
+                                                    assert product != null;
+                                                    product.setDateRecommended(new Date().getTime());
+                                                    if (category.equals(product.getArticleType())) {
+                                                        database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
+                                                    }
                                                 }
                                             }
 
@@ -80,7 +87,6 @@ public class ProductRecommendation {
                                             }
                                         });
                                     }
-
                                     Log.d("id1", results.toString());
                                 }
                             }, 100);
