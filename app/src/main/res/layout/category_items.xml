@@ -13,11 +13,12 @@
 
         <ImageView
             android:id="@+id/imgCategory"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:src="@drawable/children"
             android:padding="10dp"
-            android:background="@drawable/circle_bg" />
+            android:scaleType="centerCrop"
+            android:background="@drawable/rectangle_bg" />
 
         <TextView
             android:id="@+id/txtCatName"

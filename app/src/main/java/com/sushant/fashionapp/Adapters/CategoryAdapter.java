@@ -1,6 +1,7 @@
 package com.sushant.fashionapp.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.sushant.fashionapp.Buyer.ViewMoreActivity;
 import com.sushant.fashionapp.Models.Category;
 import com.sushant.fashionapp.R;
 
@@ -38,6 +40,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.viewHo
         Category category = categories.get(position);
         Glide.with(context).load(category.getImage()).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.catimg);
         holder.catName.setText(category.getName());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ViewMoreActivity.class);
+                intent.putExtra("catName", category.getName());
+                intent.putExtra("from", "category");
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

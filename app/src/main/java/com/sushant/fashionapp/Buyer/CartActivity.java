@@ -35,6 +35,7 @@ import com.sushant.fashionapp.databinding.ActivityCartBinding;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -173,6 +174,7 @@ public class CartActivity extends AppCompatActivity {
                         set.add(product.getStoreName());
                     }
                 }
+                Collections.sort(products, Cart.newToOld);
                 shipping = set.size() * 70;
                 sum = sum + shipping;
                 binding.txtPrice.setText(Html.fromHtml(MessageFormat.format("Total: <span style=color:#09AEA3> <b>Rs. <big>{0}</big></b></span>", sum)));

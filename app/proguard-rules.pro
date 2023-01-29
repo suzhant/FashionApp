@@ -19,8 +19,4 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 
--dontwarn com.backendless.**
--dontwarn weborb.**
--keep class weborb.** {*;}
--keep class com.backendless.** {*;}
 #-renamesourcefileattribute SourceFile

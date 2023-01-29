@@ -1,6 +1,7 @@
 package com.sushant.fashionapp.Models;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 public class Cart extends Product implements Serializable {
     private Integer variantIndex, sizeIndex;
@@ -67,4 +68,11 @@ public class Cart extends Product implements Serializable {
     public void setStoreName(String storeName) {
         this.storeName = storeName;
     }
+
+    public static Comparator<Cart> newToOld = new Comparator<Cart>() {
+        @Override
+        public int compare(Cart cart, Cart t1) {
+            return t1.getTimeStamp().compareTo(cart.getTimeStamp());
+        }
+    };
 }

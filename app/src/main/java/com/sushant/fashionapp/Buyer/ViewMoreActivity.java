@@ -1,10 +1,15 @@
 package com.sushant.fashionapp.Buyer;
 
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,6 +52,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     FirebaseAuth auth;
     ArrayList<Product> products = new ArrayList<>();
     HashSet<Product> unmodifiedList = new LinkedHashSet<>();
+    HashSet<String> cat_list = new LinkedHashSet<>();
     SortFilterAdapter sortFilterAdapter;
     ArrayList<SortModel> list = new ArrayList<>();
     ItemClickListener itemClickListener;
@@ -55,6 +61,9 @@ public class ViewMoreActivity extends AppCompatActivity {
     TextView txtClear;
     String from;
     Query query1;
+    String catName;
+    ArrayList<Product> searchList = new ArrayList<>();
+    ArrayList<Product> tempList = new ArrayList<>();
 
 
     @Override
@@ -67,6 +76,7 @@ public class ViewMoreActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         from = getIntent().getStringExtra("from");
+        catName = getIntent().getStringExtra("catName");
 
         binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,12 +117,19 @@ public class ViewMoreActivity extends AppCompatActivity {
 
         initRecyclerView();
 
-        if (from.equals("recommend")) {
-            query1 = database.getReference().child("Recommended Products").child(auth.getUid());
-            binding.toolbar.setTitle("Recommended Products");
-        } else if (from.equals("recent")) {
-            query1 = database.getReference().child("Products");
-            binding.toolbar.setTitle("Recent Products");
+        switch (from) {
+            case "recommend":
+                query1 = database.getReference().child("Recommended Products").child(auth.getUid());
+                binding.toolbar.setTitle("Recommended Products");
+                break;
+            case "recent":
+                query1 = database.getReference().child("Products");
+                binding.toolbar.setTitle("Recent Products");
+                break;
+            case "category":
+                query1 = database.getReference().child("Products").orderByChild("category").equalTo(catName);
+                binding.toolbar.setTitle(catName);
+                break;
         }
 
         query1.addValueEventListener(new ValueEventListener() {
@@ -121,13 +138,21 @@ public class ViewMoreActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
                 unmodifiedList.clear();
+                cat_list.clear();
+                tempList.clear();
                 int i = 0;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
                     if (i < 100) {
                         products.add(product);
+                        tempList.add(product);
                     }
                     unmodifiedList.add(product);
+                    if (from.equals("category")) {
+                        cat_list.add(product.getArticleType());
+                    } else {
+                        cat_list.add(product.getCategory());
+                    }
                     i++;
                 }
                 if (from.equals("recommend")) {
@@ -143,10 +168,54 @@ public class ViewMoreActivity extends AppCompatActivity {
         });
 
 
-        binding.btnSortFilter.setOnClickListener(new View.OnClickListener() {
+        binding.imgFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showBottomSheetDialog();
+            }
+        });
+
+        binding.edSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                boolean handled = false;
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    String query = textView.getText().toString().trim();
+                    if (!query.isEmpty()) {
+                        String processedQuery = removeSpecialChar(query);
+                        if (products.size() == 0) {
+                            products.addAll(tempList);
+                        }
+                        search(processedQuery);
+                        products.clear();
+                        products.addAll(searchList);
+                        hideSoftKeyboard();
+                        adapters.notifyDataSetChanged();
+                        handled = true;
+                    }
+                }
+                return handled;
+            }
+        });
+
+        binding.edSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if (editable.length() == 0) {
+                    products.clear();
+                    products.addAll(tempList);
+                    adapters.notifyItemRangeChanged(0, products.size());
+                }
+
             }
         });
 
@@ -163,9 +232,6 @@ public class ViewMoreActivity extends AppCompatActivity {
         list.add(new SortModel("Sort by", sortBy));
         list.add(new SortModel("Category", category));
         list.add(new SortModel("Season", season));
-        //      list.add(new SortModel("Season", season));
-//        list.add(new SortModel("Size", "All"));
-//        list.add(new SortModel("In stock", "on stock"));
         initSortFilterRecycler(recyclerView);
         bottomSheetDialog.show();
 
@@ -174,14 +240,13 @@ public class ViewMoreActivity extends AppCompatActivity {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 if (isSorted) {
-                    binding.btnSortFilter.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue));
-                    binding.btnSortFilter.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-                    binding.btnSortFilter.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.white)));
+                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_24);
+                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
                 } else {
-                    binding.btnSortFilter.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.gray_100));
-                    binding.btnSortFilter.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-                    binding.btnSortFilter.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.black)));
+                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_off_24);
+                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
                 }
+
                 if (!isSorted) {
                     products.clear();
                     products.addAll(unmodifiedList);
@@ -195,14 +260,13 @@ public class ViewMoreActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isSorted) {
-                    binding.btnSortFilter.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.skyBlue));
-                    binding.btnSortFilter.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.white));
-                    binding.btnSortFilter.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.white)));
+                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_24);
+                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
                 } else {
-                    binding.btnSortFilter.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.gray_100));
-                    binding.btnSortFilter.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-                    binding.btnSortFilter.setIconTint(ColorStateList.valueOf(ContextCompat.getColor(getApplicationContext(), R.color.black)));
+                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_off_24);
+                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
                 }
+
 
 
                 if (category.equals("All") || sortBy.equals("All") || season.equals("All")) {
@@ -215,7 +279,12 @@ public class ViewMoreActivity extends AppCompatActivity {
 //                }
 
                 if (!category.equals("All")) {
-                    filterCategory(category);
+                    if (from.equals("category")) {
+                        filterArticle(category);
+                    } else {
+                        filterCategory(category);
+                    }
+
                 }
                 if (!sortBy.equals("All")) {
                     performSort(sortBy);
@@ -299,6 +368,54 @@ public class ViewMoreActivity extends AppCompatActivity {
         adapters.notifyDataSetChanged();
     }
 
+    private void filterArticle(String article) {
+        products.clear();
+        Predicate<Product> byFemale = product -> product.getArticleType().equals(article);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            Set<Product> result = unmodifiedList.stream().filter(byFemale)
+                    .collect(Collectors.toSet());
+            products.addAll(result);
+        }
+        adapters.notifyDataSetChanged();
+    }
+
+    private void search(String toString) {
+        searchList.clear();
+        for (Product p : unmodifiedList) {
+            String subsubcat = removeSpecialChar(p.getArticleType());
+            if (p.getpName().toLowerCase().contains(toString.toLowerCase()) || p.getDesc().toLowerCase().contains(toString.toLowerCase())
+                    || p.getMasterCategory().toLowerCase().contains(toString) || p.getCategory().toLowerCase().contains(toString)
+                    || subsubcat.toLowerCase().contains(toString)) {
+                searchList.add(p);
+            }
+        }
+        binding.edSearch.dismissDropDown();
+    }
+
+    private String removeSpecialChar(String query) {
+        StringBuilder resultStr = new StringBuilder();
+        for (int i = 0; i < query.length(); i++) {
+            if (Character.isWhitespace(query.charAt(i))) {
+                resultStr.append(" ");
+            }
+            //comparing alphabets with their corresponding ASCII value
+            if (query.charAt(i) > 64 && query.charAt(i) <= 122) //returns true if both conditions returns true
+            {
+                //adding characters into empty string
+                resultStr.append(query.charAt(i));
+            }
+        }
+        return resultStr.toString();
+    }
+
+    public void hideSoftKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
     private void performSort(String sort) {
         sortBy = sort;
@@ -331,7 +448,7 @@ public class ViewMoreActivity extends AppCompatActivity {
     private void initSortFilterRecycler(RecyclerView recyclerView) {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener);
+        sortFilterAdapter = new SortFilterAdapter(list, this, itemClickListener, cat_list);
         recyclerView.setAdapter(sortFilterAdapter);
     }
 

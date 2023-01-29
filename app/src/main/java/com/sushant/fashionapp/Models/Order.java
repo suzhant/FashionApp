@@ -1,6 +1,7 @@
 package com.sushant.fashionapp.Models;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class Order extends Payment {
     private String orderId;
@@ -61,4 +62,11 @@ public class Order extends Payment {
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
+
+    public static Comparator<Order> newToOld = new Comparator<Order>() {
+        @Override
+        public int compare(Order order, Order t1) {
+            return t1.getOrderDate().compareTo(order.getOrderDate());
+        }
+    };
 }

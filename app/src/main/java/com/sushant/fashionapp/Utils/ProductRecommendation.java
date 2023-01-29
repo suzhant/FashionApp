@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
@@ -103,7 +102,7 @@ public class ProductRecommendation {
                 Log.d("error", error.getMessage());
             }
         }) {
-            @Nullable
+            @NonNull
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();

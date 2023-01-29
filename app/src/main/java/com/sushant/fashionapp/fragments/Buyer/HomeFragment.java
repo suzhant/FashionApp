@@ -35,15 +35,10 @@ import com.sushant.fashionapp.databinding.FragmentHomeBinding;
 
 import org.imaginativeworld.whynotimagecarousel.model.CarouselItem;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 
 public class HomeFragment extends Fragment {
@@ -123,10 +118,10 @@ public class HomeFragment extends Fragment {
                         Product product = snapshot1.getValue(Product.class);
                         recommend_list.add(product);
                     }
+                    Collections.sort(recommend_list, Product.getLatestTime);
                 } else {
                     recommend_list.addAll(smallList);
                 }
-                Collections.sort(recommend_list, Product.getLatestTime);
                 popularAdapters.notifyItemInserted(recommend_list.size());
             }
 
@@ -135,71 +130,6 @@ public class HomeFragment extends Fragment {
 
             }
         });
-
-        // Instantiate the RequestQueue.
-//        if (getContext()!=null){
-//            RequestQueue queue = Volley.newRequestQueue(getContext());
-//            String url = "http://suzhant.pythonanywhere.com/predict";
-//
-//            // Request a string response from the provided URL.
-//            StringRequest stringRequest=new StringRequest(com.android.volley.Request.Method.POST, url,
-//                    new com.android.volley.Response.Listener<String>() {
-//                        @Override
-//                        public void onResponse(String response) {
-//                            try {
-//                                JSONObject jsonObject=new JSONObject(response);
-//                                JSONArray colArray = jsonObject.getJSONArray("result");
-//                                results.clear();
-//                                for(int i=0; i<colArray.length(); i++){
-//                                    String id=colArray.getString(i);
-//                                    results.add(id);
-//                                }
-//
-//
-//                                if (!recommended_list.isEmpty()){
-//                                    for (Product product:recommended_list){
-//                                            if (!results.contains(product.getpId())) {
-//                                                database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
-//                                            }
-//                                    }
-//
-//                                }else {
-//                                    for (Product product : products) {
-//                                        if (results.contains(product.getpId())) {
-//                                            database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
-//                                        }
-//                                    }
-//
-//                                }
-//
-//
-//
-//                                Log.d("list",recommend_list.toString());
-//                                Log.d("ids",results.toString());
-//
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//
-//                        }
-//                    }, new com.android.volley.Response.ErrorListener() {
-//                @Override
-//                public void onErrorResponse(VolleyError error) {
-//                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-//                    Log.d("error",error.getMessage());
-//                }
-//            }){
-//                @Nullable
-//                @Override
-//                protected Map<String, String> getParams() throws AuthFailureError {
-//                    Map<String,String> params=new HashMap<>();
-//                    params.put("url",link);
-//                    return params;
-//                }
-//            };
-//
-//            queue.add(stringRequest);
-//        }
 
 
         database.getReference().child("Users").child(Objects.requireNonNull(auth.getUid())).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -222,6 +152,23 @@ public class HomeFragment extends Fragment {
                     }
 
                 }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        database.getReference().child("category").child("subCategory").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                categories.clear();
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    Category category = snapshot1.getValue(Category.class);
+                    categories.add(category);
+                }
+                categoryAdapter.notifyItemInserted(categories.size());
             }
 
             @Override
@@ -294,12 +241,13 @@ public class HomeFragment extends Fragment {
     }
 
     private void initCategoryRecycler() {
-        categories.add(new Category(R.drawable.indian_male, "Men"));
-        categories.add(new Category(R.drawable.model_with_coffee, "Women"));
-        categories.add(new Category(R.drawable.boy_kid, "Kid"));
-        categories.add(new Category(R.drawable.little_boy, "Toddler"));
+//        categories.add(new Category(R.drawable.indian_male, "Men"));
+//        categories.add(new Category(R.drawable.model_with_coffee, "Women"));
+//        categories.add(new Category(R.drawable.boy_kid, "Kid"));
+//        categories.add(new Category(R.drawable.little_boy, "Toddler"));
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 2, GridLayoutManager.HORIZONTAL, false);
         binding.categoryRecycler.setLayoutManager(layoutManager);
         categoryAdapter = new CategoryAdapter(categories, getActivity());
         categoryAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
@@ -318,19 +266,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    private String fetchData() throws IOException {
-        OkHttpClient client = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("https://asos2.p.rapidapi.com/products/v2/list?store=US&offset=0&categoryId=4209&limit=48&country=US&sort=freshness&currency=USD&sizeSchema=US&lang=en-US")
-                .get()
-                .addHeader("X-RapidAPI-Key", "f612959de8msh3ef06566f13b1b1p1d2c9ejsnba5e3cef2d84")
-                .addHeader("X-RapidAPI-Host", "asos2.p.rapidapi.com")
-                .build();
-        Response response = client.newCall(request).execute();
-        return response.body().toString();
     }
 
 }

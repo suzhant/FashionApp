@@ -19,6 +19,7 @@ import com.sushant.fashionapp.Models.Order;
 import com.sushant.fashionapp.databinding.FragmentOrderPendingBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class OrderPendingFragment extends Fragment {
 
@@ -33,7 +34,7 @@ public class OrderPendingFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentOrderPendingBinding.inflate(inflater, container, false);
@@ -51,6 +52,7 @@ public class OrderPendingFragment extends Fragment {
                         orders.add(order);
                     }
                 }
+                Collections.sort(orders, Order.newToOld);
                 adapter.notifyItemInserted(orders.size());
             }
 

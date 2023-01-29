@@ -1016,6 +1016,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     product.setStoreName(sName);
                     product.setStoreId(storeId);
                     product.setStock(stock);
+                    product.setTimeStamp(new Date().getTime());
                     if (status != null) {
                         if (status.equals("accepted")) {
                             product.setBargainPrice(bargainPrice);
@@ -1104,6 +1105,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         product.setStoreName(sName);
         product.setStoreId(storeId);
         product.setStock(stock);
+        product.setTimeStamp(new Date().getTime());
         if (status != null) {
             if (status.equals("accepted")) {
                 product.setBargainPrice(bargainPrice);

@@ -31,12 +31,14 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
     HashSet<String> subItems;
     TextView txtClear;
     String type, storeId, text;
+    HashSet<String> cat_list;
 
 
-    public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener) {
+    public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener, HashSet<String> cat_list) {
         this.list = list;
         this.context = context;
         this.itemClickListener = itemClickListener;
+        this.cat_list = cat_list;
     }
 
     public SortFilterAdapter(ArrayList<SortModel> list, Context context, ItemClickListener itemClickListener, String storeId, String type) {
@@ -111,8 +113,13 @@ public class SortFilterAdapter extends RecyclerView.Adapter<SortFilterAdapter.vi
                 subItems.add("Price: high to low");
                 break;
             case "Category":
-                String[] list = context.getResources().getStringArray(R.array.category);
-                subItems.addAll(Arrays.asList(list));
+                if (cat_list.size() > 0) {
+                    subItems.addAll(cat_list);
+                } else {
+                    String[] list = context.getResources().getStringArray(R.array.category);
+                    subItems.addAll(Arrays.asList(list));
+                }
+
                 break;
 
             case "Season":

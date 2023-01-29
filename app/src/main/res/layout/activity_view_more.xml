@@ -20,31 +20,89 @@
             android:layout_height="wrap_content"
             app:navigationIcon="@drawable/ic_arrow_back_24"
             app:title="Most Popular"
-            app:menu="@menu/search_menu"
             app:titleTextAppearance="@style/TextAppearance.AppCompat.Title" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSortFilter"
-        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/linear"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:backgroundTint="@color/gray_100"
-        android:letterSpacing="0"
-        android:padding="6dp"
-        android:text="Sort and Filter"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="11sp"
-        app:cornerRadius="6dp"
-        app:icon="@drawable/ccp_ic_arrow_drop_down"
-        app:iconGravity="end"
-        app:iconPadding="0dp"
-        app:iconSize="24dp"
-        app:iconTint="@color/black"
+        android:layout_marginHorizontal="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/ipSearch"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            app:boxBackgroundColor="@color/gray_100"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:endIconMode="clear_text"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/edSearch"
+                style="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Search products"
+                android:imeOptions="actionSearch"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:paddingVertical="10dp"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:cardCornerRadius="4dp"
+            app:strokeColor="@color/medium_gray">
+
+            <ImageView
+                android:id="@+id/imgFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="7dp"
+                android:src="@drawable/ic_baseline_filter_alt_off_24"
+                app:tint="@color/black" />
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!--    <com.google.android.material.button.MaterialButton-->
+    <!--        android:id="@+id/btnSortFilter"-->
+    <!--        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="10dp"-->
+    <!--        android:backgroundTint="@color/gray_100"-->
+    <!--        android:letterSpacing="0"-->
+    <!--        android:padding="6dp"-->
+    <!--        android:text="Sort and Filter"-->
+    <!--        android:textAllCaps="false"-->
+    <!--        android:textColor="@color/black"-->
+    <!--        android:textSize="11sp"-->
+    <!--        app:cornerRadius="6dp"-->
+    <!--        app:icon="@drawable/ccp_ic_arrow_drop_down"-->
+    <!--        app:iconGravity="end"-->
+    <!--        app:iconPadding="0dp"-->
+    <!--        app:iconSize="24dp"-->
+    <!--        app:iconTint="@color/black"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />-->
 
 
     <ProgressBar
@@ -67,6 +125,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnSortFilter" />
+        app:layout_constraintTop_toBottomOf="@+id/linear" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
