@@ -2,7 +2,6 @@ package com.sushant.fashionapp.Buyer;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,7 +12,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -132,8 +130,7 @@ public class ViewMoreActivity extends AppCompatActivity {
                 break;
         }
 
-        query1.addValueEventListener(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+        query1.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();
@@ -158,6 +155,7 @@ public class ViewMoreActivity extends AppCompatActivity {
                 if (from.equals("recommend")) {
                     Collections.sort(products, Product.getLatestTime);
                 }
+                binding.progressCircular.setVisibility(View.GONE);
                 adapters.notifyItemInserted(products.size());
             }
 

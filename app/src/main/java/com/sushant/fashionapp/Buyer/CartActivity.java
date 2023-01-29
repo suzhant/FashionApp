@@ -1,5 +1,6 @@
 package com.sushant.fashionapp.Buyer;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -60,6 +61,7 @@ public class CartActivity extends AppCompatActivity {
     int stock;
     SwipeHelper helper;
     QuantityListener listener;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,9 @@ public class CartActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        dialog = new ProgressDialog(this);
+        dialog.setMessage("Please wait..");
+        dialog.setCancelable(false);
 
 
         binding.imgBack.setOnClickListener(new View.OnClickListener() {
@@ -376,6 +381,7 @@ public class CartActivity extends AppCompatActivity {
 //    }
 
     private void deleteProductFromDB(Product p) {
+        dialog.show();
         FirebaseDatabase.getInstance().getReference().child("Products").child(p.getpId()).child("variants").child(String.valueOf(p.getVariantIndex()))
                 .child("sizes")
                 .child(String.valueOf(p.getSizeIndex())).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -390,6 +396,7 @@ public class CartActivity extends AppCompatActivity {
                 database.getReference().child("Cart").child(auth.getUid()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
+                        dialog.dismiss();
                         Snackbar.make(findViewById(R.id.cartLayout), "Item deleted", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
                     }
                 });
@@ -474,6 +481,7 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void updateInventory(Product product, int s, int q) {
+        dialog.show();
         HashMap<String, Object> stock = new HashMap<>();
         stock.put("stock", s);
         FirebaseDatabase.getInstance().getReference().child("Products").child(product.getpId()).child("variants").child(String.valueOf(product.getVariantIndex()))
@@ -484,7 +492,12 @@ public class CartActivity extends AppCompatActivity {
                 HashMap<String, Object> quantity = new HashMap<>();
                 quantity.put("quantity", q);
                 FirebaseDatabase.getInstance().getReference().child("Cart").child(Objects.requireNonNull(FirebaseAuth.getInstance().getUid()))
-                        .child(product.getVariantPId()).updateChildren(quantity);
+                        .child(product.getVariantPId()).updateChildren(quantity).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        dialog.dismiss();
+                    }
+                });
             }
         });
     }

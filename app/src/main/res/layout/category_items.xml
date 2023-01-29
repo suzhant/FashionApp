@@ -22,9 +22,12 @@
 
         <TextView
             android:id="@+id/txtCatName"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:textAlignment="center"
             android:text="Men"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:layout_marginTop="10dp"
             android:textSize="14sp"
             android:textColor="@color/black"

@@ -198,13 +198,13 @@ public class PdfGenerator {
         Text column2 = new Text("Item Description");
         column2.setFontColor(ColorConstants.WHITE);
         Text column3 = new Text("Size");
-        column2.setFontColor(ColorConstants.WHITE);
-        Text column4 = new Text("Quantity");
         column3.setFontColor(ColorConstants.WHITE);
-        Text column5 = new Text("Unit price");
+        Text column4 = new Text("Quantity");
         column4.setFontColor(ColorConstants.WHITE);
-        Text column6 = new Text("Amount");
+        Text column5 = new Text("Unit price");
         column5.setFontColor(ColorConstants.WHITE);
+        Text column6 = new Text("Amount");
+        column6.setFontColor(ColorConstants.WHITE);
 
         table1.addCell(new Cell().add(new Paragraph(column1)).setBackgroundColor(skyBlue));
         table1.addCell(new Cell().add(new Paragraph(column2)).setBackgroundColor(skyBlue));
@@ -235,7 +235,7 @@ public class PdfGenerator {
         }
 
         //table-2, Row- 6
-        table1.addCell(new Cell(4, 3).add(new Paragraph("")).setBorder(Border.NO_BORDER));
+        table1.addCell(new Cell(4, 4).add(new Paragraph("")).setBorder(Border.NO_BORDER));
         //   table1.addCell(new Cell().add(new Paragraph("")));
         //    table1.addCell(new Cell().add(new Paragraph("")));
         table1.addCell(new Cell().add(new Paragraph("SubTotal: ")));
