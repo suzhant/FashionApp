@@ -64,6 +64,7 @@ import com.sushant.fashionapp.Adapters.EditVariantAdapter;
 import com.sushant.fashionapp.Adapters.SizeSummaryAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
 import com.sushant.fashionapp.Inteface.VariantClickListener;
+import com.sushant.fashionapp.Models.Category;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Seller;
 import com.sushant.fashionapp.Models.Size;
@@ -114,7 +115,7 @@ public class ActivityAddProduct extends AppCompatActivity {
     double sellerPrice;
     Thread t1 = null;
     MyCalc mycalc = null;
-    String newId;
+    int newId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,13 +167,13 @@ public class ActivityAddProduct extends AppCompatActivity {
         String[] seasonList = getResources().getStringArray(R.array.seasons);
         binding.autoSeason.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, seasonList));
 
-        database.getReference().child("category").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child("masterCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 catList.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String cat = snapshot1.getKey();
-                    catList.add(cat);
+                    Category category = snapshot1.getValue(Category.class);
+                    catList.add(category.getName());
                 }
                 binding.autoCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, catList));
             }
@@ -286,7 +287,7 @@ public class ActivityAddProduct extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 cat = adapterView.getItemAtPosition(i).toString();
-                addSubCategory(cat);
+                addSubCategory();
                 binding.autoSubCategory.getText().clear();
                 binding.autoSubSubCategory.getText().clear();
                 binding.ipSubCategory.setVisibility(View.VISIBLE);
@@ -412,7 +413,8 @@ public class ActivityAddProduct extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    newId = snapshot1.getKey();
+                    String id = snapshot1.child("pId").getValue(String.class);
+                    newId = Integer.parseInt(id) + 1;
                 }
             }
 
@@ -649,13 +651,13 @@ public class ActivityAddProduct extends AppCompatActivity {
     }
 
     private void addSubSubCat() {
-        database.getReference().child("category").child(cat).child(subCat).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child("ArticleType").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subSubCatList.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String subCat = snapshot1.getValue(String.class);
-                    subSubCatList.add(subCat);
+                    Category category = snapshot1.getValue(Category.class);
+                    subSubCatList.add(category.getName());
                 }
                 binding.autoSubSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subSubCatList));
             }
@@ -667,14 +669,14 @@ public class ActivityAddProduct extends AppCompatActivity {
         });
     }
 
-    private void addSubCategory(String category) {
-        database.getReference().child("category").child(category).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void addSubCategory() {
+        database.getReference().child("category").child("subCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subCatList.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String subCat = snapshot1.getKey();
-                    subCatList.add(subCat);
+                    Category category = snapshot1.getValue(Category.class);
+                    subCatList.add(category.getName());
                 }
                 binding.autoSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subCatList));
             }
@@ -706,7 +708,8 @@ public class ActivityAddProduct extends AppCompatActivity {
                             dialog.setMessage("Please wait while we are adding your product");
                             dialog.setCancelable(false);
 
-                            Product product1 = new Product(newId, pName, variants.get(0).getPhotos().get(0));
+                            String id = String.valueOf(newId);
+                            Product product1 = new Product(id, pName, variants.get(0).getPhotos().get(0));
                             product1.setLove(0);
                             product1.setpPrice((int) sellerPrice);
                             product1.setMasterCategory(cat);
@@ -722,7 +725,7 @@ public class ActivityAddProduct extends AppCompatActivity {
 
                             dialog.show();
 
-                            database.getReference().child("Products").child(newId).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            database.getReference().child("Products").child(id).setValue(product1).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
                                     resetAllFields();

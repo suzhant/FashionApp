@@ -31,23 +31,20 @@ import java.util.Map;
 public class ProductRecommendation {
 
     private static final String url = "http://suzhant.pythonanywhere.com/predict";
-    String imgUrl, category, gender;
+    String imgUrl, category;
     Context context;
     ArrayList<String> results = new ArrayList<>();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
-    public ProductRecommendation(String imgUrl, String category, String gender, Context context) {
+    public ProductRecommendation(String imgUrl, String category, Context context) {
         this.imgUrl = imgUrl;
         this.category = category;
-        this.gender = gender;
         this.context = context;
     }
 
     public void recommend() {
-        RequestQueue queue = Volley.newRequestQueue(context);
-
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(com.android.volley.Request.Method.POST, url,
                 new com.android.volley.Response.Listener<String>() {
@@ -110,6 +107,8 @@ public class ProductRecommendation {
                 return params;
             }
         };
+
+        RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
     }
 }

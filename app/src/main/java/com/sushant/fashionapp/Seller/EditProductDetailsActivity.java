@@ -58,6 +58,7 @@ import com.google.firebase.storage.UploadTask;
 import com.sushant.fashionapp.Adapters.EditVariantAdapter;
 import com.sushant.fashionapp.Adapters.SizeSummaryAdapter;
 import com.sushant.fashionapp.Adapters.VariantPhotoAdapter;
+import com.sushant.fashionapp.Models.Category;
 import com.sushant.fashionapp.Models.Product;
 import com.sushant.fashionapp.Models.Size;
 import com.sushant.fashionapp.Models.Variants;
@@ -139,7 +140,7 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                 binding.autoCategory.setText(masterCategory);
                 binding.autoSubCategory.setText(category);
                 binding.autoSubSubCategory.setText(subcategory);
-                wholeSalePrice = String.valueOf(Math.round(price * 0.7));
+                wholeSalePrice = String.valueOf(Math.round(price * 0.5));
                 binding.edPrice.setText(wholeSalePrice);
                 binding.edDescription.setText(pDesc);
                 //season list
@@ -259,13 +260,13 @@ public class EditProductDetailsActivity extends AppCompatActivity {
             }
         });
 
-        database.getReference().child("category").addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child("masterCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 catList.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String cat = snapshot1.getKey();
-                    catList.add(cat);
+                    Category category = snapshot1.getValue(Category.class);
+                    catList.add(category.getName());
                 }
                 binding.autoCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, catList));
             }
@@ -347,13 +348,13 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     }
 
     private void addSubSubCat() {
-        database.getReference().child("category").child(masterCategory).child(category).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child("ArticleType").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subSubCatList.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String subCat = snapshot1.getValue(String.class);
-                    subSubCatList.add(subCat);
+                    Category category = snapshot1.getValue(Category.class);
+                    subSubCatList.add(category.getName());
                 }
                 binding.autoSubSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subSubCatList));
             }
@@ -366,13 +367,13 @@ public class EditProductDetailsActivity extends AppCompatActivity {
     }
 
     private void addSubCategory() {
-        database.getReference().child("category").child(masterCategory).addListenerForSingleValueEvent(new ValueEventListener() {
+        database.getReference().child("category").child("subCategory").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subCatList.clear();
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                    String subCat = snapshot1.getKey();
-                    subCatList.add(subCat);
+                    Category category = snapshot1.getValue(Category.class);
+                    subCatList.add(category.getName());
                 }
                 binding.autoSubCategory.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.drop_down_items, subCatList));
             }
@@ -406,8 +407,9 @@ public class EditProductDetailsActivity extends AppCompatActivity {
                             obj.put("pName", pName);
                             obj.put("brandName", brandName);
                             obj.put("season", season);
-                            obj.put("category", masterCategory);
-                            obj.put("subCategory", category);
+                            obj.put("masterCategory", masterCategory);
+                            obj.put("category", category);
+                            obj.put("articleType", subcategory);
                             obj.put("pPrice", sellerPrice);
                             obj.put("desc", pDesc);
                             obj.put("variants", variants);

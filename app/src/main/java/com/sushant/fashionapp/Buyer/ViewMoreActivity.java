@@ -130,7 +130,7 @@ public class ViewMoreActivity extends AppCompatActivity {
                 break;
         }
 
-        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+        query1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 products.clear();

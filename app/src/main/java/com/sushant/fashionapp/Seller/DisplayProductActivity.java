@@ -1,7 +1,7 @@
 package com.sushant.fashionapp.Seller;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,19 +46,16 @@ public class DisplayProductActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     storeId = snapshot.child("storeId").getValue(String.class);
-                    Log.d("storeId", storeId);
                     Query query = database.getReference().child("Products").orderByChild("storeId").equalTo(storeId).limitToFirst(20);
-                    query.addValueEventListener(new ValueEventListener() {
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                                 Product product = snapshot1.getValue(Product.class);
                                 assert product != null;
                                 products.add(product);
-//                                    if (product.getStoreId().equals(storeId)) {
-//
-//                                    }
                             }
+                            binding.progressCircular.setVisibility(View.GONE);
                             adapters.notifyItemInserted(products.size());
                         }
 
