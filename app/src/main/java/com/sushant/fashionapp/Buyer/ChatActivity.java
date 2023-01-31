@@ -7,6 +7,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -35,11 +36,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.MessageAdapter;
 import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.Models.ChatModel;
+import com.sushant.fashionapp.Models.FcmNotificationsSender;
 import com.sushant.fashionapp.Models.Message;
 import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityChatBinding;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -58,10 +61,14 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
     String senderId, receiverId, senderRoom, receiverRoom, receiverPic, receiverName, senderName, senderPic;
     ArrayList<Message> messages = new ArrayList<>();
     String from;
-    ValueEventListener messageListener, eventListener;
-    DatabaseReference messageRef, statusRef, infoConnected;
+    ValueEventListener messageListener, eventListener, tokenListener;
+    DatabaseReference messageRef, statusRef, infoConnected, tokenRef;
     int pos, numItems;
     LinearLayoutManager layoutManager;
+    String userToken;
+    boolean notify = false;
+    String destinationId, destination;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -247,7 +254,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
         });
 
 
-        String destination;
+
         if (from.equals("Buyer")) {
             destination = "Store";
         } else {
@@ -262,6 +269,23 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd hh:mm a");
                 LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(lastActive), ZoneId.systemDefault());
                 binding.txtLastMessage.setText(MessageFormat.format("Last Active: {0}", formatter.format(dateTime)));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        database.getReference().child(destination).child(receiverId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (destination.equals("Users")) {
+                    destinationId = snapshot.child("userId").getValue(String.class);
+                } else {
+                    destinationId = snapshot.child("buyerId").getValue(String.class);
+                }
+
             }
 
             @Override
@@ -365,6 +389,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
         String key = database.getReference().push().getKey();
         assert key != null;
         if (!message.isEmpty()) {
+            notify = true;
             binding.recyclerMessage.smoothScrollToPosition(messages.size());
             final Message model = new Message();
             model.setMessage(message);
@@ -376,6 +401,12 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
             model.setReceiverId(receiverId);
             binding.editMessage.getText().clear();
 
+            if (notify) {
+                sendNotification(senderName, message, senderPic, "text");
+            }
+            notify = false;
+
+
             database.getReference().child("Messages").child(senderRoom).child(key).setValue(model)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -386,6 +417,7 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                                     String path = "android.resource://" + getPackageName() + "/" + R.raw.google_notification;
                                     Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(path));
                                     r.play();
+
                                 }
                             });
                         }
@@ -475,5 +507,36 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
             imm.toggleSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
         }
     }
+
+    private void sendNotification(String title, String message, String image, String msgType) {
+        tokenRef = database.getReference().child("Users").child(destinationId).child("Token");
+        tokenListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userToken = snapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        tokenRef.addValueEventListener(tokenListener);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String destination = from.equals("Buyer") ? "Store" : "Buyer";
+                FcmNotificationsSender fcmNotificationsSender = new FcmNotificationsSender(userToken, title, message, image, receiverId, senderId, msgType, destination,
+                        "Chat", ".ChatActivity", ChatActivity.this);
+                try {
+                    fcmNotificationsSender.sendNotifications();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 500);
+    }
+
 
 }

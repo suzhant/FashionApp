@@ -14,15 +14,19 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.sushant.fashionapp.Buyer.CartActivity;
 import com.sushant.fashionapp.Buyer.MessageActivity;
 import com.sushant.fashionapp.Utils.Dialogs;
@@ -76,7 +80,21 @@ public class ActivityHomePage extends AppCompatActivity implements DefaultLifecy
         editor.putBoolean("isSeller", false);
         editor.apply();
 
-
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (!task.isSuccessful()) {
+                    return;
+                }
+                String token = task.getResult();
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                assert user != null;
+                String uid = user.getUid();
+                HashMap<String, Object> obj = new HashMap<>();
+                obj.put("Token", token);
+                database.getReference().child("Users").child(uid).updateChildren(obj);
+            }
+        });
 
 //        binding.bottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
 //            @Override
