@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -116,6 +117,7 @@ public class CartActivity extends AppCompatActivity {
 
             }
         };
+
         helper = new SwipeHelper(this, binding.cartRecycler) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
@@ -247,13 +249,14 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (size > 0) {
-                    //     deleteProductFromCart();
+                    for (Product product : checkedProducts) {
+                        deleteProductFromDB(product);
+                    }
+
                     refreshAdapter();
                     size = 0;
+                    checkedProducts.clear();
                     updateToolbarText(size);
-                    showDeleteMessage(null);
-                    isActionMode = false;
-                    cartAdapter.notifyDataSetChanged();
                 } else {
                     Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "No Item Selected!!",
                             Snackbar.LENGTH_SHORT);
@@ -307,18 +310,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void showDeleteMessage(Cart product) {
         Snackbar snackbar = Snackbar.make(findViewById(R.id.cartLayout), "Cart Deleted",
-                Snackbar.LENGTH_LONG).setAction("Undo", new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (product != null) {
-                    undoDeleteFromDB(product);
-                    products.add(product);
-                } else {
-                    undoDeleteActionFromCart();
-                }
-
-            }
-        }).setAnchorView(binding.cardView);
+                Snackbar.LENGTH_LONG).setAnchorView(binding.cardView);
         snackbar.show();
         snackbar.addCallback(new Snackbar.Callback() {
             @Override
@@ -397,7 +389,11 @@ public class CartActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         dialog.dismiss();
-                        Snackbar.make(findViewById(R.id.cartLayout), "Item deleted", Snackbar.LENGTH_SHORT).setAnchorView(binding.cardView).show();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        dialog.dismiss();
                     }
                 });
             }
@@ -445,11 +441,9 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void updateToolbarText(int size) {
-        if (size == 0) {
+        if (size < 1) {
             binding.count.setText(size + " item selected");
-        } else if (size == 1) {
-            binding.count.setText(size + " item selected");
-        } else if (size > 1) {
+        } else {
             binding.count.setText(size + " items selected");
         }
     }

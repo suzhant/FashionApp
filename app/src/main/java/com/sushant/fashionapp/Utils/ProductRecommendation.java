@@ -1,7 +1,6 @@
 package com.sushant.fashionapp.Utils;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,7 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,14 +29,14 @@ import java.util.Map;
 public class ProductRecommendation {
 
     private static final String url = "http://suzhant.pythonanywhere.com/predict";
-    String imgUrl, category;
+    String imgUrl, category, pId;
     Context context;
-    ArrayList<String> results = new ArrayList<>();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
-    public ProductRecommendation(String imgUrl, String category, Context context) {
+    public ProductRecommendation(String pId, String imgUrl, String category, Context context) {
+        this.pId = pId;
         this.imgUrl = imgUrl;
         this.category = category;
         this.context = context;
@@ -53,39 +51,29 @@ public class ProductRecommendation {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray colArray = jsonObject.getJSONArray("result");
-                            results.clear();
                             for (int i = 0; i < colArray.length(); i++) {
                                 String id = colArray.getString(i);
-                                results.add(id);
-                            }
-
-
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (String id : results) {
-                                        database.getReference().child("Products").orderByChild("pId").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
-                                                    Product product = snapshot1.getValue(Product.class);
-                                                    assert product != null;
-                                                    product.setDateRecommended(new Date().getTime());
-                                                    if (category.equals(product.getArticleType())) {
-                                                        database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
-                                                    }
-                                                }
+                                database.getReference().child("Products").orderByChild("pId").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                                            Product product = snapshot1.getValue(Product.class);
+                                            assert product != null;
+                                            product.setDateRecommended(new Date().getTime());
+                                            if (category.equals(product.getArticleType())) {
+                                                product.setFrequency(1);
+                                                database.getReference().child("Recommended Products").child(auth.getUid()).child(product.getpId()).setValue(product);
                                             }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-
-                                            }
-                                        });
+                                        }
                                     }
-                                    Log.d("id1", results.toString());
-                                }
-                            }, 100);
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                            }
+                            updateFrequency(pId);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -110,5 +98,25 @@ public class ProductRecommendation {
 
         RequestQueue queue = Volley.newRequestQueue(context);
         queue.add(stringRequest);
+    }
+
+    private void updateFrequency(String pId) {
+        database.getReference().child("Recommended Products").child(auth.getUid()).child(pId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            Integer frequency = snapshot.child("frequency").getValue(Integer.class);
+                            HashMap<String, Object> map = new HashMap<>();
+                            map.put("frequency", frequency + 1);
+                            database.getReference().child("Recommended Products").child(auth.getUid()).child(pId).updateChildren(map);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 }

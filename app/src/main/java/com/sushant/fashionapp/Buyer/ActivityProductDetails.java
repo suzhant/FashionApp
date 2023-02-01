@@ -101,7 +101,7 @@ public class ActivityProductDetails extends AppCompatActivity {
     ProgressDialog dialog;
     VPAdapter vpAdapter;
     Query query;
-    String from;
+    String from, articleType;
 
 
     int index;
@@ -128,6 +128,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         pName = getIntent().getStringExtra("pName");
         index = getIntent().getIntExtra("index", 0);
         from = getIntent().getStringExtra("from");
+        articleType = getIntent().getStringExtra("articleType");
 
         if (from != null && from.equals("search")) {
             addProductToDB();
@@ -1016,6 +1017,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     product.setStoreName(sName);
                     product.setStoreId(storeId);
                     product.setStock(stock);
+                    product.setArticleType(articleType);
                     product.setTimeStamp(new Date().getTime());
                     if (status != null) {
                         if (status.equals("accepted")) {
@@ -1043,22 +1045,8 @@ public class ActivityProductDetails extends AppCompatActivity {
     }
 
     private void addProductToDB() {
-        database.getReference().child("Products").orderByChild("pId").equalTo(pId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Product product = dataSnapshot.getValue(Product.class);
-                    ProductRecommendation productRecommendation = new ProductRecommendation(product.getPreviewPic(), product.getArticleType(), ActivityProductDetails.this);
-                    productRecommendation.recommend();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+        ProductRecommendation productRecommendation = new ProductRecommendation(pId, pic, articleType, ActivityProductDetails.this);
+        productRecommendation.recommend();
     }
 
     @NonNull
@@ -1105,6 +1093,7 @@ public class ActivityProductDetails extends AppCompatActivity {
         product.setStoreName(sName);
         product.setStoreId(storeId);
         product.setStock(stock);
+        product.setArticleType(articleType);
         product.setTimeStamp(new Date().getTime());
         if (status != null) {
             if (status.equals("accepted")) {

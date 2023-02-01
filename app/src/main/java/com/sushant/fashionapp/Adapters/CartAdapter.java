@@ -226,6 +226,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         intent.putExtra("storeId", product.getStoreId());
                         intent.putExtra("sName", product.getStoreName());
                         intent.putExtra("pDesc", product.getDesc());
+                        intent.putExtra("articleType", product.getArticleType());
                         intent.putExtra("index", product.getVariantIndex());
                         context.startActivity(intent);
                     }
@@ -246,6 +247,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
                         intent.putExtra("pId", product.getpId());
                         intent.putExtra("storeId", product.getStoreId());
                         intent.putExtra("sName", product.getStoreName());
+                        intent.putExtra("articleType", product.getArticleType());
                         intent.putExtra("index", product.getVariantIndex());
                         context.startActivity(intent);
                     }
@@ -270,17 +272,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.viewHolder> {
             }
         });
 
-//        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                if (!cartActivity.isActionMode) {
-//                    productClickListener.onClick(product, true);
-//                    holder.cardView.setStrokeWidth(5);
-//                    cartActivity.selectedItem();
-//                }
-//                return false;
-//            }
-//        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                if (!cartActivity.isActionMode) {
+                    productClickListener.onClick(product, true);
+                    holder.cardView.setStrokeWidth(5);
+                    cartActivity.selectedItem();
+                }
+                return false;
+            }
+        });
 
     }
 

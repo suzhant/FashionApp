@@ -1,7 +1,6 @@
 package com.sushant.fashionapp.Buyer;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -234,25 +233,25 @@ public class ViewMoreActivity extends AppCompatActivity {
         bottomSheetDialog.show();
 
 
-        bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                if (isSorted) {
-                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_24);
-                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
-                } else {
-                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_off_24);
-                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
-                }
-
-                if (!isSorted) {
-                    products.clear();
-                    products.addAll(unmodifiedList);
-                    adapters.notifyDataSetChanged();
-                    bottomSheetDialog.dismiss();
-                }
-            }
-        });
+//        bottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//            @Override
+//            public void onDismiss(DialogInterface dialogInterface) {
+//                if (isSorted) {
+//                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_24);
+//                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.skyBlue));
+//                } else {
+//                    binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_off_24);
+//                    binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
+//                }
+//
+//                if (!isSorted) {
+//                    products.clear();
+//                    products.addAll(unmodifiedList);
+//                    adapters.notifyDataSetChanged();
+//                    bottomSheetDialog.dismiss();
+//                }
+//            }
+//        });
         assert btnApply != null;
         btnApply.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -263,6 +262,10 @@ public class ViewMoreActivity extends AppCompatActivity {
                 } else {
                     binding.imgFilter.setImageResource(R.drawable.ic_baseline_filter_alt_off_24);
                     binding.imgFilter.setImageTintList(ContextCompat.getColorStateList(getApplicationContext(), R.color.black));
+                    products.clear();
+                    products.addAll(unmodifiedList);
+                    adapters.notifyDataSetChanged();
+                    bottomSheetDialog.dismiss();
                 }
 
 

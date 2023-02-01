@@ -21,7 +21,6 @@ import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
@@ -39,7 +38,7 @@ import java.util.Map;
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
     NotificationManager mNotificationManager;
-    String receiverName, senderId, profilePic, email, message, msgType, title, icon, Gid, Type, isNotification, receiverId, from;
+    String senderId, profilePic, message, msgType, title, Type, receiverId, from;
     NotificationCompat.Builder builder;
     String videoSoundPath;
 
@@ -51,8 +50,6 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
-
-        Log.d("fcmData", remoteMessage.getData().toString());
 
         Map<String, String> data = remoteMessage.getData();
         message = data.get("message");

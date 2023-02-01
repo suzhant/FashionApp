@@ -33,6 +33,7 @@ import com.sushant.fashionapp.Utils.TextUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -170,6 +171,7 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                     intent.putExtra("storeId", product.getStoreId());
                     intent.putExtra("sName", product.getStoreName());
                     intent.putExtra("index", product.getVariantIndex());
+                    intent.putExtra("articleType", product.getArticleType());
                     context.startActivity(intent);
                 }
             }
@@ -226,6 +228,8 @@ public class WishListAdapter extends RecyclerView.Adapter<WishListAdapter.viewHo
                             item.setStoreName(product.getStoreName());
                             item.setStoreId(product.getStoreId());
                             item.setQuantity(1);
+                            item.setArticleType(product.getArticleType());
+                            item.setTimeStamp(new Date().getTime());
                             if (product.getStock() != 0) {
                                 updateStock(product);
                                 item.setStock(product.getStock());

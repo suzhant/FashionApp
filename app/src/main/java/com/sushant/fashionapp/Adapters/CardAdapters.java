@@ -112,6 +112,7 @@ public class CardAdapters extends RecyclerView.Adapter<CardAdapters.viewHolder> 
                 intent.putExtra("pPrice", product.getpPrice());
                 intent.putExtra("pId", product.getpId());
                 intent.putExtra("pDesc", product.getDesc());
+                intent.putExtra("articleType", product.getArticleType());
                 intent.putExtra("storeId", product.getStoreId());
                 intent.putExtra("index", product.getVariantIndex());
                 if (from != null && from.equals("search")) {

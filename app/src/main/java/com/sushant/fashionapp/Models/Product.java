@@ -17,6 +17,7 @@ public class Product implements Serializable {
     private String season;
     private String storeId;
     private Long dateRecommended;
+    private Integer frequency;
 
     public Product() {
     }
@@ -263,6 +264,13 @@ public class Product implements Serializable {
         }
     };
 
+    public static Comparator<Product> getFrequency = new Comparator<Product>() {
+        @Override
+        public int compare(Product product, Product t1) {
+            return t1.getFrequency().compareTo(product.getFrequency());
+        }
+    };
+
 
     public Long getTimeStamp() {
         return timeStamp;
@@ -335,5 +343,13 @@ public class Product implements Serializable {
 
     public void setDateRecommended(Long dateRecommended) {
         this.dateRecommended = dateRecommended;
+    }
+
+    public Integer getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Integer frequency) {
+        this.frequency = frequency;
     }
 }

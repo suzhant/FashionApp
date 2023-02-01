@@ -109,7 +109,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        database.getReference().child("Recommended Products").child(auth.getUid()).addValueEventListener(new ValueEventListener() {
+        database.getReference().child("Recommended Products").child(auth.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 recommend_list.clear();
@@ -122,6 +122,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     recommend_list.addAll(smallList);
                 }
+                binding.progressCircular2.setVisibility(View.GONE);
                 popularAdapters.notifyItemInserted(recommend_list.size());
             }
 
@@ -168,6 +169,7 @@ public class HomeFragment extends Fragment {
                     Category category = snapshot1.getValue(Category.class);
                     categories.add(category);
                 }
+                binding.progressCircular1.setVisibility(View.GONE);
                 categoryAdapter.notifyItemInserted(categories.size());
             }
 
