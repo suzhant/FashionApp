@@ -64,6 +64,7 @@ public class SellerAccountFragment extends Fragment {
                                 Glide.with(getActivity()).load(storePic)
                                         .placeholder(R.drawable.avatar)
                                         .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                        .onlyRetrieveFromCache(true)
                                         .into(binding.imgStorePic);
                             }
                         }

@@ -19,6 +19,7 @@ import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -99,7 +100,7 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
                 String productName = snapshot.child("pName").getValue(String.class);
                 String productImage = snapshot.child("previewPic").getValue(String.class);
                 holder.txtProductName.setText(productName);
-                Glide.with(context).load(productImage).placeholder(R.drawable.avatar).into(holder.imgProduct);
+                Glide.with(context).load(productImage).placeholder(R.drawable.avatar).diskCacheStrategy(DiskCacheStrategy.ALL).onlyRetrieveFromCache(true).into(holder.imgProduct);
             }
 
             @Override
@@ -254,7 +255,7 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
         public viewHolder(@NonNull View itemView) {
             super(itemView);
             imgProduct = itemView.findViewById(R.id.imgProduct);
-            txtUserName = itemView.findViewById(R.id.txtName);
+            txtUserName = itemView.findViewById(R.id.txtUserName);
             txtProductName = itemView.findViewById(R.id.txtProductName);
             txtOriginalPrice = itemView.findViewById(R.id.txtOrigPrice);
             txtBargainPrice = itemView.findViewById(R.id.txtBargainPrice);
