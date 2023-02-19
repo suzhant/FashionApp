@@ -28,5 +28,6 @@
     <color name="skyblue_2">#84cdee</color>
     <color name="skyblue_3">#b9e2f5</color>
     <color name="skyblue_5">#edf7fc</color>
+    <color name="colorPrimary">@color/skyBlue</color>
 
 </resources>

@@ -58,7 +58,6 @@ import java.util.Objects;
 
 public class PdfGenerator {
     FirebaseStorage storage = FirebaseStorage.getInstance();
-    FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseDatabase database = FirebaseDatabase.getInstance();
 
     Context context;
