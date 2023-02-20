@@ -1,5 +1,7 @@
 package com.sushant.fashionapp.Models;
 
+import java.util.Comparator;
+
 public class Bargain {
     private Integer originalPrice, bargainPrice, noOfTries, sellerPrice;
     private String buyerId, storeId, productId, bargainId, sellerId, status;
@@ -118,4 +120,11 @@ public class Bargain {
     public void setCountered(Boolean countered) {
         isCountered = countered;
     }
+
+    public static Comparator<Bargain> latestTime = new Comparator<Bargain>() {
+        @Override
+        public int compare(Bargain bargain, Bargain t1) {
+            return t1.getTimestamp().compareTo(bargain.getTimestamp());
+        }
+    };
 }

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -980,12 +979,6 @@ public class ActivityProductDetails extends AppCompatActivity {
     }
 
     private void addProductToCart() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                addProductToDB();
-            }
-        }, 100);
 
         Snackbar snackbar = getSnackbar();
         dialog.show();
@@ -1000,6 +993,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                         updateStock(stock);
                         dialog.dismiss();
                         snackbar.show();
+                        addProductToDB();
                     } else {
                         dialog.dismiss();
                         Snackbar.make(findViewById(R.id.parent), "Maximum Limit is reached!", Snackbar.LENGTH_SHORT).setAnchorView(binding.bottom).show();
@@ -1027,6 +1021,7 @@ public class ActivityProductDetails extends AppCompatActivity {
                     database.getReference().child("Cart").child(auth.getUid()).child(actualProductId).setValue(product).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
+                            addProductToDB();
                             updateStock(stock);
                             dialog.dismiss();
                             snackbar.show();

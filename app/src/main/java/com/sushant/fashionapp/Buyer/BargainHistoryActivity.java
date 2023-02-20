@@ -21,6 +21,7 @@ import com.sushant.fashionapp.Models.Cart;
 import com.sushant.fashionapp.databinding.ActivityBargainHistoryBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -55,6 +56,7 @@ public class BargainHistoryActivity extends AppCompatActivity {
                         list.add(bargain);
                     }
                 }
+                Collections.sort(list, Bargain.latestTime);
                 adapter.notifyDataSetChanged();
             }
 

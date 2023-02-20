@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -18,9 +19,11 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Adapters.BargainUserAdapter;
 import com.sushant.fashionapp.Models.Bargain;
+import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.databinding.FragmentBargainBinding;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class BargainFragment extends Fragment {
 
@@ -32,6 +35,7 @@ public class BargainFragment extends Fragment {
     String sellerId;
     ValueEventListener valueEventListener;
     DatabaseReference reference;
+    Store store = new Store();
 
     FragmentBargainBinding binding;
 
@@ -44,6 +48,13 @@ public class BargainFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentBargainBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -65,6 +76,7 @@ public class BargainFragment extends Fragment {
                                 bargains.add(bargain);
                             }
                         }
+                        Collections.sort(bargains, Bargain.latestTime);
                         adapter.notifyDataSetChanged();
                     }
 
@@ -84,8 +96,6 @@ public class BargainFragment extends Fragment {
 
         initRecycler();
 
-
-        return binding.getRoot();
     }
 
     private void initRecycler() {

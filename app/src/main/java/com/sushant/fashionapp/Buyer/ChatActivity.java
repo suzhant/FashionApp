@@ -38,6 +38,7 @@ import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.Models.ChatModel;
 import com.sushant.fashionapp.Models.FcmNotificationsSender;
 import com.sushant.fashionapp.Models.Message;
+import com.sushant.fashionapp.Models.NotificationModel;
 import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.databinding.ActivityChatBinding;
@@ -414,6 +415,16 @@ public class ChatActivity extends AppCompatActivity implements DefaultLifecycleO
                             database.getReference().child("Messages").child(receiverRoom).child(key).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
+                                    NotificationModel notificationModel = new NotificationModel();
+                                    notificationModel.setTitle(senderName);
+                                    notificationModel.setBody(message);
+                                    notificationModel.setTime(date.getTime());
+                                    notificationModel.setInteracted(false);
+                                    notificationModel.setType("message");
+                                    notificationModel.setReceiverId(senderId);
+                                    notificationModel.setNotificationId(key);
+                                    notificationModel.setImageProfile(senderPic);
+                                    database.getReference().child("Notification").child(receiverId).child(key).setValue(notificationModel);
                                     String path = "android.resource://" + getPackageName() + "/" + R.raw.google_notification;
                                     Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), Uri.parse(path));
                                     r.play();

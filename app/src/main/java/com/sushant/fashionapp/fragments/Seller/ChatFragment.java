@@ -93,4 +93,10 @@ public class ChatFragment extends Fragment {
             binding.recyclerChat.setAdapter(adapter);
         }
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        binding.recyclerChat.requestLayout();
+//    }
 }

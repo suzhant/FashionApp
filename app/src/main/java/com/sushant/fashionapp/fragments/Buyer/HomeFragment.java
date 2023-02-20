@@ -19,6 +19,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -28,7 +29,9 @@ import com.sushant.fashionapp.Adapters.CategoryAdapter;
 import com.sushant.fashionapp.Buyer.SearchActivity;
 import com.sushant.fashionapp.Buyer.ViewMoreActivity;
 import com.sushant.fashionapp.Models.Category;
+import com.sushant.fashionapp.Models.NotificationModel;
 import com.sushant.fashionapp.Models.Product;
+import com.sushant.fashionapp.NotificationActivity;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Utils.TextUtils;
 import com.sushant.fashionapp.databinding.FragmentHomeBinding;
@@ -56,6 +59,7 @@ public class HomeFragment extends Fragment {
     ArrayList<Product> smallList = new ArrayList<>();
     ArrayList<Product> recommend_list = new ArrayList<>();
     CardAdapters recentAdapter;
+
 
     public HomeFragment() {
         // Required empty public constructor
@@ -219,6 +223,13 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        binding.imgNotification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), NotificationActivity.class));
+            }
+        });
+
         binding.txtRecentViewMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -227,6 +238,29 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        DatabaseReference notificationRef = database.getReference().child("Notification").child(auth.getUid());
+        ValueEventListener notificationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                int count = 0;
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    NotificationModel notification = snapshot1.getValue(NotificationModel.class);
+                    if (!notification.getInteracted()) {
+                        count++;
+                    }
+                }
+                if (count > 0) {
+                    binding.imgNotificationDot.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        notificationRef.addListenerForSingleValueEvent(notificationListener);
 
 
         return binding.getRoot();

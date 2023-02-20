@@ -139,10 +139,16 @@ public class ViewMoreActivity extends AppCompatActivity {
                 int i = 0;
                 for (DataSnapshot snapshot1 : snapshot.getChildren()) {
                     Product product = snapshot1.getValue(Product.class);
-                    if (i < 100) {
+                    if (from.equals("recommend")) {
                         products.add(product);
                         tempList.add(product);
+                    } else {
+                        if (i < 100) {
+                            products.add(product);
+                            tempList.add(product);
+                        }
                     }
+
                     unmodifiedList.add(product);
                     if (from.equals("category")) {
                         cat_list.add(product.getArticleType());

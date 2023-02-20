@@ -1,8 +1,8 @@
 package com.sushant.fashionapp.Utils;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -83,8 +83,10 @@ public class ProductRecommendation {
                 }, new com.android.volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d("error", error.getMessage());
+                if (error != null) {
+                    //   Toast.makeText(context.getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("errorMessage", error.getMessage());
+                }
             }
         }) {
             @NonNull
@@ -97,7 +99,15 @@ public class ProductRecommendation {
         };
 
         RequestQueue queue = Volley.newRequestQueue(context);
-        queue.add(stringRequest);
+
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                queue.add(stringRequest);
+            }
+        });
+
     }
 
     private void updateFrequency(String pId) {

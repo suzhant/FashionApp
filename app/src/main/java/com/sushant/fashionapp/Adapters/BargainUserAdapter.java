@@ -34,6 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.sushant.fashionapp.Models.Bargain;
 import com.sushant.fashionapp.Models.Buyer;
 import com.sushant.fashionapp.Models.Cart;
+import com.sushant.fashionapp.Models.NotificationModel;
+import com.sushant.fashionapp.Models.Store;
 import com.sushant.fashionapp.R;
 import com.sushant.fashionapp.Seller.MessageActivity;
 
@@ -54,6 +56,7 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
     ArrayList<Bargain> list;
     Context context;
     MessageActivity activity;
+    Store store;
 
     public BargainUserAdapter(ArrayList<Bargain> list, Context context) {
         this.list = list;
@@ -94,6 +97,22 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
             }
         });
 
+        Query query = FirebaseDatabase.getInstance().getReference().child("Store").orderByChild("buyerId").equalTo(FirebaseAuth.getInstance().getUid());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot snapshot1 : snapshot.getChildren()) {
+                    store = snapshot1.getValue(Store.class);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         FirebaseDatabase.getInstance().getReference().child("Products").child(bargain.getProductId()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -125,7 +144,8 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
                 FirebaseDatabase.getInstance().getReference().child("Bargain").child(bargain.getBargainId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Snackbar.make(activity.findViewById(R.id.parent), "Approved", Snackbar.LENGTH_SHORT).show();
+                        sendNotification(bargain, store, "Your bargain request has for " + bargain.getProductId() + " been accepted.");
+                        Snackbar.make(activity.findViewById(R.id.drawer_layout), "Approved", Snackbar.LENGTH_SHORT).show();
                         Query query = FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid())
                                 .orderByChild("pId").equalTo(bargain.getProductId());
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -137,7 +157,11 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
                                         HashMap<String, Object> map1 = new HashMap<>();
                                         map1.put("bargainPrice", bargain.getBargainPrice());
                                         FirebaseDatabase.getInstance().getReference().child("Cart").child(FirebaseAuth.getInstance().getUid())
-                                                .child(cart.getVariantPId()).updateChildren(map1);
+                                                .child(cart.getVariantPId()).updateChildren(map1).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
+                                                    }
+                                                });
                                     }
                                 }
                             }
@@ -166,7 +190,8 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
                 FirebaseDatabase.getInstance().getReference().child("Bargain").child(bargain.getBargainId()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Snackbar.make(activity.findViewById(R.id.parent), "Rejected", Snackbar.LENGTH_SHORT).show();
+                        sendNotification(bargain, store, "Your bargain request for " + bargain.getProductId() + " has been Rejected.");
+                        Snackbar.make(activity.findViewById(R.id.drawer_layout), "Rejected", Snackbar.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -220,8 +245,9 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
+                                        sendNotification(bargain, store, "Your bargain request for " + bargain.getProductId() + " has been Countered.");
                                         dialog.dismiss();
-                                        Snackbar.make(activity.findViewById(R.id.parent), "Counter price sent successfully", Snackbar.LENGTH_SHORT).show();
+                                        Snackbar.make(activity.findViewById(R.id.drawer_layout), "Counter price sent successfully", Snackbar.LENGTH_SHORT).show();
                                         bottomSheetDialog.dismiss();
                                     }
                                 });
@@ -268,4 +294,18 @@ public class BargainUserAdapter extends RecyclerView.Adapter<BargainUserAdapter.
             txtSellerPrice = itemView.findViewById(R.id.txtSellerPrice);
         }
     }
+
+    private void sendNotification(Bargain bargain, Store store, String message) {
+        String key = FirebaseDatabase.getInstance().getReference().push().getKey();
+        NotificationModel notificationModel = new NotificationModel();
+        notificationModel.setTitle(store.getStoreName());
+        notificationModel.setBody(message);
+        notificationModel.setTime(new Date().getTime());
+        notificationModel.setInteracted(false);
+        notificationModel.setType("bargain");
+        notificationModel.setNotificationId(key);
+        notificationModel.setImageProfile(store.getStorePic());
+        FirebaseDatabase.getInstance().getReference().child("Notification").child(bargain.getBuyerId()).child(key).setValue(notificationModel);
+    }
+
 }
