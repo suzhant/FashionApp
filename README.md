@@ -1,4 +1,4 @@
-# FashionApp
+# Pahiran
 An e-commerce mobile application which is focused on building a fashion business.
 
 <b>Click on the image below to watch demo video </b><br>
