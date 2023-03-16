@@ -90,7 +90,7 @@ public class BuyerBargainAdapter extends RecyclerView.Adapter<BuyerBargainAdapte
                 String productName = snapshot.child("pName").getValue(String.class);
                 String productImage = snapshot.child("previewPic").getValue(String.class);
                 holder.txtProductName.setText(productName);
-                Glide.with(context).load(productImage).placeholder(R.drawable.avatar).into(holder.imgProduct);
+                Glide.with(context).load(productImage).placeholder(com.denzcoskun.imageslider.R.drawable.loading).into(holder.imgProduct);
             }
 
             @Override

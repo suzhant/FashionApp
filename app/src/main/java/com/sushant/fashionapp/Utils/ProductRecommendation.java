@@ -6,7 +6,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -47,25 +46,26 @@ public class ProductRecommendation {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONArray colArray = jsonObject.getJSONArray("result");
-                            for (int i = 0; i < colArray.length(); i++) {
-                                //  String id = colArray.getString(i);
-                                JSONObject jsonObject1 = colArray.getJSONObject(i);
-                                Log.d("jsonArray", jsonObject1.toString());
-                                String id = jsonObject1.getString("pId");
-                                String cat = jsonObject1.getString("articleType");
+                            if (response != null) {
+                                JSONObject jsonObject = new JSONObject(response);
+                                JSONArray colArray = jsonObject.getJSONArray("result");
+                                for (int i = 0; i < colArray.length(); i++) {
+                                    //  String id = colArray.getString(i);
+                                    JSONObject jsonObject1 = colArray.getJSONObject(i);
+                                    Log.d("jsonArray", jsonObject1.toString());
+                                    String id = jsonObject1.getString("pId");
+                                    String cat = jsonObject1.getString("articleType");
 
-                                //converting jsonObject into Product model..or serializing
-                                Gson gson = new Gson();
-                                Product product = gson.fromJson(jsonObject1.toString(), Product.class);
+                                    //converting jsonObject into Product model..or deserializing json into Product model
+                                    Gson gson = new Gson();
+                                    Product product = gson.fromJson(jsonObject1.toString(), Product.class);
 
-                                if (cat.equals(category)) {
-                                    product.setDateRecommended(new Date().getTime());
-                                    database.getReference().child("Recommended Products").child(auth.getUid()).child(id).setValue(product);
+                                    if (cat.equals(category)) {
+                                        product.setDateRecommended(new Date().getTime());
+                                        database.getReference().child("Recommended Products").child(auth.getUid()).child(id).setValue(product);
+                                    }
                                 }
                             }
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -82,7 +82,7 @@ public class ProductRecommendation {
         }) {
             @NonNull
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
+            protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("url", imgUrl);
                 return params;

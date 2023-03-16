@@ -27,6 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="Chats"
+                app:navigationIcon="@drawable/ic_arrow_back_24"
                 app:titleTextAppearance="@style/TextAppearance.AppCompat.Title">
 
                 <TextView
