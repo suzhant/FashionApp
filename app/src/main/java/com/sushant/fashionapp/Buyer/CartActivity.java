@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class CartActivity extends AppCompatActivity {
+public class CartActivity extends AppCompatActivity implements SwipeHelper.ItemSwipeListener {
 
     ActivityCartBinding binding;
     CartAdapter cartAdapter;
@@ -77,48 +77,39 @@ public class CartActivity extends AppCompatActivity {
         dialog.setCancelable(false);
 
 
-        binding.imgBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isActionMode) {
-                    disableActionMode();
-                } else {
-                    onBackPressed();
-                }
-
+        binding.imgBack.setOnClickListener(view -> {
+            if (isActionMode) {
+                disableActionMode();
+            } else {
+                onBackPressed();
             }
+
         });
 
 
 
 
-        productClickListener = new ProductClickListener() {
-            @Override
-            public void onClick(Product product, boolean b) {
-                if (b) {
-                    checkedProducts.add(product);
-                    size++;
-                } else {
-                    checkedProducts.remove(product);
-                    size--;
-                }
-                updateToolbarText(size);
+        productClickListener = (product, b) -> {
+            if (b) {
+                checkedProducts.add(product);
+                size++;
+            } else {
+                checkedProducts.remove(product);
+                size--;
             }
+            updateToolbarText(size);
         };
 
-        listener = new QuantityListener() {
-            @Override
-            public void onClick(Cart cart, int quantity, String type) {
-                if (type.equals("plus")) {
-                    updateInventory(cart, cart.getStock() - 1, quantity + 1);
-                } else if (type.equals("minus")) {
-                    updateInventory(cart, cart.getStock() + 1, quantity - 1);
-                }
-
+        listener = (cart, quantity, type) -> {
+            if (type.equals("plus")) {
+                updateInventory(cart, cart.getStock() - 1, quantity + 1);
+            } else if (type.equals("minus")) {
+                updateInventory(cart, cart.getStock() + 1, quantity - 1);
             }
+
         };
 
-        helper = new SwipeHelper(this, binding.cartRecycler) {
+        helper = new SwipeHelper(this, binding.cartRecycler,this) {
             @Override
             public void instantiateUnderlayButton(RecyclerView.ViewHolder viewHolder, List<UnderlayButton> underlayButtons) {
                 int deleteId = R.drawable.ic_fluent_delete_24_regular;
@@ -127,14 +118,11 @@ public class CartActivity extends AppCompatActivity {
                         "Delete",
                         deleteIcon,
                         Color.parseColor("#FF3C30"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                // TODO: onDelete
-                                Product product = products.get(pos);
-                                //        showDeleteMessage(product);
-                                deleteProductFromDB(product);
-                            }
+                        pos -> {
+                            // TODO: onDelete
+                            Product product = products.get(pos);
+                            //        showDeleteMessage(product);
+                            deleteProductFromDB(product);
                         }
                 ));
                 int idWishList = R.drawable.fav_icon;
@@ -143,13 +131,10 @@ public class CartActivity extends AppCompatActivity {
                         "WishList",
                         favIcon,
                         Color.parseColor("#FF9502"),
-                        new SwipeHelper.UnderlayButtonClickListener() {
-                            @Override
-                            public void onClick(int pos) {
-                                // TODO: onWishList
-                                Product product = products.get(pos);
-                                addToWishList(product);
-                            }
+                        pos -> {
+                            // TODO: onWishList
+                            Product product = products.get(pos);
+                            addToWishList(product);
                         }
                 ));
             }
@@ -494,5 +479,11 @@ public class CartActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    @Override
+    public void onSwipe(int from, int to) {
+        Collections.swap(products, from, to);
+        cartAdapter.notifyItemMoved(from, to);
     }
 }
